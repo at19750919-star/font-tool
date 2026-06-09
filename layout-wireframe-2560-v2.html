@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>字型工具三欄桌面線框</title>
+  <style>
+    @font-face {
+      font-family: "Glow Sans TC";
+      src: url("public/fonts/GlowSansTC-Extended.otf") format("opentype");
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "GenWan Min";
+      src: url("public/fonts/GenWanMin2TC-R.otf") format("opentype");
+      font-display: swap;
+    }
+
+    :root {
+      --bg: oklch(97.8% 0.012 88);
+      --surface: oklch(99.2% 0.006 88);
+      --surface-strong: oklch(100% 0 0);
+      --fg: oklch(24% 0.025 55);
+      --muted: oklch(54% 0.02 55);
+      --border: oklch(87% 0.012 85);
+      --accent: oklch(67% 0.12 72);
+      --accent-ink: oklch(36% 0.06 55);
+      --preview-bg: oklch(98.8% 0.004 250);
+      --shadow: 0 24px 50px color-mix(in oklch, var(--fg) 10%, transparent);
+      --radius-lg: 30px;
+      --radius-md: 22px;
+      --radius-sm: 16px;
+      --font-display: "Glow Sans TC", "Segoe UI", system-ui, sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-serif: "GenWan Min", "Iowan Old Style", serif;
+      --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top center, color-mix(in oklch, var(--accent) 14%, white) 0, transparent 28%),
+        linear-gradient(180deg, oklch(99.4% 0.005 90), var(--bg));
+      color: var(--fg);
+      font-family: var(--font-body);
+    }
+
+    body {
+      min-width: 1720px;
+    }
+
+    .page {
+      width: min(2520px, calc(100vw - 48px));
+      min-height: calc(100vh - 24px);
+      margin: 12px auto;
+      padding: 22px;
+      border-radius: 36px;
+      background: color-mix(in oklch, var(--surface) 88%, white);
+      border: 1px solid color-mix(in oklch, var(--border) 80%, white);
+      box-shadow: 0 40px 80px color-mix(in oklch, var(--fg) 8%, transparent);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 20px;
+    }
+
+    .panel {
+      background: color-mix(in oklch, var(--surface-strong) 92%, var(--bg));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .header {
+      display: grid;
+      grid-template-columns: 1.1fr auto auto;
+      gap: 22px;
+      align-items: center;
+      padding: 24px 28px;
+      min-height: 144px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font: 700 12px/1 var(--font-mono);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(42px, 2.8vw, 62px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+
+    .subcopy {
+      max-width: 38ch;
+      margin: 12px 0 0;
+      font-size: 17px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    .flow,
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .chip,
+    .button,
+    .tab,
+    .mini-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface-strong);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--fg);
+      white-space: nowrap;
+    }
+
+    .chip.active,
+    .button.primary,
+    .tab.active,
+    .mini-chip.active {
+      background: var(--accent);
+      border-color: color-mix(in oklch, var(--accent) 74%, var(--accent-ink));
+      color: var(--accent-ink);
+    }
+
+    .workspace {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 396px minmax(880px, 1fr) 420px;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .sidebar,
+    .inspector {
+      min-height: 0;
+      display: grid;
+      gap: 16px;
+    }
+
+    .sidebar .panel,
+    .inspector .panel {
+      padding: 18px;
+    }
+
+    .scroll-stack {
+      min-height: 0;
+      overflow: auto;
+      display: grid;
+      gap: 16px;
+      padding-right: 4px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 14px;
+    }
+
+    .section-head h2,
+    .section-head h3 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .section-note {
+      color: var(--muted);
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+
+    .upload {
+      min-height: 138px;
+      border: 1.5px dashed color-mix(in oklch, var(--accent) 32%, var(--border));
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: linear-gradient(180deg, color-mix(in oklch, white 80%, var(--accent)), white);
+      text-align: center;
+    }
+
+    .upload strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .search {
+      min-height: 52px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface-strong);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .switch-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .font-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .font-card {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--surface-strong);
+      display: grid;
+      gap: 12px;
+    }
+
+    .font-card.active {
+      background: linear-gradient(180deg, color-mix(in oklch, white 72%, var(--accent)), white 72%);
+      border-color: color-mix(in oklch, var(--accent) 42%, var(--border));
+    }
+
+    .font-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .font-name {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .font-tag {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--surface) 75%, var(--bg));
+      font: 700 11px/1 var(--font-mono);
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .font-preview {
+      font-family: var(--font-serif);
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: 0.01em;
+    }
+
+    .body-column {
+      min-height: 0;
+      position: relative;
+    }
+
+    .body-shell {
+      height: 100%;
+      padding: 20px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 16px;
+      background: linear-gradient(180deg, white, color-mix(in oklch, white 76%, var(--preview-bg)));
+    }
+
+    .body-top {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .tabs {
+      display: inline-grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 6px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: color-mix(in oklch, white 82%, var(--bg));
+    }
+
+    .tab {
+      border-radius: 14px;
+      padding-inline: 18px;
+    }
+
+    .sample-input {
+      min-height: 58px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface-strong);
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    .body-note {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 0 2px;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: var(--font-mono);
+    }
+
+    .preview-stage {
+      min-height: 0;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      background:
+        linear-gradient(180deg, white, var(--preview-bg)),
+        radial-gradient(circle at top right, color-mix(in oklch, var(--accent) 10%, white) 0, transparent 24%);
+      padding: 26px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.32fr) minmax(240px, 0.72fr);
+      gap: 18px;
+    }
+
+    .hero {
+      min-height: 100%;
+      padding: 30px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: white;
+      display: grid;
+      align-content: center;
+      gap: 18px;
+    }
+
+    .label {
+      font: 700 12px/1 var(--font-mono);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .hero-text {
+      font-family: var(--font-serif);
+      font-size: clamp(96px, 5vw, 150px);
+      line-height: 0.9;
+      letter-spacing: -0.05em;
+      text-wrap: balance;
+    }
+
+    .preview-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .preview-card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: white;
+      display: grid;
+      gap: 12px;
+    }
+
+    .preview-card.tall {
+      min-height: 240px;
+      align-content: space-between;
+      background: linear-gradient(160deg, color-mix(in oklch, white 70%, var(--accent)), white 62%);
+    }
+
+    .line,
+    .line-short,
+    .line-mini,
+    .block {
+      background: color-mix(in oklch, var(--border) 74%, white);
+      border-radius: 999px;
+    }
+
+    .line {
+      width: 100%;
+      height: 12px;
+    }
+
+    .line-short {
+      width: 62%;
+      height: 12px;
+    }
+
+    .line-mini {
+      width: 32%;
+      height: 8px;
+    }
+
+    .block {
+      min-height: 92px;
+      border-radius: 18px;
+      background: color-mix(in oklch, var(--accent) 10%, white);
+    }
+
+    .meta-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .meta-box {
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface-strong);
+    }
+
+    .meta-box .k {
+      color: var(--muted);
+      font: 700 11px/1 var(--font-mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .meta-box .v {
+      display: block;
+      margin-top: 10px;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .range-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 92px 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .slider {
+      height: 8px;
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--border) 76%, white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 0 0;
+      width: 68%;
+      border-radius: inherit;
+      background: color-mix(in oklch, var(--accent) 58%, white);
+    }
+
+    .slider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 68%;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid color-mix(in oklch, var(--accent) 52%, var(--border));
+      box-shadow: 0 4px 10px color-mix(in oklch, var(--fg) 10%, transparent);
+      transform: translate(-50%, -50%);
+    }
+
+    .weight-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .weight-grid .mini-chip {
+      border-radius: 16px;
+      padding-block: 12px;
+    }
+
+    .code-card {
+      padding: 16px;
+      border-radius: 20px;
+      background: oklch(23% 0.025 260);
+      color: oklch(95% 0.01 240);
+      font: 500 12px/1.7 var(--font-mono);
+      overflow: hidden;
+    }
+
+    .footer {
+      padding: 22px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 18px;
+      min-height: 224px;
+    }
+
+    .footer-card {
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: color-mix(in oklch, white 86%, var(--bg));
+      display: grid;
+      gap: 14px;
+    }
+
+    .scene-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 12px;
+    }
+
+    .scene-frame {
+      min-height: 130px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: white;
+      display: grid;
+      gap: 12px;
+    }
+
+    .scene-frame.wide {
+      min-height: 160px;
+      background: linear-gradient(180deg, white, color-mix(in oklch, white 74%, var(--accent)));
+    }
+
+    .effect-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .effect {
+      min-height: 78px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      display: grid;
+      align-content: space-between;
+      gap: 10px;
+    }
+
+    .effect.active {
+      background: linear-gradient(180deg, color-mix(in oklch, white 64%, var(--accent)), white 72%);
+      border-color: color-mix(in oklch, var(--accent) 42%, var(--border));
+    }
+
+    .effect-name {
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .footer-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: color-mix(in oklch, var(--border) 78%, var(--muted));
+      border-radius: 999px;
+    }
+
+    @media (max-width: 2100px) {
+      body {
+        min-width: 0;
+      }
+
+      .page {
+        width: calc(100vw - 32px);
+      }
+
+      .workspace {
+        grid-template-columns: 340px minmax(620px, 1fr) 360px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header panel">
+      <section>
+        <p class="eyebrow">Three-Column Desktop Wireframe / 2560 × 1080</p>
+        <h1>Header 在上、預覽進 Body、<br>情境與快速效果落到底部</h1>
+        <p class="subcopy">這版直接照你附的三欄結構改。上方只保留頁面身分與目前模式，中段固定左選字、中看預覽、右調控制，下方 footer 才放版面情境效果和快速效果。</p>
+      </section>
+
+      <div class="flow">
+        <span class="chip">Header</span>
+        <span class="chip active">Body Preview</span>
+        <span class="chip">Footer Effects</span>
+      </div>
+
+      <div class="header-actions">
+        <span class="button">2560 × 1080</span>
+        <span class="button primary">桌面線框</span>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <aside class="sidebar">
+        <div class="scroll-stack">
+          <section class="panel">
+            <div class="section-head">
+              <h2>字型來源</h2>
+              <span class="section-note">Left Sidebar</span>
+            </div>
+            <div class="upload">
+              <div>
+                <strong>上傳字型放左邊</strong>
+                <div class="helper">拖放、匯入與來源切換都收在左欄，不再插進主要預覽動線。</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="switch-row">
+              <span class="mini-chip active">全部</span>
+              <span class="mini-chip">系統</span>
+              <span class="mini-chip">本地</span>
+            </div>
+            <div class="search" style="margin-top: 14px;">搜尋字型名稱、來源、標籤</div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <h3>字型選擇</h3>
+              <span class="section-note">只做挑選</span>
+            </div>
+            <div class="font-list">
+              <article class="font-card active">
+                <div class="font-meta">
+                  <div>
+                    <div class="font-name">GenWanMin2TC-R</div>
+                    <div class="helper">目前預覽字型</div>
+                  </div>
+                  <span class="font-tag">Local</span>
+                </div>
+                <div class="font-preview">前｜虛｜$450｜洪</div>
+              </article>
+
+              <article class="font-card">
+                <div class="font-meta">
+                  <div>
+                    <div class="font-name">GlowSansTC-Extended</div>
+                    <div class="helper">幾何、現代、均衡</div>
+                  </div>
+                  <span class="font-tag">Open</span>
+                </div>
+                <div class="font-preview" style="font-family: var(--font-display);">前｜虛｜$450｜洪</div>
+              </article>
+
+              <article class="font-card">
+                <div class="font-meta">
+                  <div>
+                    <div class="font-name">ChenYuluoyan-Thin</div>
+                    <div class="helper">細字、裝飾感強</div>
+                  </div>
+                  <span class="font-tag">Local</span>
+                </div>
+                <div class="font-preview">書感與留白測試</div>
+              </article>
+
+              <article class="font-card">
+                <div class="font-meta">
+                  <div>
+                    <div class="font-name">HanYiQiHei</div>
+                    <div class="helper">厚重展示、結構明顯</div>
+                  </div>
+                  <span class="font-tag">Local</span>
+                </div>
+                <div class="font-preview" style="font-family: var(--font-display);">字型測試工具</div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </aside>
+
+      <section class="body-column">
+        <div class="body-shell panel">
+          <div class="body-top">
+            <div class="tabs">
+              <span class="tab active">純文字</span>
+              <span class="tab">按鈕</span>
+              <span class="tab">海報感</span>
+            </div>
+            <div class="sample-input">在這裡輸入預覽文字，中央 Body 永遠保持可見</div>
+            <div class="flow" style="justify-content:flex-end;">
+              <span class="chip">單字檢視</span>
+              <span class="chip active">中心預覽</span>
+            </div>
+          </div>
+
+          <div class="body-note">
+            <span>Body 是主預覽區，視線永遠停在中央。</span>
+            <span>左右欄捲動，中央不被操作打斷。</span>
+          </div>
+
+          <div class="preview-stage">
+            <article class="hero">
+              <span class="label">Main Preview / Body</span>
+              <div class="hero-text">前｜虛<br>$450｜洪</div>
+              <div class="helper">主預覽只顯示目前字型、樣式與排版效果，不混入上傳按鈕或一長串控制器。</div>
+            </article>
+
+            <div class="preview-stack">
+              <section class="preview-card tall">
+                <span class="label">補充視角</span>
+                <div class="block"></div>
+                <div class="helper">右側小卡保留次要情境，例如名片、海報標題或橫幅字樣。</div>
+              </section>
+
+              <section class="preview-card">
+                <div class="line-mini"></div>
+                <div class="line-short"></div>
+                <div class="line"></div>
+                <div class="helper">可切換第二組比較樣本，但不離開主舞台。</div>
+              </section>
+            </div>
+          </div>
+
+          <div class="meta-row">
+            <div class="meta-box">
+              <span class="k">Current Font</span>
+              <span class="v">GenWanMin2TC-R</span>
+            </div>
+            <div class="meta-box">
+              <span class="k">Current Layout</span>
+              <span class="v">Header / Body / Footer</span>
+            </div>
+            <div class="meta-box">
+              <span class="k">Current Focus</span>
+              <span class="v">主預覽固定</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="inspector">
+        <div class="scroll-stack">
+          <section class="panel range-card">
+            <div class="section-head">
+              <h2>文字控制</h2>
+              <span class="section-note">Right Sidebar</span>
+            </div>
+            <div class="slider-row">
+              <span class="helper">字級</span>
+              <div class="slider"></div>
+              <span>96px</span>
+            </div>
+            <div class="slider-row">
+              <span class="helper">行高</span>
+              <div class="slider"></div>
+              <span>1.05</span>
+            </div>
+            <div class="slider-row">
+              <span class="helper">字距</span>
+              <div class="slider"></div>
+              <span>0.04em</span>
+            </div>
+            <div class="slider-row">
+              <span class="helper">外框</span>
+              <div class="slider"></div>
+              <span>8px</span>
+            </div>
+          </section>
+
+          <section class="panel range-card">
+            <div class="section-head">
+              <h3>字重與細修</h3>
+              <span class="section-note">滑桿集中</span>
+            </div>
+            <div class="weight-grid">
+              <span class="mini-chip">300</span>
+              <span class="mini-chip active">400</span>
+              <span class="mini-chip">500</span>
+              <span class="mini-chip">600</span>
+              <span class="mini-chip">700</span>
+              <span class="mini-chip">800</span>
+            </div>
+            <div class="slider-row">
+              <span class="helper">陰影</span>
+              <div class="slider"></div>
+              <span>22</span>
+            </div>
+            <div class="slider-row">
+              <span class="helper">透明</span>
+              <div class="slider"></div>
+              <span>100%</span>
+            </div>
+            <div class="slider-row">
+              <span class="helper">位移</span>
+              <div class="slider"></div>
+              <span>4px</span>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <h3>輸出區</h3>
+              <span class="section-note">保持收斂</span>
+            </div>
+            <div class="code-card">font-family: "GenWanMin2TC-R";<br>font-size: 96px;<br>line-height: 1.05;<br>letter-spacing: 0.04em;<br>font-weight: 400;<br>text-shadow: 0 0 22px rgba(0, 0, 0, 0.18);</div>
+          </section>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="footer panel">
+      <section class="footer-card">
+        <div class="section-head">
+          <h2>版面情境效果</h2>
+          <span class="section-note">Footer / Context Scenes</span>
+        </div>
+        <div class="scene-grid">
+          <article class="scene-frame wide">
+            <div class="line-mini"></div>
+            <div class="block"></div>
+            <div class="helper">海報標題、橫幅字樣、長版排版情境統一移到下面。</div>
+          </article>
+          <article class="scene-frame">
+            <div class="line-short"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="helper">卡片、列表、局部元件情境。</div>
+          </article>
+        </div>
+        <p class="footer-note">這一區不再跟主預覽搶位置。使用者先在 Body 看字型本身，再往下看它放進版面時的效果。</p>
+      </section>
+
+      <section class="footer-card">
+        <div class="section-head">
+          <h2>快速效果</h2>
+          <span class="section-note">Footer / Quick Effects</span>
+        </div>
+        <div class="effect-grid">
+          <article class="effect active">
+            <span class="effect-name">霓虹燈</span>
+            <div class="line-short"></div>
+          </article>
+          <article class="effect">
+            <span class="effect-name">金屬</span>
+            <div class="line-short"></div>
+          </article>
+          <article class="effect">
+            <span class="effect-name">浮雕</span>
+            <div class="line-short"></div>
+          </article>
+          <article class="effect">
+            <span class="effect-name">玻璃</span>
+            <div class="line-short"></div>
+          </article>
+          <article class="effect">
+            <span class="effect-name">描邊</span>
+            <div class="line-short"></div>
+          </article>
+          <article class="effect">
+            <span class="effect-name">故障感</span>
+            <div class="line-short"></div>
+          </article>
+        </div>
+        <p class="footer-note">快速效果改到底部，是因為它屬於「套樣式」而不是「挑字型」或「細修數值」。這樣資訊分工會比較清楚。</p>
+      </section>
+    </footer>
+  </main>
+</body>
+</html>

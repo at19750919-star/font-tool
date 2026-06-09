@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "字型工具桌面線框",
+  "entry": "font-tool-desktop-wireframe.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-06-06T22:06:57.470Z",
+  "updatedAt": "2026-06-06T22:06:57.485Z",
+  "metadata": {
+    "identifier": "font-tool-desktop-wireframe",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}

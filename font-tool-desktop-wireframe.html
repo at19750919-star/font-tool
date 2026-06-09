@@ -1,0 +1,904 @@
+
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>字型工具桌面線框 2560x1080</title>
+  <style>
+    @font-face {
+      font-family: "Glow Sans TC";
+      src: url("public/fonts/GlowSansTC-Extended.otf") format("opentype");
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "GenWan Min";
+      src: url("public/fonts/GenWanMin2TC-R.otf") format("opentype");
+      font-display: swap;
+    }
+
+    :root {
+      --bg: oklch(98% 0.005 250);
+      --surface: oklch(100% 0 0);
+      --surface-alt: oklch(99% 0.002 240);
+      --fg: oklch(22% 0.02 240);
+      --muted: oklch(50% 0.018 240);
+      --border: oklch(90% 0.008 240);
+      --accent: oklch(58% 0.16 145);
+      --accent-soft: color-mix(in oklch, var(--accent) 12%, white);
+      --preview: oklch(99.2% 0.003 250);
+      --shadow: 0 18px 40px color-mix(in oklch, var(--fg) 8%, transparent);
+      --radius: 24px;
+      --radius-sm: 14px;
+      --font-display: "Glow Sans TC", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, color-mix(in oklch, var(--accent) 7%, white) 0, transparent 24%),
+        linear-gradient(180deg, white, var(--bg));
+      color: var(--fg);
+      font-family: var(--font-body);
+    }
+
+    body {
+      min-width: 1440px;
+    }
+
+    .page {
+      max-width: 2480px;
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 28px 28px 32px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr auto;
+      gap: 24px;
+      align-items: end;
+      padding: 8px 8px 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      font: 600 12px/1 var(--font-mono);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(40px, 2.2vw, 60px);
+      line-height: 0.94;
+      letter-spacing: -0.04em;
+    }
+
+    .subcopy {
+      max-width: 34ch;
+      margin: 14px 0 0;
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--muted);
+    }
+
+    .sample-strip {
+      display: grid;
+      gap: 10px;
+    }
+
+    .strip-label,
+    .panel-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .sample-row,
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .pill,
+    .action,
+    .mini-tab,
+    .chip,
+    .toggle {
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--fg);
+      font: 600 14px/1 var(--font-body);
+      padding: 12px 18px;
+      white-space: nowrap;
+    }
+
+    .pill.active,
+    .chip.active,
+    .toggle.active,
+    .action.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.88fr) minmax(980px, 1.35fr) minmax(360px, 0.84fr);
+      gap: 22px;
+      align-items: start;
+      padding-top: 22px;
+      height: calc(100vh - 162px);
+    }
+
+    .column {
+      min-height: 0;
+    }
+
+    .scroll-col {
+      height: 100%;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .card,
+    .preview-shell,
+    .preview-stage,
+    .preview-meta,
+    .font-card,
+    .control-card,
+    .inspector-card {
+      background: color-mix(in oklch, var(--surface) 92%, var(--bg));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .card,
+    .control-card,
+    .inspector-card {
+      padding: 18px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 14px;
+    }
+
+    .section-title h2,
+    .section-title h3 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .section-note {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+    }
+
+    .upload-zone {
+      min-height: 126px;
+      border: 1.5px dashed color-mix(in oklch, var(--border) 65%, var(--accent));
+      border-radius: 22px;
+      background: linear-gradient(180deg, color-mix(in oklch, white 80%, var(--accent-soft)), white);
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .upload-zone strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .helper {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .search {
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .source-switch {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .list-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .font-card {
+      padding: 16px 18px;
+      display: grid;
+      gap: 12px;
+      background: var(--surface);
+    }
+
+    .font-card.active {
+      border-color: color-mix(in oklch, var(--accent) 55%, var(--border));
+      background: linear-gradient(180deg, var(--accent-soft), white 66%);
+    }
+
+    .font-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .font-name {
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .font-tag {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--surface-alt);
+      color: var(--muted);
+      font: 600 11px/1 var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .font-preview {
+      font-family: "GenWan Min", var(--font-display);
+      font-size: clamp(20px, 1.25vw, 30px);
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+    }
+
+    .stage-column {
+      position: sticky;
+      top: 0;
+      height: 100%;
+      display: grid;
+    }
+
+    .preview-shell {
+      height: 100%;
+      padding: 20px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 16px;
+      background: linear-gradient(180deg, white, var(--surface-alt));
+    }
+
+    .preview-header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .tabs {
+      display: inline-grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface);
+    }
+
+    .mini-tab {
+      border-radius: 12px;
+      padding: 11px 16px;
+      text-align: center;
+    }
+
+    .mini-tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .sample-input {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: white;
+      font-size: 18px;
+    }
+
+    .preview-stage {
+      padding: 22px;
+      background:
+        linear-gradient(180deg, white, var(--preview));
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+    }
+
+    .stage-note {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      font-family: var(--font-mono);
+    }
+
+    .preview-canvas {
+      border: 1px solid var(--border);
+      border-radius: 26px;
+      background:
+        linear-gradient(180deg, color-mix(in oklch, var(--surface-alt) 80%, white), white),
+        repeating-linear-gradient(90deg, transparent 0, transparent 119px, color-mix(in oklch, var(--border) 65%, transparent) 119px, color-mix(in oklch, var(--border) 65%, transparent) 120px);
+      display: grid;
+      grid-template-columns: 1.3fr 0.8fr;
+      gap: 18px;
+      padding: 24px;
+      min-height: 100%;
+    }
+
+    .hero-sample {
+      display: grid;
+      align-content: center;
+      gap: 18px;
+      padding: 26px;
+      border-radius: 22px;
+      background: white;
+      border: 1px solid var(--border);
+    }
+
+    .hero-sample .label {
+      font: 700 12px/1 var(--font-mono);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .hero-sample .text {
+      font-family: "GenWan Min", var(--font-display);
+      font-size: clamp(88px, 5vw, 144px);
+      line-height: 0.9;
+      letter-spacing: -0.05em;
+      text-wrap: balance;
+    }
+
+    .scene-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .scene {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .scene.visual {
+      min-height: 210px;
+      align-content: space-between;
+      background: linear-gradient(160deg, color-mix(in oklch, var(--accent) 18%, white), white 55%);
+    }
+
+    .scene.small-preview {
+      min-height: 132px;
+    }
+
+    .line,
+    .line-short,
+    .line-mini,
+    .block {
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--border) 75%, white);
+    }
+
+    .line {
+      height: 12px;
+      width: 100%;
+    }
+
+    .line-short {
+      height: 12px;
+      width: 58%;
+    }
+
+    .line-mini {
+      height: 8px;
+      width: 38%;
+    }
+
+    .block {
+      border-radius: 18px;
+      min-height: 84px;
+      background: color-mix(in oklch, var(--accent) 10%, white);
+    }
+
+    .preview-meta {
+      padding: 16px 18px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      background: white;
+    }
+
+    .meta-box {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface-alt);
+    }
+
+    .meta-box .k {
+      font: 700 11px/1 var(--font-mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .meta-box .v {
+      display: block;
+      margin-top: 10px;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .rail-footer,
+    .inspector-footer {
+      padding: 14px 16px;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      background: color-mix(in oklch, var(--surface) 86%, var(--bg));
+    }
+
+    .chip-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .chip {
+      border-radius: 14px;
+      text-align: center;
+      padding: 14px 12px;
+    }
+
+    .control-card,
+    .inspector-card {
+      display: grid;
+      gap: 14px;
+      background: var(--surface);
+    }
+
+    .inspector-card {
+      padding: 18px 18px 20px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .slider {
+      height: 8px;
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--border) 75%, white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      inset: 0 28% 0 0;
+      background: color-mix(in oklch, var(--accent) 70%, white);
+      border-radius: inherit;
+    }
+
+    .slider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 68%;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid color-mix(in oklch, var(--accent) 48%, var(--border));
+      box-shadow: 0 4px 10px color-mix(in oklch, var(--fg) 12%, transparent);
+      transform: translate(-50%, -50%);
+    }
+
+    .weight-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .weight-grid .toggle {
+      border-radius: 14px;
+      text-align: center;
+      padding: 12px 10px;
+    }
+
+    .code-block {
+      padding: 16px;
+      border-radius: 18px;
+      background: oklch(18% 0.02 240);
+      color: oklch(96% 0.01 240);
+      font: 500 12px/1.7 var(--font-mono);
+      overflow: hidden;
+    }
+
+    .legend {
+      margin-top: 18px;
+      padding: 14px 18px 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: color-mix(in oklch, var(--border) 80%, var(--muted));
+      border-radius: 999px;
+    }
+
+    @media (max-width: 1900px) {
+      body {
+        min-width: 0;
+      }
+
+      .workspace {
+        grid-template-columns: minmax(320px, 0.9fr) minmax(720px, 1.3fr);
+        height: auto;
+      }
+
+      .stage-column {
+        grid-column: 1 / -1;
+        position: static;
+        order: -1;
+        height: auto;
+      }
+
+      .scroll-col {
+        height: auto;
+        overflow: visible;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <section>
+        <p class="eyebrow">Desktop Wireframe / 2560 × 1080</p>
+        <h1>字型預覽測試器<br>重排線框</h1>
+        <p class="subcopy">把主要預覽固定在中心舞台，所有選字與微調分流到左右兩側。使用者先選字，再看效果，最後才進入細修。</p>
+      </section>
+
+      <section class="sample-strip">
+        <span class="strip-label">新版操作節奏</span>
+        <div class="sample-row">
+          <span class="pill active">1. 選字型</span>
+          <span class="pill">2. 看預覽</span>
+          <span class="pill">3. 微調效果</span>
+        </div>
+      </section>
+
+      <section class="header-actions">
+        <span class="action">桌面主視圖</span>
+        <span class="action primary">固定預覽區</span>
+      </section>
+    </header>
+
+    <section class="workspace">
+      <div class="column scroll-col">
+        <div class="stack">
+          <section class="card">
+            <div class="section-title">
+              <h2>字型來源</h2>
+              <span class="section-note">左側只做選擇與篩選</span>
+            </div>
+            <div class="upload-zone">
+              <div>
+                <strong>拖放或點擊上傳字型</strong>
+                <div class="helper">保留你現有的上傳功能，但往左側收斂，不再插在預覽前面打斷視線。</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="stack">
+              <div class="source-switch">
+                <span class="toggle active">全部字型</span>
+                <span class="toggle">系統</span>
+                <span class="toggle">本地</span>
+              </div>
+              <div class="search">搜尋字型名稱、來源或風格</div>
+              <div class="sample-row" style="justify-content:flex-start;">
+                <span class="chip active">中文字型</span>
+                <span class="chip">英數混排</span>
+                <span class="chip">高對比</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="section-title">
+              <h3>字型清單</h3>
+              <span class="section-note">可捲動</span>
+            </div>
+            <div class="list-grid">
+              <article class="font-card active">
+                <div class="font-meta">
+                  <div>
+                    <div class="font-name">GenWanMin2TC-R</div>
+                    <div class="helper">目前選取</div>
+                  </div>
+                  <span class="font-tag">Local</span>
+                </div>
+                <div class="font-preview">永國字體 Aa 123</div>
+              </article>
+
+              <article class="font-card">
+                <div class="font-meta">
+                  <div>
+                    <div class="font-name">GlowSansTC-Extended</div>
+                    <div class="helper">幾何、均衡</div>
+                  </div>
+                  <span class="font-tag">Open</span>
+                </div>
+                <div class="font-preview" style="font-family:'Glow Sans TC', var(--font-display);">前｜虛｜$450｜洪</div>
+              </article>
+
+              <article class="font-card">
+                <div class="font-meta">
+                  <div>
+                    <div class="font-name">ChenYuluoyan-Thin</div>
+                    <div class="helper">筆畫細、裝飾感</div>
+                  </div>
+                  <span class="font-tag">Local</span>
+                </div>
+                <div class="font-preview">永國字體 Aa 123</div>
+              </article>
+
+              <article class="font-card">
+                <div class="font-meta">
+                  <div>
+                    <div class="font-name">Noto Sans TC</div>
+                    <div class="helper">系統基準</div>
+                  </div>
+                  <span class="font-tag">System</span>
+                </div>
+                <div class="font-preview" style="font-family:var(--font-display);">快速比對中文型態</div>
+              </article>
+
+              <article class="font-card">
+                <div class="font-meta">
+                  <div>
+                    <div class="font-name">HanYiQiHei</div>
+                    <div class="helper">厚重、展示</div>
+                  </div>
+                  <span class="font-tag">Local</span>
+                </div>
+                <div class="font-preview">永國字體 Aa 123</div>
+              </article>
+            </div>
+          </section>
+
+          <div class="rail-footer">左欄只保留會影響「選哪一套字」的東西。你現在頁面把上傳、清單、預覽、效果全部直向排下去，使用者每次換字都要重新找回預覽位置，這一版把這個問題切掉。</div>
+        </div>
+      </div>
+
+      <div class="column stage-column">
+        <section class="preview-shell">
+          <div class="preview-header">
+            <div class="tabs">
+              <span class="mini-tab active">純文字</span>
+              <span class="mini-tab">按鈕</span>
+              <span class="mini-tab">版面</span>
+            </div>
+            <div class="sample-input">前｜虛｜$450｜洪</div>
+            <div class="sample-row">
+              <span class="pill">單欄</span>
+              <span class="pill active">中心舞台</span>
+            </div>
+          </div>
+
+          <div class="preview-stage">
+            <div class="stage-note">
+              <span>固定預覽區 / 捲動左右欄時不離開視線</span>
+              <span>對比模式可從右上角進入</span>
+            </div>
+
+            <div class="preview-canvas">
+              <article class="hero-sample">
+                <span class="label">Main Preview</span>
+                <div class="text">前｜虛<br>$450｜洪</div>
+                <div class="helper">主預覽只做一件事：讓你看清楚字型本身與效果套用後的層級。輸入框、模式切換與字型資訊都壓在同一塊區域內。</div>
+              </article>
+
+              <div class="scene-stack">
+                <section class="scene visual">
+                  <div>
+                    <div class="line-mini"></div>
+                    <div class="line-short" style="margin-top:10px;"></div>
+                  </div>
+                  <div class="block"></div>
+                  <div class="helper">版面情境預覽</div>
+                </section>
+
+                <section class="scene small-preview">
+                  <div class="line-short"></div>
+                  <div class="line"></div>
+                  <div class="line"></div>
+                  <div class="helper">按鈕 / 卡片 / 標題等次要場景</div>
+                </section>
+              </div>
+            </div>
+
+            <div class="preview-meta">
+              <div class="meta-box">
+                <span class="k">Current Font</span>
+                <span class="v">GenWanMin2TC-R</span>
+              </div>
+              <div class="meta-box">
+                <span class="k">Applied Effects</span>
+                <span class="v">霓虹燈 + 描邊</span>
+              </div>
+              <div class="meta-box">
+                <span class="k">Preview Scope</span>
+                <span class="v">中心舞台 / 固定</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="legend">中心欄是整頁唯一需要長時間停留的區域，所以改成固定。2560×1080 下預覽不該被推到首屏以下，而是永遠讓人一進頁就看到「現在選的是什麼、長成什麼樣」。</div>
+        </section>
+      </div>
+
+      <div class="column scroll-col">
+        <div class="stack">
+          <section class="control-card">
+            <div class="section-title">
+              <h2>快速效果</h2>
+              <span class="section-note">先粗調，再細修</span>
+            </div>
+            <div class="chip-grid">
+              <span class="chip active">霓虹燈</span>
+              <span class="chip">立體</span>
+              <span class="chip">浮雕</span>
+              <span class="chip">陰刻</span>
+              <span class="chip">金屬</span>
+              <span class="chip">發光</span>
+            </div>
+          </section>
+
+          <section class="inspector-card">
+            <div class="section-title">
+              <h3>文字規格</h3>
+              <span class="section-note">單列 slider</span>
+            </div>
+            <div class="row">
+              <span class="panel-label">字型大小</span>
+              <div class="slider"></div>
+              <span>96px</span>
+            </div>
+            <div class="row">
+              <span class="panel-label">行高</span>
+              <div class="slider"></div>
+              <span>1.05</span>
+            </div>
+            <div class="row">
+              <span class="panel-label">字距</span>
+              <div class="slider"></div>
+              <span>0.04em</span>
+            </div>
+            <div class="row">
+              <span class="panel-label">詞距</span>
+              <div class="slider"></div>
+              <span>0</span>
+            </div>
+
+            <div class="weight-grid">
+              <span class="toggle">300</span>
+              <span class="toggle active">400</span>
+              <span class="toggle">500</span>
+              <span class="toggle">600</span>
+              <span class="toggle">700</span>
+              <span class="toggle">800</span>
+            </div>
+          </section>
+
+          <section class="inspector-card">
+            <div class="section-title">
+              <h3>外觀層</h3>
+              <span class="section-note">把開關集中</span>
+            </div>
+            <div class="sample-row" style="justify-content:flex-start;">
+              <span class="toggle active">文字漸層</span>
+              <span class="toggle">陰影</span>
+              <span class="toggle">描邊</span>
+            </div>
+            <div class="row">
+              <span class="panel-label">主色</span>
+              <div class="slider"></div>
+              <span>#111827</span>
+            </div>
+            <div class="row">
+              <span class="panel-label">透明度</span>
+              <div class="slider"></div>
+              <span>100%</span>
+            </div>
+            <div class="row">
+              <span class="panel-label">外框厚度</span>
+              <div class="slider"></div>
+              <span>8px</span>
+            </div>
+          </section>
+
+          <section class="inspector-card">
+            <div class="section-title">
+              <h3>輸出 CSS</h3>
+              <span class="section-note">保留在最下方</span>
+            </div>
+            <div class="code-block">font-family: "GenWanMin2TC-R";<br>font-size: 96px;<br>line-height: 1.05;<br>letter-spacing: 0.04em;<br>font-weight: 400;<br>text-shadow: 0 0 22px rgba(14, 165, 86, 0.45);</div>
+          </section>
+
+          <div class="inspector-footer">右欄只放會影響「怎麼調」的控制器。現在頁面的效果區、多重效果、slider、CSS 區塊是切散的，重排後變成一個連續檢視器，操作時不用上下跳來跳去。</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

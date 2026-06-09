@@ -1,0 +1,422 @@
+- generic [ref=e2]:
+  - region "Notifications alt+T"
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - generic [ref=e9]:
+        - button "純文字" [ref=e10] [cursor=pointer]
+        - button "按鈕" [ref=e11] [cursor=pointer]
+        - button "對比" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+          - text: 對比
+      - generic [ref=e18]:
+        - generic [ref=e19]: 預覽文字
+        - textbox "輸入要預覽的文字" [ref=e20]: 前｜盧｜$450｜洪
+      - generic [ref=e22]: 前｜盧｜$450｜洪
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]: 版面情境預覽
+          - paragraph [ref=e26]: 預覽在真實網頁中的效果
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - generic [ref=e29]:
+              - generic [ref=e30]: 前｜盧｜$450｜洪
+              - paragraph [ref=e31]: Hero 標題區展示
+            - generic [ref=e32]:
+              - paragraph [ref=e33]: 常見於：
+              - paragraph [ref=e34]: 網站首頁大標題、廣告區、品牌宣傳
+          - generic [ref=e35]:
+            - generic [ref=e36]:
+              - generic [ref=e38]: 商品圖片
+              - generic [ref=e39]: 前｜盧｜$450｜洪
+            - generic [ref=e41]: 按鈕模式才顯示
+            - generic [ref=e42]:
+              - paragraph [ref=e43]: 常見於：
+              - paragraph [ref=e44]: 電商商品卡片、購物推薦
+          - generic [ref=e45]:
+            - generic [ref=e46]:
+              - generic [ref=e47]:
+                - generic [ref=e48]:
+                  - generic [ref=e49]: 電子郵件
+                  - textbox "you@example.com" [disabled] [ref=e50]
+                - generic [ref=e51]:
+                  - generic [ref=e52]: 訊息
+                  - textbox "輸入您的訊息…" [disabled] [ref=e53]
+              - generic [ref=e55]: 按鈕模式才顯示
+            - generic [ref=e56]:
+              - paragraph [ref=e57]: 常見於：
+              - paragraph [ref=e58]: 聯絡表單、訂閱表單、登入表單
+      - generic [ref=e59]:
+        - generic [ref=e60]: 預覽背景
+        - textbox [ref=e61] [cursor=pointer]: "#f9fafb"
+        - textbox [ref=e62]: "#f9fafb"
+      - generic [ref=e63]:
+        - paragraph [ref=e64]: 當前字型：系統預設
+        - paragraph [ref=e65]: system-ui
+    - generic [ref=e66]:
+      - generic [ref=e67]:
+        - generic [ref=e68]:
+          - heading "多重效果" [level=3] [ref=e70]
+          - paragraph [ref=e71]: 點擊選擇多個預設進行疊加（最多 3 個）
+          - generic [ref=e72]:
+            - button "霓虹燈" [ref=e73] [cursor=pointer]
+            - button "立體" [ref=e74] [cursor=pointer]
+            - button "浮雕" [ref=e75] [cursor=pointer]
+            - button "陰刻" [ref=e76] [cursor=pointer]
+            - button "金屬" [ref=e77] [cursor=pointer]
+            - button "發光" [ref=e78] [cursor=pointer]
+        - generic [ref=e79]:
+          - generic [ref=e80]: 字型大小
+          - slider [ref=e85]
+          - generic [ref=e86]: 48px
+        - generic [ref=e87]:
+          - generic [ref=e88]: 行高
+          - slider [ref=e93]
+          - generic [ref=e94]: "1.5"
+        - generic [ref=e95]:
+          - generic [ref=e96]: 字距
+          - slider [ref=e101]
+          - generic [ref=e102]: "0.0"
+        - generic [ref=e103]:
+          - generic [ref=e104]: 詞距
+          - slider [ref=e109]
+          - generic [ref=e110]: "0.0"
+        - generic [ref=e111]:
+          - generic [ref=e112]: 字重
+          - generic [ref=e113]:
+            - button "300" [ref=e114] [cursor=pointer]
+            - button "400" [ref=e115] [cursor=pointer]
+            - button "500" [ref=e116] [cursor=pointer]
+            - button "600" [ref=e117] [cursor=pointer]
+            - button "700" [ref=e118] [cursor=pointer]
+            - button "800" [ref=e119] [cursor=pointer]
+        - generic [ref=e120]:
+          - generic [ref=e121]: 透明度
+          - slider [ref=e126]
+          - generic [ref=e127]: 100%
+        - generic [ref=e128]:
+          - generic [ref=e129]: 文字顏色
+          - generic [ref=e130]:
+            - textbox [ref=e131] [cursor=pointer]: "#111827"
+            - textbox [ref=e132]: "#111827"
+        - generic [ref=e134]:
+          - generic [ref=e135]: 文字漸層
+          - button "關閉" [ref=e136] [cursor=pointer]
+        - generic [ref=e138]:
+          - generic [ref=e139]: 文字陰影
+          - button "關閉" [ref=e140] [cursor=pointer]
+        - generic [ref=e142]:
+          - generic [ref=e143]: 文字描邊
+          - button "關閉" [ref=e144] [cursor=pointer]
+        - generic [ref=e145]:
+          - heading "CSS 代碼" [level=3] [ref=e146]
+          - generic [ref=e147]:
+            - generic [ref=e148]: "font-family: system-ui;"
+            - generic [ref=e149]: "font-size: 48px;"
+            - generic [ref=e150]: "line-height: 1.5;"
+            - generic [ref=e151]: "letter-spacing: 0px;"
+            - generic [ref=e152]: "word-spacing: 0px;"
+            - generic [ref=e153]: "font-weight: 400;"
+            - generic [ref=e154]: "opacity: 1.00;"
+            - generic [ref=e155]: "color: #111827;"
+          - button "複製 CSS" [ref=e156] [cursor=pointer]:
+            - img
+            - text: 複製 CSS
+      - generic [ref=e157]:
+        - heading "選擇字型" [level=3] [ref=e158]
+        - generic [ref=e159]:
+          - generic [ref=e162] [cursor=pointer]:
+            - img [ref=e163]
+            - paragraph [ref=e166]: 拖拽或點擊上傳字型
+            - paragraph [ref=e167]: 支援 TTF、OTF、TTC、WOFF、WOFF2 (最大 100MB)，可一次上傳多個
+          - generic [ref=e168]:
+            - button "一鍵匯入我已安裝的字型" [ref=e169] [cursor=pointer]
+            - paragraph [ref=e170]: 讀取你電腦已安裝的字型（需開發伺服器執行中）
+        - generic [ref=e171]:
+          - generic [ref=e172]:
+            - heading "系統" [level=4] [ref=e173]
+            - generic [ref=e174]:
+              - button "系統預設" [ref=e175] [cursor=pointer]
+              - button "微軟雅黑" [ref=e176] [cursor=pointer]
+              - button "蘋果字體" [ref=e177] [cursor=pointer]
+          - generic [ref=e178]:
+            - heading "Google Fonts" [level=4] [ref=e179]
+            - generic [ref=e180]:
+              - button "Noto Sans TC" [ref=e181] [cursor=pointer]
+              - button "Noto Serif TC" [ref=e182] [cursor=pointer]
+          - generic [ref=e183]:
+            - heading "Adobe" [level=4] [ref=e184]
+            - generic [ref=e185]:
+              - button "思源黑體" [ref=e186] [cursor=pointer]
+              - button "思源宋體" [ref=e187] [cursor=pointer]
+          - generic [ref=e188]:
+            - heading "開源" [level=4] [ref=e189]
+            - generic [ref=e190]:
+              - button "文泉驛微米黑" [ref=e191] [cursor=pointer]
+              - button "文泉驛正黑" [ref=e192] [cursor=pointer]
+      - generic [ref=e193]:
+        - generic [ref=e194]: 畫廊範例字
+        - textbox "輸入想顯示在中文字型卡片上的文字" [ref=e195]: 永 國 字體 Aa 123
+      - generic [ref=e196]:
+        - heading "網路字型（64）" [level=3] [ref=e197]
+        - generic [ref=e198]:
+          - button "中文（30）" [ref=e199] [cursor=pointer]:
+            - img [ref=e200]
+            - text: 中文（30）
+          - generic [ref=e202]:
+            - generic [ref=e203] [cursor=pointer]:
+              - generic [ref=e204]:
+                - generic [ref=e205]: Dela Gothic One
+                - generic [ref=e206]: 演唱會海報黑體
+              - generic [ref=e207]: 永 國 字體 Aa 123
+            - generic [ref=e208] [cursor=pointer]:
+              - generic [ref=e209]:
+                - generic [ref=e210]: DotGothic16
+                - generic [ref=e211]: 像素點陣黑體
+              - generic [ref=e212]: 永 國 字體 Aa 123
+            - generic [ref=e213] [cursor=pointer]:
+              - generic [ref=e214]:
+                - generic [ref=e215]: Zen Old Mincho
+                - generic [ref=e216]: 金色裝飾明朝
+              - generic [ref=e217]: 永 國 字體 Aa 123
+            - generic [ref=e218] [cursor=pointer]:
+              - generic [ref=e219]:
+                - generic [ref=e220]: Rampart One
+                - generic [ref=e221]: 中空立體
+              - generic [ref=e222]: 永 國 字體 Aa 123
+            - generic [ref=e223] [cursor=pointer]:
+              - generic [ref=e224]:
+                - generic [ref=e225]: Reggae One
+                - generic [ref=e226]: 複古反白
+              - generic [ref=e227]: 永 國 字體 Aa 123
+            - generic [ref=e228] [cursor=pointer]:
+              - generic [ref=e229]:
+                - generic [ref=e230]: Hachi Maru Pop
+                - generic [ref=e231]: 手寫圓滑
+              - generic [ref=e232]: 永 國 字體 Aa 123
+            - generic [ref=e233] [cursor=pointer]:
+              - generic [ref=e234]:
+                - generic [ref=e235]: Stick
+                - generic [ref=e236]: 骨架細體
+              - generic [ref=e237]: 永 國 字體 Aa 123
+            - generic [ref=e238] [cursor=pointer]:
+              - generic [ref=e239]:
+                - generic [ref=e240]: Potta One
+                - generic [ref=e241]: 超粗膨脹黑體
+              - generic [ref=e242]: 永 國 字體 Aa 123
+            - generic [ref=e243] [cursor=pointer]:
+              - generic [ref=e244]:
+                - generic [ref=e245]: RocknRoll One
+                - generic [ref=e246]: 活力手感黑體
+              - generic [ref=e247]: 永 國 字體 Aa 123
+            - generic [ref=e248] [cursor=pointer]:
+              - generic [ref=e249]:
+                - generic [ref=e250]: Palette Mosaic
+                - generic [ref=e251]: 馬賽克拼貼
+              - generic [ref=e252]: 永 國 字體 Aa 123
+            - generic [ref=e253] [cursor=pointer]:
+              - generic [ref=e254]:
+                - generic [ref=e255]: Kaisei Opti
+                - generic [ref=e256]: 日式優雅明朝
+              - generic [ref=e257]: 永 國 字體 Aa 123
+            - generic [ref=e258] [cursor=pointer]:
+              - generic [ref=e259]:
+                - generic [ref=e260]: Chocolate Classical Sans
+                - generic [ref=e261]: 優雅現代
+              - generic [ref=e262]: 永 國 字體 Aa 123
+            - generic [ref=e263] [cursor=pointer]:
+              - generic [ref=e264]:
+                - generic [ref=e265]: LXGW WenKai TC
+                - generic [ref=e266]: 霞鶩文楷
+              - generic [ref=e267]: 永 國 字體 Aa 123
+            - generic [ref=e268] [cursor=pointer]:
+              - generic [ref=e269]:
+                - generic [ref=e270]: LXGW WenKai Mono TC
+                - generic [ref=e271]: 等寬楷書
+              - generic [ref=e272]: 永 國 字體 Aa 123
+            - generic [ref=e273] [cursor=pointer]:
+              - generic [ref=e274]:
+                - generic [ref=e275]: Taipei Sans TC
+                - generic [ref=e276]: 台北黑體
+              - generic [ref=e277]: 永 國 字體 Aa 123
+            - generic [ref=e278] [cursor=pointer]:
+              - generic [ref=e279]:
+                - generic [ref=e280]: Chiron Sung HK WS
+                - generic [ref=e281]: 港式現代宋
+              - generic [ref=e282]: 永 國 字體 Aa 123
+            - generic [ref=e283] [cursor=pointer]:
+              - generic [ref=e284]:
+                - generic [ref=e285]: ChenYuluoyan Thin
+                - generic [ref=e286]: 極細毛筆楷書
+              - generic [ref=e287]: 永 國 字體 Aa 123
+            - generic [ref=e288] [cursor=pointer]:
+              - generic [ref=e289]:
+                - generic [ref=e290]: GenWanMin2 TC
+                - generic [ref=e291]: 文鼎開源宋體
+              - generic [ref=e292]: 永 國 字體 Aa 123
+            - generic [ref=e293] [cursor=pointer]:
+              - generic [ref=e294]:
+                - generic [ref=e295]: Glow Sans TC Extended
+                - generic [ref=e296]: 多字重無襯線
+              - generic [ref=e297]: 永 國 字體 Aa 123
+            - generic [ref=e298] [cursor=pointer]:
+              - generic [ref=e299]:
+                - generic [ref=e300]: Satsuki Gendai Mincho
+                - generic [ref=e301]: 現代感明朝
+              - generic [ref=e302]: 永 國 字體 Aa 123
+            - generic [ref=e303] [cursor=pointer]:
+              - generic [ref=e304]:
+                - generic [ref=e305]: Swei Spring CJK TC
+                - generic [ref=e306]: 台灣手感黑體
+              - generic [ref=e307]: 永 國 字體 Aa 123
+            - generic [ref=e308] [cursor=pointer]:
+              - generic [ref=e309]:
+                - generic [ref=e310]: ToneOZ Tsuipita TC
+                - generic [ref=e311]: 注音符號標注
+              - generic [ref=e312]: 永 國 字體 Aa 123
+            - generic [ref=e313] [cursor=pointer]:
+              - generic [ref=e314]:
+                - generic [ref=e315]: 香萃刻宋
+                - generic [ref=e316]: 精刻宋體
+              - generic [ref=e317]: 永 國 字體 Aa 123
+            - generic [ref=e318] [cursor=pointer]:
+              - generic [ref=e319]:
+                - generic [ref=e320]: 哥特式字體
+                - generic [ref=e321]: 西式哥特裝飾
+              - generic [ref=e322]: 永 國 字體 Aa 123
+            - generic [ref=e323] [cursor=pointer]:
+              - generic [ref=e324]:
+                - generic [ref=e325]: 漢儀彩雲體繁
+                - generic [ref=e326]: 雲朵裝飾輪廓
+              - generic [ref=e327]: 永 國 字體 Aa 123
+            - generic [ref=e328] [cursor=pointer]:
+              - generic [ref=e329]:
+                - generic [ref=e330]: 漢儀齊黑繁
+                - generic [ref=e331]: 方正均勻黑體
+              - generic [ref=e332]: 永 國 字體 Aa 123
+            - generic [ref=e333] [cursor=pointer]:
+              - generic [ref=e334]:
+                - generic [ref=e335]: 山海黑奇式格特
+                - generic [ref=e336]: 奇幻哥特黑體
+              - generic [ref=e337]: 永 國 字體 Aa 123
+            - generic [ref=e338] [cursor=pointer]:
+              - generic [ref=e339]:
+                - generic [ref=e340]: 山海星夜格特
+                - generic [ref=e341]: 星夜哥特黑體
+              - generic [ref=e342]: 永 國 字體 Aa 123
+            - generic [ref=e343] [cursor=pointer]:
+              - generic [ref=e344]:
+                - generic [ref=e345]: Gen Ei Gothic P Heavy
+                - generic [ref=e346]: 源暎圓角超粗黑
+              - generic [ref=e347]: 永 國 字體 Aa 123
+            - generic [ref=e348] [cursor=pointer]:
+              - generic [ref=e349]:
+                - generic [ref=e350]: AR RomanMinchoJP UL
+                - generic [ref=e351]: 日系超細明朝
+              - generic [ref=e352]: 永 國 字體 Aa 123
+        - generic [ref=e353]:
+          - button "英文（34）" [ref=e354] [cursor=pointer]:
+            - img [ref=e355]
+            - text: 英文（34）
+          - generic [ref=e357]:
+            - generic [ref=e358] [cursor=pointer]:
+              - generic [ref=e360]: Monoton
+              - generic [ref=e361]: Aa Bb Cc 123
+            - generic [ref=e362] [cursor=pointer]:
+              - generic [ref=e364]: Bebas Neue
+              - generic [ref=e365]: Aa Bb Cc 123
+            - generic [ref=e366] [cursor=pointer]:
+              - generic [ref=e368]: Pacifico
+              - generic [ref=e369]: Aa Bb Cc 123
+            - generic [ref=e370] [cursor=pointer]:
+              - generic [ref=e372]: Press Start 2P
+              - generic [ref=e373]: Aa Bb Cc 123
+            - generic [ref=e374] [cursor=pointer]:
+              - generic [ref=e376]: Orbitron
+              - generic [ref=e377]: Aa Bb Cc 123
+            - generic [ref=e378] [cursor=pointer]:
+              - generic [ref=e380]: Audiowide
+              - generic [ref=e381]: Aa Bb Cc 123
+            - generic [ref=e382] [cursor=pointer]:
+              - generic [ref=e384]: Russo One
+              - generic [ref=e385]: Aa Bb Cc 123
+            - generic [ref=e386] [cursor=pointer]:
+              - generic [ref=e388]: Major Mono Display
+              - generic [ref=e389]: Aa Bb Cc 123
+            - generic [ref=e390] [cursor=pointer]:
+              - generic [ref=e392]: Abril Fatface
+              - generic [ref=e393]: Aa Bb Cc 123
+            - generic [ref=e394] [cursor=pointer]:
+              - generic [ref=e396]: Rubik Glitch
+              - generic [ref=e397]: Aa Bb Cc 123
+            - generic [ref=e398] [cursor=pointer]:
+              - generic [ref=e400]: Bungee Shade
+              - generic [ref=e401]: Aa Bb Cc 123
+            - generic [ref=e402] [cursor=pointer]:
+              - generic [ref=e404]: Rubik Wet Paint
+              - generic [ref=e405]: Aa Bb Cc 123
+            - generic [ref=e406] [cursor=pointer]:
+              - generic [ref=e408]: Cherry Bomb One
+              - generic [ref=e409]: Aa Bb Cc 123
+            - generic [ref=e410] [cursor=pointer]:
+              - generic [ref=e412]: Kablammo
+              - generic [ref=e413]: Aa Bb Cc 123
+            - generic [ref=e414] [cursor=pointer]:
+              - generic [ref=e416]: Faster One
+              - generic [ref=e417]: Aa Bb Cc 123
+            - generic [ref=e418] [cursor=pointer]:
+              - generic [ref=e420]: Wallpoet
+              - generic [ref=e421]: Aa Bb Cc 123
+            - generic [ref=e422] [cursor=pointer]:
+              - generic [ref=e424]: Iceberg
+              - generic [ref=e425]: Aa Bb Cc 123
+            - generic [ref=e426] [cursor=pointer]:
+              - generic [ref=e428]: Rubik Mono One
+              - generic [ref=e429]: Aa Bb Cc 123
+            - generic [ref=e430] [cursor=pointer]:
+              - generic [ref=e432]: Modak
+              - generic [ref=e433]: Aa Bb Cc 123
+            - generic [ref=e434] [cursor=pointer]:
+              - generic [ref=e436]: Playfair Display
+              - generic [ref=e437]: Aa Bb Cc 123
+            - generic [ref=e438] [cursor=pointer]:
+              - generic [ref=e440]: DM Serif Display
+              - generic [ref=e441]: Aa Bb Cc 123
+            - generic [ref=e442] [cursor=pointer]:
+              - generic [ref=e444]: Bodoni Moda
+              - generic [ref=e445]: Aa Bb Cc 123
+            - generic [ref=e446] [cursor=pointer]:
+              - generic [ref=e448]: Yeseva One
+              - generic [ref=e449]: Aa Bb Cc 123
+            - generic [ref=e450] [cursor=pointer]:
+              - generic [ref=e452]: Libre Bodoni
+              - generic [ref=e453]: Aa Bb Cc 123
+            - generic [ref=e454] [cursor=pointer]:
+              - generic [ref=e456]: Roboto Slab
+              - generic [ref=e457]: Aa Bb Cc 123
+            - generic [ref=e458] [cursor=pointer]:
+              - generic [ref=e460]: Old Standard TT
+              - generic [ref=e461]: Aa Bb Cc 123
+            - generic [ref=e462] [cursor=pointer]:
+              - generic [ref=e464]: Cormorant SC
+              - generic [ref=e465]: Aa Bb Cc 123
+            - generic [ref=e466] [cursor=pointer]:
+              - generic [ref=e468]: Source Serif 4
+              - generic [ref=e469]: Aa Bb Cc 123
+            - generic [ref=e470] [cursor=pointer]:
+              - generic [ref=e472]: Fraunces
+              - generic [ref=e473]: Aa Bb Cc 123
+            - generic [ref=e474] [cursor=pointer]:
+              - generic [ref=e476]: Instrument Serif
+              - generic [ref=e477]: Aa Bb Cc 123
+            - generic [ref=e478] [cursor=pointer]:
+              - generic [ref=e480]: Caveat
+              - generic [ref=e481]: Aa Bb Cc 123
+            - generic [ref=e482] [cursor=pointer]:
+              - generic [ref=e484]: Patrick Hand
+              - generic [ref=e485]: Aa Bb Cc 123
+            - generic [ref=e486] [cursor=pointer]:
+              - generic [ref=e488]: DM Sans
+              - generic [ref=e489]: Aa Bb Cc 123
+            - generic [ref=e490] [cursor=pointer]:
+              - generic [ref=e492]: JetBrains Mono
+              - generic [ref=e493]: Aa Bb Cc 123

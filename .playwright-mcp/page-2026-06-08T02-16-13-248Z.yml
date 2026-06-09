@@ -1,0 +1,662 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: UI Component Variants · 款式參考 · 即時 CSS
+      - heading "組件款式參考菜單" [level=1] [ref=e6]
+    - link "← 回效果參考圖" [ref=e7] [cursor=pointer]:
+      - /url: gallery.html
+  - paragraph [ref=e8]: 每種組件都展示不同款式 × 多彩設計(玻璃擬態／新擬態／3D按下／漸層／霓虹／黏土／野獸派…),配色也鋪上真實色系。看上哪個直接跟我說,我寫進工具。也可把小紅書看到的款式截圖貼我,照做到最準。
+  - navigation [ref=e9]:
+    - link "按鈕" [ref=e10] [cursor=pointer]:
+      - /url: "#btn"
+    - link "輸入框" [ref=e11] [cursor=pointer]:
+      - /url: "#input"
+    - link "數字輸入" [ref=e12] [cursor=pointer]:
+      - /url: "#number"
+    - link "下拉/搜尋" [ref=e13] [cursor=pointer]:
+      - /url: "#select"
+    - link "開關" [ref=e14] [cursor=pointer]:
+      - /url: "#switch"
+    - link "滑桿" [ref=e15] [cursor=pointer]:
+      - /url: "#slider"
+    - link "核取/單選" [ref=e16] [cursor=pointer]:
+      - /url: "#choice"
+    - link "工具列" [ref=e17] [cursor=pointer]:
+      - /url: "#toolbar"
+    - link "導覽列" [ref=e18] [cursor=pointer]:
+      - /url: "#navbar"
+    - link "分頁" [ref=e19] [cursor=pointer]:
+      - /url: "#tabs"
+    - link "標籤" [ref=e20] [cursor=pointer]:
+      - /url: "#chip"
+    - link "徽章" [ref=e21] [cursor=pointer]:
+      - /url: "#badge"
+    - link "頭像" [ref=e22] [cursor=pointer]:
+      - /url: "#avatar"
+    - link "進度" [ref=e23] [cursor=pointer]:
+      - /url: "#progress"
+    - link "通知" [ref=e24] [cursor=pointer]:
+      - /url: "#feedback"
+  - generic [ref=e25]:
+    - generic [ref=e26]:
+      - heading "按鈕 Button" [level=2] [ref=e27]
+      - generic [ref=e28]: 20 款式
+    - generic [ref=e29]:
+      - generic [ref=e30]:
+        - button "漸層膠囊" [ref=e31] [cursor=pointer]
+        - generic [ref=e32]: 按鈕 · 漸層膠囊(紫粉)
+      - generic [ref=e33]:
+        - button "海洋漸層" [ref=e34] [cursor=pointer]
+        - generic [ref=e35]: 按鈕 · 漸層(藍青)
+      - generic [ref=e36]:
+        - button "日落漸層" [ref=e37] [cursor=pointer]
+        - generic [ref=e38]: 按鈕 · 漸層(橘紅)
+      - generic [ref=e39]:
+        - button "立體按下" [ref=e40] [cursor=pointer]
+        - generic [ref=e41]: 按鈕 · 3D按下(橘)
+      - generic [ref=e42]:
+        - button "立體藍" [ref=e43] [cursor=pointer]
+        - generic [ref=e44]: 按鈕 · 3D按下(藍)
+      - generic [ref=e45]:
+        - button "新擬態浮起" [ref=e46] [cursor=pointer]
+        - generic [ref=e47]: 按鈕 · 新擬態浮起
+      - generic [ref=e48]:
+        - button "新擬態凹陷" [ref=e49] [cursor=pointer]
+        - generic [ref=e50]: 按鈕 · 新擬態凹陷
+      - generic [ref=e51]:
+        - button "玻璃擬態" [ref=e53] [cursor=pointer]
+        - generic [ref=e54]: 按鈕 · 玻璃擬態
+      - generic [ref=e55]:
+        - button "霓虹發光" [ref=e56] [cursor=pointer]
+        - generic [ref=e57]: 按鈕 · 霓虹(青)
+      - generic [ref=e58]:
+        - button "霓虹粉" [ref=e59] [cursor=pointer]
+        - generic [ref=e60]: 按鈕 · 霓虹(粉)
+      - generic [ref=e61]:
+        - button "柔感陰影" [ref=e62] [cursor=pointer]
+        - generic [ref=e63]: 按鈕 · 柔感陰影(紫)
+      - generic [ref=e64]:
+        - button "柔感藍" [ref=e65] [cursor=pointer]
+        - generic [ref=e66]: 按鈕 · 柔感陰影(藍)
+      - generic [ref=e67]:
+        - button "漸層描邊" [ref=e68] [cursor=pointer]
+        - generic [ref=e69]: 按鈕 · 漸層描邊
+      - generic [ref=e70]:
+        - button "黏土擬態" [ref=e71] [cursor=pointer]
+        - generic [ref=e72]: 按鈕 · 黏土擬態
+      - generic [ref=e73]:
+        - button "新野獸派" [ref=e74] [cursor=pointer]
+        - generic [ref=e75]: 按鈕 · 新野獸派
+      - generic [ref=e76]:
+        - button "金屬質感" [ref=e77] [cursor=pointer]
+        - generic [ref=e78]: 按鈕 · 金屬質感
+      - generic [ref=e79]:
+        - button "圖示+文字" [ref=e80] [cursor=pointer]:
+          - img [ref=e81]
+          - text: 圖示+文字
+        - generic [ref=e83]: 按鈕 · 圖示+文字
+      - generic [ref=e84]:
+        - button "幽靈外框" [ref=e85] [cursor=pointer]
+        - generic [ref=e86]: 按鈕 · 幽靈外框
+      - generic [ref=e87]:
+        - button "區塊全寬鈕" [ref=e88] [cursor=pointer]
+        - generic [ref=e89]: 按鈕 · 區塊全寬
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - button "取消" [ref=e92] [cursor=pointer]
+          - button "確定" [ref=e93] [cursor=pointer]
+        - generic [ref=e94]: 按鈕 · 雙按鈕主次
+      - generic [ref=e95]:
+        - button [ref=e96] [cursor=pointer]:
+          - img [ref=e97]
+        - generic [ref=e99]: 按鈕 · 浮動FAB
+      - generic [ref=e100]:
+        - button "載入中" [ref=e101] [cursor=pointer]: 載入中
+        - generic [ref=e103]: 按鈕 · 載入中
+  - generic [ref=e104]:
+    - generic [ref=e105]:
+      - heading "文字輸入框 Text input" [level=2] [ref=e106]
+      - generic [ref=e107]: 14 款式
+    - generic [ref=e108]:
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - generic [ref=e111]: 電子郵件
+          - textbox "you@mail.com" [ref=e112]
+        - generic [ref=e113]: 輸入 · 標題在上(藍 focus)
+      - generic [ref=e114]:
+        - generic [ref=e115]:
+          - textbox "暱稱" [ref=e116]:
+            - /placeholder: " "
+            - text: 森森
+          - generic [ref=e117]: 暱稱
+        - generic [ref=e118]: 輸入 · 浮動標籤
+      - generic [ref=e119]:
+        - textbox "新擬態凹陷" [ref=e120]
+        - generic [ref=e121]: 輸入 · 新擬態
+      - generic [ref=e122]:
+        - textbox "霓虹輸入框" [ref=e123]
+        - generic [ref=e124]: 輸入 · 霓虹
+      - generic [ref=e125]:
+        - textbox "漸層描邊框" [ref=e126]
+        - generic [ref=e127]: 輸入 · 漸層描邊
+      - generic [ref=e128]:
+        - generic [ref=e129]:
+          - img [ref=e130]
+          - textbox "前置圖示" [ref=e133]
+        - generic [ref=e134]: 輸入 · 前置圖示(霓虹)
+      - generic [ref=e135]:
+        - generic [ref=e136]:
+          - textbox "尺寸" [ref=e137]: "48"
+          - generic [ref=e138]: px
+        - generic [ref=e139]: 輸入 · 後置單位
+      - generic [ref=e140]:
+        - generic [ref=e141]:
+          - textbox [ref=e142]: 可清除的內容
+          - button "×" [ref=e143] [cursor=pointer]
+        - generic [ref=e144]: 輸入 · 可清除
+      - generic [ref=e145]:
+        - generic [ref=e146]:
+          - textbox [ref=e147]: 格式正確
+          - generic [ref=e148]: ✓ 看起來不錯
+        - generic [ref=e149]: 輸入 · 成功態
+      - generic [ref=e150]:
+        - generic [ref=e151]:
+          - textbox [ref=e152]: 格式錯誤
+          - generic [ref=e153]: ✕ 請輸入有效信箱
+        - generic [ref=e154]: 輸入 · 錯誤態
+      - generic [ref=e155]:
+        - generic [ref=e156]:
+          - textbox [ref=e157]: secret
+          - button [ref=e158] [cursor=pointer]:
+            - img [ref=e159]
+        - generic [ref=e162]: 輸入 · 密碼切換
+      - generic [ref=e163]:
+        - generic [ref=e164]:
+          - img [ref=e165]
+          - textbox "搜尋…" [ref=e168]
+        - generic [ref=e169]: 輸入 · 搜尋
+      - generic [ref=e170]:
+        - generic [ref=e171]:
+          - textbox [ref=e172]: "3"
+          - textbox [ref=e173]: "6"
+          - textbox [ref=e174]: "9"
+          - textbox [ref=e175]
+        - generic [ref=e176]: 輸入 · OTP 驗證碼
+      - generic [ref=e177]:
+        - generic [ref=e178]:
+          - generic [ref=e179]: 明體 ×
+          - generic [ref=e180]: 黑體 ×
+          - textbox "加標籤" [ref=e181]
+        - generic [ref=e182]: 輸入 · 標籤輸入
+      - generic [ref=e183]:
+        - textbox "多行文字區塊…" [ref=e184]: 一杯森活力滿分
+        - generic [ref=e185]: 輸入 · 文字區塊
+  - generic [ref=e186]:
+    - generic [ref=e187]:
+      - heading "數字輸入 Number" [level=2] [ref=e188]
+      - generic [ref=e189]: 4 款式
+    - generic [ref=e190]:
+      - generic [ref=e191]:
+        - generic [ref=e192]:
+          - button "−" [ref=e193] [cursor=pointer]
+          - textbox [ref=e194]: "12"
+          - button "+" [ref=e195] [cursor=pointer]
+        - generic [ref=e196]: 數字 · 步進 ±(玻璃)
+      - generic [ref=e197]:
+        - generic [ref=e198]:
+          - button "−" [ref=e199] [cursor=pointer]
+          - textbox [ref=e200]: "48"
+          - button "+" [ref=e201] [cursor=pointer]
+        - generic [ref=e202]: 數字 · 漸層
+      - generic [ref=e203]:
+        - generic [ref=e204]:
+          - button "−" [ref=e205] [cursor=pointer]
+          - textbox [ref=e206]: "6"
+          - button "+" [ref=e207] [cursor=pointer]
+        - generic [ref=e208]: 數字 · 霓虹
+      - generic [ref=e209]:
+        - generic [ref=e210]:
+          - textbox [ref=e211]: "3"
+          - generic [ref=e212]:
+            - button "▲" [ref=e213] [cursor=pointer]
+            - button "▼" [ref=e214] [cursor=pointer]
+        - generic [ref=e215]: 數字 · 新擬態垂直
+  - generic [ref=e216]:
+    - generic [ref=e217]:
+      - heading "下拉 / 搜尋選擇" [level=2] [ref=e218]
+      - generic [ref=e219]: 3 款式
+    - generic [ref=e220]:
+      - generic [ref=e221]:
+        - combobox [ref=e222] [cursor=pointer]:
+          - option "選擇字型" [selected]
+          - option "明體"
+        - generic [ref=e223]: 下拉 · 漸層描邊
+      - generic [ref=e224]:
+        - generic [ref=e225]:
+          - img [ref=e226]
+          - textbox "搜尋並選擇" [ref=e229]
+          - img [ref=e230]
+        - generic [ref=e232]: 下拉 · 可搜尋(霓虹)
+      - generic [ref=e233]:
+        - generic [ref=e234]:
+          - generic [ref=e235]: 標籤A ×
+          - generic [ref=e236]: 標籤B ×
+          - textbox "多選…" [ref=e237]
+        - generic [ref=e238]: 下拉 · 多選標籤
+  - generic [ref=e239]:
+    - generic [ref=e240]:
+      - heading "開關 Switch" [level=2] [ref=e241]
+      - generic [ref=e242]: 5 款式
+    - generic [ref=e243]:
+      - generic [ref=e247]: 開關 · iOS 藍
+      - generic [ref=e248]:
+        - generic [ref=e250] [cursor=pointer]: 開
+        - generic [ref=e252]: 開關 · 漸層+開關字
+      - generic [ref=e253]:
+        - img [ref=e256] [cursor=pointer]
+        - generic [ref=e258]: 開關 · 含圖示(綠)
+      - generic [ref=e262]: 開關 · 霓虹方形
+      - generic [ref=e263]:
+        - generic [ref=e265]:
+          - generic [ref=e266]: 自動套用
+          - text: 變更時即時更新預覽
+        - generic [ref=e269]: 開關 · 新擬態設定列
+  - generic [ref=e270]:
+    - generic [ref=e271]:
+      - heading "滑桿 Slider" [level=2] [ref=e272]
+      - generic [ref=e273]: 5 款式
+    - generic [ref=e274]:
+      - generic [ref=e280]: 滑桿 · 漸層(紫粉)
+      - generic [ref=e287]: 滑桿 · 範圍(藍青)
+      - generic [ref=e299]: 滑桿 · 新擬態+刻度
+      - generic [ref=e300]:
+        - generic [ref=e302]: "58"
+        - generic [ref=e306]: 滑桿 · 霓虹+數值氣泡
+      - generic [ref=e311]: 滑桿 · 垂直
+  - generic [ref=e312]:
+    - generic [ref=e313]:
+      - heading "核取 / 單選" [level=2] [ref=e314]
+      - generic [ref=e315]: 6 款式
+    - generic [ref=e316]:
+      - generic [ref=e317]:
+        - generic [ref=e318] [cursor=pointer]:
+          - img [ref=e320]
+          - text: 方框勾選
+        - generic [ref=e322]: 核取 · 方框(藍)
+      - generic [ref=e323]:
+        - generic [ref=e324] [cursor=pointer]:
+          - img [ref=e326]
+          - text: 圓形勾選
+        - generic [ref=e328]: 核取 · 圓形(粉)
+      - generic [ref=e329]:
+        - generic [ref=e330] [cursor=pointer]: 不確定態
+        - generic [ref=e332]: 核取 · 不確定(綠)
+      - generic [ref=e333]:
+        - generic [ref=e334]:
+          - generic [ref=e335] [cursor=pointer]: 選項一
+          - generic [ref=e337] [cursor=pointer]: 選項二
+        - generic [ref=e339]: 單選 · 群組(藍)
+      - generic [ref=e340]:
+        - generic [ref=e341]:
+          - generic [ref=e342] [cursor=pointer]: 月繳
+          - generic [ref=e343] [cursor=pointer]: 年繳
+        - generic [ref=e344]: 單選 · 卡片選擇
+      - generic [ref=e345]:
+        - generic [ref=e346]:
+          - generic [ref=e347]: 中文
+          - generic [ref=e348]: 英文
+          - generic [ref=e349]: 數字
+        - generic [ref=e350]: 多選 · 籌碼篩選
+  - generic [ref=e351]:
+    - generic [ref=e352]:
+      - heading "工具列 Toolbar" [level=2] [ref=e353]
+      - generic [ref=e354]: 5 款式
+    - generic [ref=e355]:
+      - generic [ref=e356]:
+        - generic [ref=e357]:
+          - button [ref=e358] [cursor=pointer]:
+            - img [ref=e359]
+          - button [ref=e361] [cursor=pointer]:
+            - img [ref=e362]
+          - button [ref=e364] [cursor=pointer]:
+            - img [ref=e365]
+        - generic [ref=e367]: 工具列 · 圖示列(藍)
+      - generic [ref=e368]:
+        - generic [ref=e369]:
+          - button "新增" [ref=e370] [cursor=pointer]:
+            - img [ref=e371]
+            - text: 新增
+          - button "儲存" [ref=e373] [cursor=pointer]:
+            - img [ref=e374]
+            - text: 儲存
+        - generic [ref=e376]: 工具列 · 含文字
+      - generic [ref=e377]:
+        - generic [ref=e378]:
+          - button [ref=e379] [cursor=pointer]:
+            - img [ref=e380]
+          - button [ref=e381] [cursor=pointer]:
+            - img [ref=e382]
+          - button [ref=e384] [cursor=pointer]:
+            - img [ref=e385]
+        - generic [ref=e387]: 工具列 · 分組(紫)
+      - generic [ref=e388]:
+        - generic [ref=e389]:
+          - button [ref=e390] [cursor=pointer]:
+            - img [ref=e391]
+          - generic [ref=e394]:
+            - img [ref=e395]
+            - textbox "搜尋…" [ref=e398]
+          - button [ref=e399] [cursor=pointer]:
+            - img [ref=e400]
+        - generic [ref=e404]: 工具列 · 含搜尋+溢出選單
+      - generic [ref=e405]:
+        - generic [ref=e406]:
+          - button [ref=e407] [cursor=pointer]:
+            - img [ref=e408]
+          - button [ref=e410] [cursor=pointer]:
+            - img [ref=e411]
+          - button [ref=e414] [cursor=pointer]:
+            - img [ref=e415]
+        - generic [ref=e417]: 工具列 · 垂直側邊
+  - generic [ref=e418]:
+    - generic [ref=e419]:
+      - heading "導覽列 Navbar / 行動底部導覽" [level=2] [ref=e420]
+      - generic [ref=e421]: 10 款式
+    - generic [ref=e422]:
+      - generic [ref=e423]:
+        - generic [ref=e424]:
+          - generic [ref=e425]: 森
+          - generic [ref=e426]:
+            - generic [ref=e427]: 首頁
+            - generic [ref=e428]: 作品
+            - generic [ref=e429]: 關於
+          - button "免費試用" [ref=e430] [cursor=pointer]
+        - generic [ref=e431]: 頂部導覽 · 含CTA
+      - generic [ref=e432]:
+        - generic [ref=e433]:
+          - generic [ref=e434]: 森
+          - generic [ref=e435]:
+            - img [ref=e436]
+            - textbox "搜尋" [ref=e439]
+          - generic [ref=e440]: 森
+        - generic [ref=e441]: 頂部導覽 · 含搜尋+頭像
+      - generic [ref=e442]:
+        - generic [ref=e443]:
+          - button "首頁" [ref=e444] [cursor=pointer]:
+            - img [ref=e445]
+            - text: 首頁
+          - button [ref=e447] [cursor=pointer]:
+            - img [ref=e448]
+          - button [ref=e451] [cursor=pointer]:
+            - img [ref=e452]
+          - button [ref=e454] [cursor=pointer]:
+            - img [ref=e455]
+        - generic [ref=e458]: 底部導覽 · 膠囊高亮(M3)
+      - generic [ref=e459]:
+        - generic [ref=e460]:
+          - button [ref=e461] [cursor=pointer]:
+            - img [ref=e462]
+          - button [ref=e464] [cursor=pointer]:
+            - img [ref=e465]
+          - button [ref=e468] [cursor=pointer]:
+            - img [ref=e469]
+          - button [ref=e471] [cursor=pointer]:
+            - img [ref=e472]
+        - generic [ref=e475]: 底部導覽 · 浮動白圓角
+      - generic [ref=e476]:
+        - generic [ref=e477]:
+          - button [ref=e478]:
+            - img [ref=e479]
+          - button [ref=e481] [cursor=pointer]:
+            - img [ref=e482]
+          - button [ref=e484] [cursor=pointer]:
+            - img [ref=e485]
+          - button [ref=e488] [cursor=pointer]:
+            - img [ref=e489]
+          - button [ref=e491] [cursor=pointer]:
+            - img [ref=e492]
+        - generic [ref=e495]: 底部導覽 · 中央凸起FAB
+      - generic [ref=e496]:
+        - generic [ref=e497]:
+          - generic [ref=e498]: 森
+          - generic [ref=e499]:
+            - button [ref=e500] [cursor=pointer]:
+              - img [ref=e501]
+            - button "NEW" [ref=e503] [cursor=pointer]:
+              - generic [ref=e504]: NEW
+              - img [ref=e505]
+            - button [ref=e508] [cursor=pointer]:
+              - img [ref=e509]
+        - generic [ref=e511]: 底部導覽 · 缺角凹槽+浮動頭像
+      - generic [ref=e512]:
+        - generic [ref=e513]:
+          - button [ref=e514]:
+            - img [ref=e515]
+          - generic [ref=e517]:
+            - button [ref=e518] [cursor=pointer]:
+              - img [ref=e519]
+            - button [ref=e521] [cursor=pointer]:
+              - img [ref=e522]
+            - button [ref=e524] [cursor=pointer]:
+              - img [ref=e525]
+            - button [ref=e527] [cursor=pointer]:
+              - img [ref=e528]
+        - generic [ref=e530]: 底部導覽 · 曲線凹槽中央FAB
+      - generic [ref=e531]:
+        - generic [ref=e532]:
+          - button [ref=e533] [cursor=pointer]:
+            - img [ref=e534]
+          - button [ref=e536] [cursor=pointer]:
+            - img [ref=e537]
+          - button [ref=e540] [cursor=pointer]:
+            - img [ref=e541]
+          - button [ref=e543] [cursor=pointer]:
+            - img [ref=e544]
+        - generic [ref=e547]: 底部導覽 · 全黑浮動+亮active
+      - generic [ref=e548]:
+        - generic [ref=e549]:
+          - button [ref=e550] [cursor=pointer]:
+            - img [ref=e551]
+          - button [ref=e553] [cursor=pointer]:
+            - img [ref=e554]
+          - button [ref=e556] [cursor=pointer]:
+            - img [ref=e557]
+          - button [ref=e559] [cursor=pointer]:
+            - img [ref=e560]
+          - button "GO!" [ref=e563] [cursor=pointer]
+        - generic [ref=e564]: 底部導覽 · GO 膠囊整合
+      - generic [ref=e565]:
+        - generic [ref=e566]:
+          - button [ref=e567] [cursor=pointer]:
+            - img [ref=e568]
+          - button [ref=e570] [cursor=pointer]:
+            - img [ref=e571]
+          - button [ref=e574] [cursor=pointer]:
+            - img [ref=e575]
+          - button [ref=e577] [cursor=pointer]:
+            - img [ref=e578]
+        - generic [ref=e581]: 底部導覽 · 毛玻璃底列
+  - generic [ref=e582]:
+    - generic [ref=e583]:
+      - heading "分頁 Tabs" [level=2] [ref=e584]
+      - generic [ref=e585]: 5 款式
+    - generic [ref=e586]:
+      - generic [ref=e587]:
+        - generic [ref=e588]:
+          - button "總覽" [ref=e589] [cursor=pointer]
+          - button "設定" [ref=e590] [cursor=pointer]
+          - button "紀錄" [ref=e591] [cursor=pointer]
+        - generic [ref=e592]: 分頁 · 漸層底線
+      - generic [ref=e593]:
+        - generic [ref=e594]:
+          - button "全部" [ref=e595] [cursor=pointer]
+          - button "進行中" [ref=e596] [cursor=pointer]
+        - generic [ref=e597]: 分頁 · 膠囊(藍青)
+      - generic [ref=e598]:
+        - generic [ref=e599]:
+          - button "面板" [ref=e600] [cursor=pointer]:
+            - img [ref=e601]
+            - text: 面板
+          - button "狀態" [ref=e603] [cursor=pointer]:
+            - img [ref=e604]
+            - text: 狀態
+        - generic [ref=e606]: 分頁 · 含圖示
+      - generic [ref=e607]:
+        - generic [ref=e608]:
+          - button "收件匣 5" [ref=e609] [cursor=pointer]:
+            - text: 收件匣
+            - generic [ref=e610]: "5"
+          - button "已寄出" [ref=e611] [cursor=pointer]
+        - generic [ref=e612]: 分頁 · 含數字徽章
+      - generic [ref=e613]:
+        - generic [ref=e614]:
+          - generic [ref=e615]:
+            - text: index.html
+            - generic [ref=e616] [cursor=pointer]: ×
+          - generic [ref=e617]:
+            - text: style.css
+            - generic [ref=e618] [cursor=pointer]: ×
+        - generic [ref=e619]: 分頁 · 可關閉(瀏覽器型)
+  - generic [ref=e620]:
+    - generic [ref=e621]:
+      - heading "標籤 Chip / Tag" [level=2] [ref=e622]
+      - generic [ref=e623]: 6 款式
+    - generic [ref=e624]:
+      - generic [ref=e625]:
+        - generic [ref=e626]: 一般標籤
+        - generic [ref=e627]: 標籤 · 一般(藍)
+      - generic [ref=e628]:
+        - generic [ref=e629]:
+          - text: 可關閉
+          - generic [ref=e630] [cursor=pointer]: ×
+        - generic [ref=e631]: 標籤 · 可關閉(粉)
+      - generic [ref=e632]:
+        - generic [ref=e633]:
+          - img [ref=e634]
+          - text: 含圖示
+        - generic [ref=e636]: 標籤 · 含圖示(琥珀)
+      - generic [ref=e637]:
+        - generic [ref=e638]:
+          - generic [ref=e639]: 王
+          - text: 王小明
+        - generic [ref=e640]: 標籤 · 含頭像(紫)
+      - generic [ref=e641]:
+        - generic [ref=e642]:
+          - text: 未讀
+          - generic [ref=e643]: "12"
+        - generic [ref=e644]: 標籤 · 漸層計數
+      - generic [ref=e645]:
+        - generic [ref=e646]:
+          - generic [ref=e647]: 已選
+          - generic [ref=e648]: 可選
+        - generic [ref=e649]: 標籤 · 可點篩選
+  - generic [ref=e650]:
+    - generic [ref=e651]:
+      - heading "徽章 Badge" [level=2] [ref=e652]
+      - generic [ref=e653]: 4 款式
+    - generic [ref=e654]:
+      - generic [ref=e655]:
+        - generic [ref=e656]:
+          - img [ref=e657]
+          - generic [ref=e659]: "5"
+        - generic [ref=e660]: 徽章 · 漸層數字
+      - generic [ref=e661]:
+        - img [ref=e663]
+        - generic [ref=e666]: 徽章 · 藍點
+      - generic [ref=e667]:
+        - generic [ref=e668]:
+          - img [ref=e669]
+          - generic [ref=e672]: VIP
+        - generic [ref=e673]: 徽章 · 角落標籤
+      - generic [ref=e674]:
+        - generic [ref=e675]:
+          - generic [ref=e676]: 運作中
+          - generic [ref=e678]: 同步中
+          - generic [ref=e680]: 離線
+        - generic [ref=e682]: 徽章 · 狀態點(三色)
+  - generic [ref=e683]:
+    - generic [ref=e684]:
+      - heading "頭像 Avatar" [level=2] [ref=e685]
+      - generic [ref=e686]: 5 款式
+    - generic [ref=e687]:
+      - generic [ref=e688]:
+        - generic [ref=e689]: 森
+        - generic [ref=e690]: 頭像 · 文字圓形(紫粉)
+      - generic [ref=e691]:
+        - generic [ref=e692]: A
+        - generic [ref=e693]: 頭像 · 方圓(藍青)
+      - generic [ref=e694]:
+        - generic [ref=e696]: 王
+        - generic [ref=e698]: 頭像 · 在線點(翠綠)
+      - generic [ref=e699]:
+        - generic [ref=e700]:
+          - generic [ref=e701]: 林
+          - generic [ref=e702]: "3"
+        - generic [ref=e703]: 頭像 · 含徽章(橘紅)
+      - generic [ref=e704]:
+        - generic [ref=e705]:
+          - generic [ref=e706]: A
+          - generic [ref=e707]: B
+          - generic [ref=e708]: C
+          - generic [ref=e709]: "+5"
+        - generic [ref=e710]: 頭像 · 群組疊
+  - generic [ref=e711]:
+    - generic [ref=e712]:
+      - heading "進度 Progress" [level=2] [ref=e713]
+      - generic [ref=e714]: 6 款式
+    - generic [ref=e715]:
+      - generic [ref=e719]: 進度 · 線性(紫粉)
+      - generic [ref=e720]:
+        - generic [ref=e722]:
+          - generic [ref=e723]: 上傳中
+          - generic [ref=e724]: 62%
+        - generic [ref=e727]: 進度 · 含百分比(藍青)
+      - generic [ref=e735]: 進度 · 分段(藍)
+      - generic [ref=e736]:
+        - generic [ref=e737]: 67%
+        - generic [ref=e738]: 進度 · 圓環(紫)
+      - generic [ref=e741]: 進度 · 不確定(載入)
+      - generic [ref=e744]: 進度 · 轉圈 Spinner
+  - generic [ref=e745]:
+    - generic [ref=e746]:
+      - heading "通知 / 列表項" [level=2] [ref=e747]
+      - generic [ref=e748]: 4 款式
+    - generic [ref=e749]:
+      - generic [ref=e750]:
+        - generic [ref=e751]:
+          - generic [ref=e752]: i
+          - generic [ref=e753]:
+            - generic [ref=e754]: 提示
+            - text: 這是一般資訊通知。
+        - generic [ref=e755]: 通知 · 資訊(藍)
+      - generic [ref=e756]:
+        - generic [ref=e757]:
+          - generic [ref=e758]: ✓
+          - generic [ref=e759]:
+            - generic [ref=e760]: 已儲存
+            - text: 設定已成功更新。
+          - generic [ref=e761] [cursor=pointer]: ×
+        - generic [ref=e762]: 通知 · 成功(綠)+關閉
+      - generic [ref=e763]:
+        - generic [ref=e764]:
+          - generic [ref=e765]: "!"
+          - generic [ref=e766]:
+            - generic [ref=e767]: 要套用變更嗎?
+            - text: 尚未儲存的調整將被套用。
+            - generic [ref=e768]:
+              - button "套用" [ref=e769] [cursor=pointer]
+              - button "稍後" [ref=e770] [cursor=pointer]
+        - generic [ref=e771]: 通知 · 警告(琥珀)+動作鈕
+      - generic [ref=e772]:
+        - generic [ref=e773]:
+          - generic [ref=e774]: ✓
+          - text: 已複製 CSS
+        - generic [ref=e775]: 通知 · 漸層 Toast
+      - generic [ref=e776]:
+        - generic [ref=e777]:
+          - generic [ref=e778]: 森
+          - generic [ref=e779]:
+            - generic [ref=e780]: 一杯森活力
+            - text: 飲品 · 上架中
+          - generic [ref=e781]: 在線
+        - generic [ref=e783]: 列表項

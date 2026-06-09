@@ -1,0 +1,249 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - heading "效果參考菜單" [level=1] [ref=e3]
+    - paragraph [ref=e4]: 挑好哪一張,跟我說它的檔名(或描述),我用真 CSS 寫進工具。點圖可放大;滑到圖右上角可刪除;也可拖曳圖片進視窗或按「上傳圖片」新增。
+    - generic [ref=e5]:
+      - button "＋ 上傳圖片" [ref=e6] [cursor=pointer]
+      - button "↻ 重新整理" [ref=e7] [cursor=pointer]
+      - generic [ref=e8]: 40 張
+  - generic [ref=e9]:
+    - figure "02.png ＋ 點此加說明" [ref=e10]:
+      - img "02.png"
+      - button "✕" [ref=e11] [cursor=pointer]
+      - generic [ref=e12]:
+        - generic [ref=e13]: 02.png
+        - generic "點此編輯說明" [ref=e14]: ＋ 點此加說明
+    - figure "03.png ＋ 點此加說明" [ref=e15]:
+      - img "03.png"
+      - button "✕" [ref=e16] [cursor=pointer]
+      - generic [ref=e17]:
+        - generic [ref=e18]: 03.png
+        - generic "點此編輯說明" [ref=e19]: ＋ 點此加說明
+    - figure "04.png ＋ 點此加說明" [ref=e20]:
+      - img "04.png"
+      - button "✕" [ref=e21] [cursor=pointer]
+      - generic [ref=e22]:
+        - generic [ref=e23]: 04.png
+        - generic "點此編輯說明" [ref=e24]: ＋ 點此加說明
+    - figure "05.png ＋ 點此加說明" [ref=e25]:
+      - img "05.png"
+      - button "✕" [ref=e26] [cursor=pointer]
+      - generic [ref=e27]:
+        - generic [ref=e28]: 05.png
+        - generic "點此編輯說明" [ref=e29]: ＋ 點此加說明
+    - figure "06.png ＋ 點此加說明" [ref=e30]:
+      - img "06.png"
+      - button "✕" [ref=e31] [cursor=pointer]
+      - generic [ref=e32]:
+        - generic [ref=e33]: 06.png
+        - generic "點此編輯說明" [ref=e34]: ＋ 點此加說明
+    - figure "07.png ＋ 點此加說明" [ref=e35]:
+      - img "07.png"
+      - button "✕" [ref=e36] [cursor=pointer]
+      - generic [ref=e37]:
+        - generic [ref=e38]: 07.png
+        - generic "點此編輯說明" [ref=e39]: ＋ 點此加說明
+    - figure "12種設計風格.png ＋ 點此加說明" [ref=e40]:
+      - img "12種設計風格.png"
+      - button "✕" [ref=e41] [cursor=pointer]
+      - generic [ref=e42]:
+        - generic [ref=e43]: 12種設計風格.png
+        - generic "點此編輯說明" [ref=e44]: ＋ 點此加說明
+    - figure "手機搜尋框.png ＋ 點此加說明" [ref=e45]:
+      - img "手機搜尋框.png"
+      - button "✕" [ref=e46] [cursor=pointer]
+      - generic [ref=e47]:
+        - generic [ref=e48]: 手機搜尋框.png
+        - generic "點此編輯說明" [ref=e49]: ＋ 點此加說明
+    - figure "出圖提示慈.png ＋ 點此加說明" [ref=e50]:
+      - img "出圖提示慈.png"
+      - button "✕" [ref=e51] [cursor=pointer]
+      - generic [ref=e52]:
+        - generic [ref=e53]: 出圖提示慈.png
+        - generic "點此編輯說明" [ref=e54]: ＋ 點此加說明
+    - figure "外框.png ＋ 點此加說明" [ref=e55]:
+      - img "外框.png"
+      - button "✕" [ref=e56] [cursor=pointer]
+      - generic [ref=e57]:
+        - generic [ref=e58]: 外框.png
+        - generic "點此編輯說明" [ref=e59]: ＋ 點此加說明
+    - figure "外框03.png ＋ 點此加說明" [ref=e60]:
+      - img "外框03.png"
+      - button "✕" [ref=e61] [cursor=pointer]
+      - generic [ref=e62]:
+        - generic [ref=e63]: 外框03.png
+        - generic "點此編輯說明" [ref=e64]: ＋ 點此加說明
+    - figure "光影.png ＋ 點此加說明" [ref=e65]:
+      - img "光影.png"
+      - button "✕" [ref=e66] [cursor=pointer]
+      - generic [ref=e67]:
+        - generic [ref=e68]: 光影.png
+        - generic "點此編輯說明" [ref=e69]: ＋ 點此加說明
+    - figure "底部導覽.png ＋ 點此加說明" [ref=e70]:
+      - img "底部導覽.png"
+      - button "✕" [ref=e71] [cursor=pointer]
+      - generic [ref=e72]:
+        - generic [ref=e73]: 底部導覽.png
+        - generic "點此編輯說明" [ref=e74]: ＋ 點此加說明
+    - figure "按鈕.png ＋ 點此加說明" [ref=e75]:
+      - img "按鈕.png"
+      - button "✕" [ref=e76] [cursor=pointer]
+      - generic [ref=e77]:
+        - generic [ref=e78]: 按鈕.png
+        - generic "點此編輯說明" [ref=e79]: ＋ 點此加說明
+    - figure "按鈕03.png ＋ 點此加說明" [ref=e80]:
+      - img "按鈕03.png"
+      - button "✕" [ref=e81] [cursor=pointer]
+      - generic [ref=e82]:
+        - generic [ref=e83]: 按鈕03.png
+        - generic "點此編輯說明" [ref=e84]: ＋ 點此加說明
+    - figure "按鈕04.png ＋ 點此加說明" [ref=e85]:
+      - img "按鈕04.png"
+      - button "✕" [ref=e86] [cursor=pointer]
+      - generic [ref=e87]:
+        - generic [ref=e88]: 按鈕04.png
+        - generic "點此編輯說明" [ref=e89]: ＋ 點此加說明
+    - figure "時間排法.png ＋ 點此加說明" [ref=e90]:
+      - img "時間排法.png"
+      - button "✕" [ref=e91] [cursor=pointer]
+      - generic [ref=e92]:
+        - generic [ref=e93]: 時間排法.png
+        - generic "點此編輯說明" [ref=e94]: ＋ 點此加說明
+    - figure "時間軸.png ＋ 點此加說明" [ref=e95]:
+      - img "時間軸.png"
+      - button "✕" [ref=e96] [cursor=pointer]
+      - generic [ref=e97]:
+        - generic [ref=e98]: 時間軸.png
+        - generic "點此編輯說明" [ref=e99]: ＋ 點此加說明
+    - figure "高級玻璃.png ＋ 點此加說明" [ref=e100]:
+      - img "高級玻璃.png"
+      - button "✕" [ref=e101] [cursor=pointer]
+      - generic [ref=e102]:
+        - generic [ref=e103]: 高級玻璃.png
+        - generic "點此編輯說明" [ref=e104]: ＋ 點此加說明
+    - figure "搜尋欄.png ＋ 點此加說明" [ref=e105]:
+      - img "搜尋欄.png"
+      - button "✕" [ref=e106] [cursor=pointer]
+      - generic [ref=e107]:
+        - generic [ref=e108]: 搜尋欄.png
+        - generic "點此編輯說明" [ref=e109]: ＋ 點此加說明
+    - figure "擬物玻璃.png ＋ 點此加說明" [ref=e110]:
+      - img "擬物玻璃.png"
+      - button "✕" [ref=e111] [cursor=pointer]
+      - generic [ref=e112]:
+        - generic [ref=e113]: 擬物玻璃.png
+        - generic "點此編輯說明" [ref=e114]: ＋ 點此加說明
+    - figure "雙按鈕.png ＋ 點此加說明" [ref=e115]:
+      - img "雙按鈕.png"
+      - button "✕" [ref=e116] [cursor=pointer]
+      - generic [ref=e117]:
+        - generic [ref=e118]: 雙按鈕.png
+        - generic "點此編輯說明" [ref=e119]: ＋ 點此加說明
+    - figure "AI插畫風格.png ＋ 點此加說明" [ref=e120]:
+      - img "AI插畫風格.png"
+      - button "✕" [ref=e121] [cursor=pointer]
+      - generic [ref=e122]:
+        - generic [ref=e123]: AI插畫風格.png
+        - generic "點此編輯說明" [ref=e124]: ＋ 點此加說明
+    - figure "IMAGE2實用.png ＋ 點此加說明" [ref=e125]:
+      - img "IMAGE2實用.png"
+      - button "✕" [ref=e126] [cursor=pointer]
+      - generic [ref=e127]:
+        - generic [ref=e128]: IMAGE2實用.png
+        - generic "點此編輯說明" [ref=e129]: ＋ 點此加說明
+    - figure "ref-01.png ＋ 點此加說明" [ref=e130]:
+      - img "ref-01.png"
+      - button "✕" [ref=e131] [cursor=pointer]
+      - generic [ref=e132]:
+        - generic [ref=e133]: ref-01.png
+        - generic "點此編輯說明" [ref=e134]: ＋ 點此加說明
+    - figure "ref-02.png ＋ 點此加說明" [ref=e135]:
+      - img "ref-02.png"
+      - button "✕" [ref=e136] [cursor=pointer]
+      - generic [ref=e137]:
+        - generic [ref=e138]: ref-02.png
+        - generic "點此編輯說明" [ref=e139]: ＋ 點此加說明
+    - figure "ref-03.png ＋ 點此加說明" [ref=e140]:
+      - img "ref-03.png"
+      - button "✕" [ref=e141] [cursor=pointer]
+      - generic [ref=e142]:
+        - generic [ref=e143]: ref-03.png
+        - generic "點此編輯說明" [ref=e144]: ＋ 點此加說明
+    - figure "ref-04.png ＋ 點此加說明" [ref=e145]:
+      - img "ref-04.png"
+      - button "✕" [ref=e146] [cursor=pointer]
+      - generic [ref=e147]:
+        - generic [ref=e148]: ref-04.png
+        - generic "點此編輯說明" [ref=e149]: ＋ 點此加說明
+    - figure "ref-05.png 文字效果主菜單:金屬漸層 / 霓虹 / 3D / 發光按鈕" [ref=e150]:
+      - img "ref-05.png"
+      - button "✕" [ref=e151] [cursor=pointer]
+      - generic [ref=e152]:
+        - generic [ref=e153]: ref-05.png
+        - generic "點此編輯說明" [ref=e154]: 文字效果主菜單:金屬漸層 / 霓虹 / 3D / 發光按鈕
+    - figure "ref-06.png ＋ 點此加說明" [ref=e155]:
+      - img "ref-06.png"
+      - button "✕" [ref=e156] [cursor=pointer]
+      - generic [ref=e157]:
+        - generic [ref=e158]: ref-06.png
+        - generic "點此編輯說明" [ref=e159]: ＋ 點此加說明
+    - figure "ref-07.png ＋ 點此加說明" [ref=e160]:
+      - img "ref-07.png"
+      - button "✕" [ref=e161] [cursor=pointer]
+      - generic [ref=e162]:
+        - generic [ref=e163]: ref-07.png
+        - generic "點此編輯說明" [ref=e164]: ＋ 點此加說明
+    - figure "ref-08.png ＋ 點此加說明" [ref=e165]:
+      - img "ref-08.png"
+      - button "✕" [ref=e166] [cursor=pointer]
+      - generic [ref=e167]:
+        - generic [ref=e168]: ref-08.png
+        - generic "點此編輯說明" [ref=e169]: ＋ 點此加說明
+    - figure "Tab設計.png ＋ 點此加說明" [ref=e170]:
+      - img "Tab設計.png"
+      - button "✕" [ref=e171] [cursor=pointer]
+      - generic [ref=e172]:
+        - generic [ref=e173]: Tab設計.png
+        - generic "點此編輯說明" [ref=e174]: ＋ 點此加說明
+    - figure "UI元素01.png ＋ 點此加說明" [ref=e175]:
+      - img "UI元素01.png"
+      - button "✕" [ref=e176] [cursor=pointer]
+      - generic [ref=e177]:
+        - generic [ref=e178]: UI元素01.png
+        - generic "點此編輯說明" [ref=e179]: ＋ 點此加說明
+    - figure "UI元素02.png ＋ 點此加說明" [ref=e180]:
+      - img "UI元素02.png"
+      - button "✕" [ref=e181] [cursor=pointer]
+      - generic [ref=e182]:
+        - generic [ref=e183]: UI元素02.png
+        - generic "點此編輯說明" [ref=e184]: ＋ 點此加說明
+    - figure "UI元素03.png ＋ 點此加說明" [ref=e185]:
+      - img "UI元素03.png"
+      - button "✕" [ref=e186] [cursor=pointer]
+      - generic [ref=e187]:
+        - generic [ref=e188]: UI元素03.png
+        - generic "點此編輯說明" [ref=e189]: ＋ 點此加說明
+    - figure "UI按鈕.png ＋ 點此加說明" [ref=e190]:
+      - img "UI按鈕.png"
+      - button "✕" [ref=e191] [cursor=pointer]
+      - generic [ref=e192]:
+        - generic [ref=e193]: UI按鈕.png
+        - generic "點此編輯說明" [ref=e194]: ＋ 點此加說明
+    - figure "UI按鈕02.png ＋ 點此加說明" [ref=e195]:
+      - img "UI按鈕02.png"
+      - button "✕" [ref=e196] [cursor=pointer]
+      - generic [ref=e197]:
+        - generic [ref=e198]: UI按鈕02.png
+        - generic "點此編輯說明" [ref=e199]: ＋ 點此加說明
+    - figure "UI風格02.png ＋ 點此加說明" [ref=e200]:
+      - img "UI風格02.png"
+      - button "✕" [ref=e201] [cursor=pointer]
+      - generic [ref=e202]:
+        - generic [ref=e203]: UI風格02.png
+        - generic "點此編輯說明" [ref=e204]: ＋ 點此加說明
+    - figure "UI風格03.png ＋ 點此加說明" [ref=e205]:
+      - img "UI風格03.png"
+      - button "✕" [ref=e206] [cursor=pointer]
+      - generic [ref=e207]:
+        - generic [ref=e208]: UI風格03.png
+        - generic "點此編輯說明" [ref=e209]: ＋ 點此加說明

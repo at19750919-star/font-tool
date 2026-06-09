@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-Hant">
+
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>字型預覽測試工具</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet" />
+    <!-- 與 dashboard 一致的網路字型（Google Fonts） -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=Caveat:wght@400;500;600;700&family=Patrick+Hand&family=Chocolate+Classical+Sans&family=Bebas+Neue&family=Pacifico&family=Monoton&family=Press+Start+2P&family=Orbitron:wght@400;700;900&family=Audiowide&family=Russo+One&family=Major+Mono+Display&family=Abril+Fatface&family=Rubik+Glitch&family=Bungee+Shade&family=Rubik+Wet+Paint&family=Cherry+Bomb+One&family=Kablammo&family=Faster+One&family=Wallpoet&family=Iceberg&family=Rubik+Mono+One&family=Modak&family=DM+Serif+Display&family=Bodoni+Moda:wght@700;800&family=Yeseva+One&family=Libre+Bodoni:wght@700&family=Roboto+Slab:wght@700&family=Old+Standard+TT:wght@700&family=Cormorant+SC:wght@700&family=Source+Serif+4:wght@800&family=Kaisei+Opti:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Old+Mincho:wght@400;700;900&family=Rampart+One&family=Reggae+One&family=Hachi+Maru+Pop&family=Stick&family=Fraunces:opsz,wght@9..144,400;9..144,700&family=Potta+One&family=RocknRoll+One&family=DotGothic16&family=Palette+Mosaic&display=swap" rel="stylesheet" />
+    <!-- CDN 中文網路字型 -->
+    <link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-tc-webfont@1.2.0/style.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/taipei-sans-tc/dist/Regular/TaipeiSansTCBeta-Regular.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/chiron-sung-hk-webfont/css/vf.css" rel="stylesheet" />
+    <!-- 本機下載字型（檔案放在 public/fonts/，從個人網頁專案搬來） -->
+    <style>
+      @font-face { font-family: 'ChenYuluoyan Thin';      src: url('/fonts/ChenYuluoyan-Thin.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: 'GenWanMin2 TC';           src: url('/fonts/GenWanMin2TC-R.otf') format('opentype'); font-display: swap; }
+      @font-face { font-family: 'Glow Sans TC Extended';   src: url('/fonts/GlowSansTC-Extended.otf') format('opentype'); font-display: swap; }
+      @font-face { font-family: 'Satsuki Gendai Mincho';   src: url('/fonts/SatsukiGendaiMincho.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: 'Swei Spring CJK TC';      src: url('/fonts/SweiSpringCJKtc.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: 'ToneOZ Tsuipita TC';      src: url('/fonts/ToneOZ-Tsuipita-TC.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: '香萃刻宋';                  src: url('/fonts/XiangcuiKesong.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: '哥特式字體';                src: url('/fonts/GeTeShiZiTi.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: '漢儀彩雲體繁';              src: url('/fonts/HanYiCaiYunTiFan.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: '漢儀齊黑繁';                src: url('/fonts/HanYiQiHei.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: '山海黑奇式格特';            src: url('/fonts/ShanHaiHeiQiShiGeTe.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: '山海星夜格特';              src: url('/fonts/ShanHaiXingYeGeTe.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: 'Gen Ei Gothic P Heavy';   src: url('/fonts/GenEiGothicP-Heavy.ttf') format('truetype'); font-display: swap; }
+      @font-face { font-family: 'AR RomanMinchoJP UL';     src: url('/fonts/AR-RomanMinchoJP-UL.ttc') format('truetype'); font-display: swap; }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+
+</html>

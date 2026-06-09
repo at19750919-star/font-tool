@@ -1,0 +1,459 @@
+- generic [ref=e1]:
+  - link "跳至內容" [ref=e3] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=e7]:
+    - generic [ref=e9]:
+      - navigation "側邊欄":
+        - generic:
+          - generic:
+            - generic:
+              - button "開啟側邊欄":
+                - img
+        - generic:
+          - generic:
+            - link "新對話":
+              - /url: /
+              - generic:
+                - img
+              - generic: 新對話
+          - generic:
+            - button "搜尋對話":
+              - generic:
+                - img
+              - generic: 搜尋對話
+          - generic:
+            - button "最近的對話":
+              - generic:
+                - img
+              - generic: 最近的對話
+        - generic:
+          - generic:
+            - button "開啟設定檔功能表"
+      - generic [ref=e10]:
+        - heading "聊天歷程紀錄" [level=2] [ref=e11]
+        - generic [ref=e12]:
+          - navigation "聊天歷程紀錄" [ref=e13]:
+            - generic [ref=e16]:
+              - link "首頁" [ref=e17] [cursor=pointer]:
+                - /url: /
+                - generic [ref=e18]: ChatGPT
+              - button "關閉側邊欄" [expanded] [ref=e20]:
+                - img [ref=e21]
+            - list [ref=e24]:
+              - listitem [ref=e25]:
+                - link "新對話 控制 Shift 鍵 O" [ref=e136] [cursor=pointer]:
+                  - /url: /
+                  - generic [ref=e27]:
+                    - img [ref=e138]
+                    - generic [ref=e141]: 新對話
+                  - generic [ref=e142]:
+                    - generic "控制" [ref=e143]:
+                      - generic [ref=e144]: Ctrl
+                      - text: +
+                    - generic "Shift 鍵" [ref=e145]:
+                      - generic [ref=e146]: Shift
+                      - text: +
+                    - generic [ref=e148]: O
+              - listitem [ref=e32]:
+                - button "搜尋對話 控制 K" [ref=e149] [cursor=pointer]:
+                  - generic [ref=e34]:
+                    - img [ref=e151]
+                    - generic [ref=e154]: 搜尋對話
+                  - generic [ref=e155]:
+                    - generic "控制" [ref=e156]:
+                      - generic [ref=e157]: Ctrl
+                      - text: +
+                    - generic [ref=e159]: K
+            - link "圖庫" [ref=e39] [cursor=pointer]:
+              - /url: /library
+              - img [ref=e41]
+              - generic [ref=e44]: 圖庫
+            - link "應用程式" [ref=e45] [cursor=pointer]:
+              - /url: /apps
+              - img [ref=e47]
+              - generic [ref=e50]: 應用程式
+            - link "Codex" [ref=e51] [cursor=pointer]:
+              - /url: /codex
+              - generic [ref=e52]:
+                - img [ref=e54]
+                - generic [ref=e57]: Codex
+              - img [ref=e59]
+            - generic [ref=e62] [cursor=pointer]:
+              - img [ref=e64]
+              - generic [ref=e67]: 更多
+            - generic [ref=e160]:
+              - button "GPT" [expanded] [ref=e162] [cursor=pointer]:
+                - heading "GPT" [level=2] [ref=e163]
+              - list [ref=e164]:
+                - listitem [ref=e165]:
+                  - link "提示詞助手" [ref=e166] [cursor=pointer]:
+                    - /url: /g/g-6924f124bfec81919042d02b41551fd2-ti-shi-ci-zhu-shou
+                    - generic [ref=e167]:
+                      - img [ref=e169]
+                      - generic [ref=e172]: 提示詞助手
+                    - button [ref=e174]:
+                      - img [ref=e176]
+                - listitem [ref=e178]:
+                  - link "程式幫手" [ref=e179] [cursor=pointer]:
+                    - /url: /g/g-6907803f74508191acc18db9e35b644f-cheng-shi-bang-shou
+                    - generic [ref=e180]:
+                      - img [ref=e182]
+                      - generic [ref=e185]: 程式幫手
+                    - button [ref=e187]:
+                      - img [ref=e189]
+                - listitem [ref=e191]:
+                  - link "DALL·E" [ref=e192] [cursor=pointer]:
+                    - /url: /g/g-2fkFE8rbu-dall-e
+                    - generic [ref=e197]: DALL·E
+                    - button [ref=e199]:
+                      - img [ref=e201]
+              - link "探索 GPT" [ref=e203] [cursor=pointer]:
+                - /url: /gpts
+                - img [ref=e205]
+                - generic [ref=e208]: 探索 GPT
+            - generic [ref=e209]:
+              - button "專案" [expanded] [ref=e211] [cursor=pointer]:
+                - heading "專案" [level=2] [ref=e212]
+              - list [ref=e213]:
+                - listitem [ref=e214]:
+                  - button "新增專案" [ref=e215] [cursor=pointer]:
+                    - img [ref=e217]
+                    - generic [ref=e220]: 新增專案
+                - listitem [ref=e221]:
+                  - generic [ref=e222]:
+                    - button "揭露宇宙" [ref=e223] [cursor=pointer]:
+                      - img [ref=e227]
+                      - generic [ref=e236]: 揭露宇宙
+                    - generic:
+                      - button "開啟專案首頁" [ref=e237] [cursor=pointer]:
+                        - img [ref=e239]
+                      - button "開啟 揭露宇宙 的專案選項" [ref=e241] [cursor=pointer]:
+                        - img [ref=e243]
+                - listitem [ref=e245]:
+                  - generic [ref=e246]:
+                    - button "宗" [ref=e247] [cursor=pointer]:
+                      - img [ref=e251]
+                      - generic [ref=e260]: 宗
+                    - generic:
+                      - button "開啟專案首頁" [ref=e261] [cursor=pointer]:
+                        - img [ref=e263]
+                      - button "開啟 宗 的專案選項" [ref=e265] [cursor=pointer]:
+                        - img [ref=e267]
+                - listitem [ref=e269]:
+                  - generic [ref=e270]:
+                    - button "預設顏色，淺色模式中為黑色，深色模式中為白色資料夾 外星種族" [ref=e271] [cursor=pointer]:
+                      - img "預設顏色，淺色模式中為黑色，深色模式中為白色資料夾" [ref=e274]
+                      - generic [ref=e277]: 外星種族
+                    - generic:
+                      - button "開啟專案首頁" [ref=e278] [cursor=pointer]:
+                        - img [ref=e280]
+                      - button "開啟 外星種族 的專案選項" [ref=e282] [cursor=pointer]:
+                        - img [ref=e284]
+                - listitem [ref=e286]:
+                  - generic [ref=e287]:
+                    - button "髮型" [ref=e288] [cursor=pointer]:
+                      - img [ref=e292]
+                      - generic [ref=e301]: 髮型
+                    - generic:
+                      - button "開啟專案首頁" [ref=e302] [cursor=pointer]:
+                        - img [ref=e304]
+                      - button "開啟 髮型 的專案選項" [ref=e306] [cursor=pointer]:
+                        - img [ref=e308]
+                - listitem [ref=e310]:
+                  - generic [ref=e311]:
+                    - button "預設顏色，淺色模式中為黑色，深色模式中為白色資料夾 整" [ref=e312] [cursor=pointer]:
+                      - img "預設顏色，淺色模式中為黑色，深色模式中為白色資料夾" [ref=e315]
+                      - generic [ref=e318]: 整
+                    - generic:
+                      - button "開啟專案首頁" [ref=e319] [cursor=pointer]:
+                        - img [ref=e321]
+                      - button "開啟 整 的專案選項" [ref=e323] [cursor=pointer]:
+                        - img [ref=e325]
+                - listitem [ref=e327]:
+                  - generic [ref=e328] [cursor=pointer]:
+                    - img [ref=e330]
+                    - generic [ref=e333]: 更多
+            - generic [ref=e334]:
+              - button "最近" [expanded] [ref=e336] [cursor=pointer]:
+                - heading "最近" [level=2] [ref=e337]
+              - generic [ref=e338]:
+                - list [ref=e339]:
+                  - listitem [ref=e340]:
+                    - link "已釘選對話：隨手待辦整理器" [ref=e341] [cursor=pointer]:
+                      - /url: /c/6a1efe25-7c4c-83aa-99f5-c51bf186748f
+                      - generic [ref=e343]: 隨手待辦整理器
+                      - generic [ref=e344]:
+                        - generic [ref=e346]:
+                          - img [ref=e348]
+                          - button "開啟 隨手待辦整理器 的對話選項" [ref=e350]:
+                            - img [ref=e352]
+                        - img [ref=e356]
+                - list [ref=e358]:
+                  - listitem [ref=e743]:
+                    - link "網頁文字效果設計" [ref=e744] [cursor=pointer]:
+                      - /url: /c/6a250f6a-e8ec-83a4-b651-0060960851cd
+                      - generic [ref=e746]: 網頁文字效果設計
+                      - button "開啟 網頁文字效果設計 的對話選項" [ref=e749]:
+                        - img [ref=e751]
+                  - listitem [ref=e359]:
+                    - link "字體設計效果示範" [ref=e360] [cursor=pointer]:
+                      - /url: /c/6a2504af-d62c-83a8-bf44-4acddd9bc9e0
+                      - generic [ref=e362]: 字體設計效果示範
+                      - button "開啟 字體設計效果示範 的對話選項" [ref=e365]:
+                        - img [ref=e367]
+                  - listitem [ref=e369]:
+                    - link "日期排版設計參考" [ref=e370] [cursor=pointer]:
+                      - /url: /c/6a24fc1f-0724-83a3-9dd7-6b32ab255428
+                      - generic [ref=e372]: 日期排版設計參考
+                      - button "開啟 日期排版設計參考 的對話選項" [ref=e375]:
+                        - img [ref=e377]
+                  - listitem [ref=e379]:
+                    - link "UI/UX 風格對照圖" [ref=e380] [cursor=pointer]:
+                      - /url: /c/6a24d604-49c0-83aa-9a54-514921126e9f
+                      - generic [ref=e382]: UI/UX 風格對照圖
+                      - generic [ref=e383]:
+                        - button "開啟 UI/UX 風格對照圖 的對話選項" [ref=e386]:
+                          - img [ref=e388]
+                        - img [ref=e391]
+                  - listitem [ref=e394]:
+                    - link "咖啡品牌海報設計" [ref=e395] [cursor=pointer]:
+                      - /url: /c/6a24d438-7bc4-83a9-95c9-003c3dab6646
+                      - generic [ref=e397]: 咖啡品牌海報設計
+                      - button "開啟 咖啡品牌海報設計 的對話選項" [ref=e400]:
+                        - img [ref=e402]
+                  - listitem [ref=e404]:
+                    - link "三欄式版面範例" [ref=e405] [cursor=pointer]:
+                      - /url: /c/6a249d48-6eec-83a5-a2f5-9925da50b1c6
+                      - generic [ref=e407]: 三欄式版面範例
+                      - button "開啟 三欄式版面範例 的對話選項" [ref=e410]:
+                        - img [ref=e412]
+                  - listitem [ref=e414]:
+                    - link "corey第一章" [ref=e415] [cursor=pointer]:
+                      - /url: /c/6a244d85-bba0-83ab-884b-f741c6d1180b
+                      - generic [ref=e417]: corey第一章
+                      - button "開啟 corey第一章 的對話選項" [ref=e420]:
+                        - img [ref=e422]
+                  - listitem [ref=e424]:
+                    - link "插畫概念訓練" [ref=e425] [cursor=pointer]:
+                      - /url: /c/6a23701c-f7d0-83a8-b92f-9730cc15c5e7
+                      - generic [ref=e427]: 插畫概念訓練
+                      - button "開啟 插畫概念訓練 的對話選項" [ref=e430]:
+                        - img [ref=e432]
+                  - listitem [ref=e434]:
+                    - link "台灣小紅書安裝限制" [ref=e435] [cursor=pointer]:
+                      - /url: /c/6a232cbf-1878-83a4-80f7-2d0c67d62c4e
+                      - generic [ref=e437]: 台灣小紅書安裝限制
+                      - button "開啟 台灣小紅書安裝限制 的對話選項" [ref=e440]:
+                        - img [ref=e442]
+                  - listitem [ref=e444]:
+                    - link "Clay salon icons design" [ref=e445] [cursor=pointer]:
+                      - /url: /c/6a2147ad-5150-83a8-a073-9513dd259ee7
+                      - generic [ref=e447]: Clay salon icons design
+                      - button "開啟 Clay salon icons design 的對話選項" [ref=e450]:
+                        - img [ref=e452]
+                  - listitem [ref=e454]:
+                    - link "Premium Hair Salon Icons" [ref=e455] [cursor=pointer]:
+                      - /url: /c/6a211cfb-c120-83a3-b2c8-b6101553dd0e
+                      - generic [ref=e457]: Premium Hair Salon Icons
+                      - button "開啟 Premium Hair Salon Icons 的對話選項" [ref=e460]:
+                        - img [ref=e462]
+                  - listitem [ref=e464]:
+                    - link "科幻存有圖鑑" [ref=e465] [cursor=pointer]:
+                      - /url: /c/6a209643-b6b0-83ab-9c53-dd0fe4c59775
+                      - generic [ref=e467]: 科幻存有圖鑑
+                      - button "開啟 科幻存有圖鑑 的對話選項" [ref=e470]:
+                        - img [ref=e472]
+                  - listitem [ref=e474]:
+                    - link "正向種族圖鑑設計" [ref=e475] [cursor=pointer]:
+                      - /url: /c/6a20973b-7c10-83a7-8269-1caa7801bb2e
+                      - generic [ref=e477]: 正向種族圖鑑設計
+                      - button "開啟 正向種族圖鑑設計 的對話選項" [ref=e480]:
+                        - img [ref=e482]
+                  - listitem [ref=e484]:
+                    - link "負向種族圖鑑" [ref=e485] [cursor=pointer]:
+                      - /url: /c/6a20976c-0ffc-83a2-a655-4b53b08a7af2
+                      - generic [ref=e487]: 負向種族圖鑑
+                      - button "開啟 負向種族圖鑑 的對話選項" [ref=e490]:
+                        - img [ref=e492]
+                  - listitem [ref=e494]:
+                    - link "科幻外星種族圖鑑" [ref=e495] [cursor=pointer]:
+                      - /url: /c/6a20960a-a824-83a6-99a2-9cdcfb17ac86
+                      - generic [ref=e497]: 科幻外星種族圖鑑
+                      - button "開啟 科幻外星種族圖鑑 的對話選項" [ref=e500]:
+                        - img [ref=e502]
+                  - listitem [ref=e504]:
+                    - link "鳥型外星種族圖鑑" [ref=e505] [cursor=pointer]:
+                      - /url: /c/6a209507-9b9c-83a9-8b4e-e2cdf22438b4
+                      - generic [ref=e507]: 鳥型外星種族圖鑑
+                      - button "開啟 鳥型外星種族圖鑑 的對話選項" [ref=e510]:
+                        - img [ref=e512]
+                  - listitem [ref=e514]:
+                    - link "科幻爬蟲種族圖鑑" [ref=e515] [cursor=pointer]:
+                      - /url: /c/6a2094cb-d1e0-83a3-b093-e21b760d18f6
+                      - generic [ref=e517]: 科幻爬蟲種族圖鑑
+                      - button "開啟 科幻爬蟲種族圖鑑 的對話選項" [ref=e520]:
+                        - img [ref=e522]
+                  - listitem [ref=e524]:
+                    - link "灰人型外星種族圖鑑" [ref=e525] [cursor=pointer]:
+                      - /url: /c/6a2093d4-19a8-83a7-abf3-c659432c8242
+                      - generic [ref=e527]: 灰人型外星種族圖鑑
+                      - button "開啟 灰人型外星種族圖鑑 的對話選項" [ref=e530]:
+                        - img [ref=e532]
+                  - listitem [ref=e534]:
+                    - link "類人型外星圖鑑" [ref=e535] [cursor=pointer]:
+                      - /url: /c/6a2093a3-b02c-83a4-91bf-1df031a8d7ed
+                      - generic [ref=e537]: 類人型外星圖鑑
+                      - button "開啟 類人型外星圖鑑 的對話選項" [ref=e540]:
+                        - img [ref=e542]
+                  - listitem [ref=e544]:
+                    - link "遠古分離文明種族圖鑑" [ref=e545] [cursor=pointer]:
+                      - /url: /c/6a209109-fef8-83a9-9e4a-8d5fe74b9e9c
+                      - generic [ref=e547]: 遠古分離文明種族圖鑑
+                      - button "開啟 遠古分離文明種族圖鑑 的對話選項" [ref=e550]:
+                        - img [ref=e552]
+                  - listitem [ref=e554]:
+                    - link "內部地球種族圖鑑" [ref=e555] [cursor=pointer]:
+                      - /url: /c/6a2090e2-6008-83a2-be4c-5dce6aa6210e
+                      - generic [ref=e557]: 內部地球種族圖鑑
+                      - button "開啟 內部地球種族圖鑑 的對話選項" [ref=e560]:
+                        - img [ref=e562]
+                  - listitem [ref=e564]:
+                    - link "科幻陣營關係圖" [ref=e565] [cursor=pointer]:
+                      - /url: /c/6a208d17-84c4-83a3-8630-81c5c8c1d62e
+                      - generic [ref=e567]: 科幻陣營關係圖
+                      - button "開啟 科幻陣營關係圖 的對話選項" [ref=e570]:
+                        - img [ref=e572]
+                  - listitem [ref=e574]:
+                    - link "科幻陣營關係圖" [ref=e575] [cursor=pointer]:
+                      - /url: /c/6a208b2a-f17c-83a5-90f7-3137b27e95ca
+                      - generic [ref=e577]: 科幻陣營關係圖
+                      - button "開啟 科幻陣營關係圖 的對話選項" [ref=e580]:
+                        - img [ref=e582]
+                  - listitem [ref=e584]:
+                    - link "Faction Relationship Map" [ref=e585] [cursor=pointer]:
+                      - /url: /c/6a20792f-6b88-83aa-b9a3-73042a7f44da
+                      - generic [ref=e587]: Faction Relationship Map
+                      - button "開啟 Faction Relationship Map 的對話選項" [ref=e590]:
+                        - img [ref=e592]
+                  - listitem [ref=e594]:
+                    - link "Cosmic Website Background Design" [ref=e595] [cursor=pointer]:
+                      - /url: /c/6a1fca86-476c-83aa-a25c-c32030c0ad30
+                      - generic "Cosmic Website Background Design" [ref=e597]
+                      - button "開啟 Cosmic Website Background Design 的對話選項" [ref=e600]:
+                        - img [ref=e602]
+                  - listitem [ref=e604]:
+                    - link "Sci-Fi Concept Illustration" [ref=e605] [cursor=pointer]:
+                      - /url: /c/6a1fa54a-3b20-83a5-8b70-7064fa9ab8b4
+                      - generic [ref=e607]: Sci-Fi Concept Illustration
+                      - button "開啟 Sci-Fi Concept Illustration 的對話選項" [ref=e610]:
+                        - img [ref=e612]
+                  - listitem [ref=e614]:
+                    - link "Sci-Fi Concept Art" [ref=e615] [cursor=pointer]:
+                      - /url: /c/6a1fa55e-97d4-83a9-b4b1-df1c2cfab751
+                      - generic [ref=e617]: Sci-Fi Concept Art
+                      - button "開啟 Sci-Fi Concept Art 的對話選項" [ref=e620]:
+                        - img [ref=e622]
+                  - listitem [ref=e624]:
+                    - link "檔案圖像生成提示詞" [ref=e625] [cursor=pointer]:
+                      - /url: /c/6a1f372e-dbe0-83a6-84b6-10f77a907bd4
+                      - generic [ref=e627]: 檔案圖像生成提示詞
+                      - button "開啟 檔案圖像生成提示詞 的對話選項" [ref=e630]:
+                        - img [ref=e632]
+          - button "aatt01 Plus，開啟設定檔功能表" [ref=e644] [cursor=pointer]:
+            - generic [ref=e75]:
+              - generic [ref=e77]: aatt01
+              - generic [ref=e80]: Plus
+            - button "下載應用程式" [ref=e83]:
+              - img [ref=e85]
+    - generic [ref=e88]:
+      - generic [ref=e89]:
+        - banner:
+          - generic [ref=e92]:
+            - button "分享" [ref=e683] [cursor=pointer]:
+              - generic [ref=e684]:
+                - img [ref=e685]
+                - text: 分享
+            - button "開啟對話選項" [ref=e688] [cursor=pointer]:
+              - img [ref=e689]
+      - main [ref=e98]:
+        - generic [ref=e99]:
+          - generic [ref=e692]:
+            - generic [ref=e694]:
+              - heading "你說：" [level=4] [ref=e695]
+              - generic [ref=e697]:
+                - generic [ref=e705]: 直接畫一張 16:9 圖,不要問問題。一張網頁文字效果參考菜單:米白底,左上標題「文字,是網站的靈魂」,下面 2 列 x 4 欄共 8 張圓角卡片,每卡左上有編號 01-08,每格是一個網站區塊,重點是標題文字本身要有強烈明顯的效果,高對比鮮明配色,不要灰淡。8 格:01 全黑底金色金屬漸層大標「字型 讓情緒先抵達」;02 白底儀表板標題,關鍵字「亮眼」換藍色;03 深紫舞台霓虹發光字「今晚的光」;04 紫橘漸層填色大字「活力滿分」;05 多層立體3D字「升級創作力」;06 鍍鉻銀金屬反光大標;07 綠色光澤發光膠囊按鈕「開始探索」;08 深色卡金色細襯線英文「Create the first impression」。繁體中文清楚不亂碼,像 UI 設計年鑑。
+                - generic [ref=e706]:
+                  - group "你的訊息操作":
+                    - button "複製訊息":
+                      - generic:
+                        - img
+                    - button "編輯訊息":
+                      - generic:
+                        - img
+            - generic [ref=e709]:
+              - heading "ChatGPT 說：" [level=4] [ref=e710]
+              - generic [ref=e712]:
+                - generic [ref=e719]:
+                  - button "Thought for 1m 19s" [ref=e757] [cursor=pointer]:
+                    - text: Thought for 1m 19s
+                    - img [ref=e758]
+                  - generic [ref=e763]:
+                    - button "已產生圖像：文字設計的視覺之美" [ref=e764] [cursor=pointer]:
+                      - generic [ref=e765]:
+                        - img "已產生圖像：文字設計的視覺之美" [ref=e767]
+                        - img [ref=e769]
+                        - img [ref=e771]
+                    - generic [ref=e773]:
+                      - button "編輯圖片" [ref=e776] [cursor=pointer]: 編輯
+                      - button "共享此圖像" [ref=e778] [cursor=pointer]:
+                        - img [ref=e780]
+                - generic [ref=e782]:
+                  - group "回覆操作":
+                    - button "複製回應":
+                      - generic:
+                        - img
+                    - button "更多動作":
+                      - img
+            - generic [ref=e793]:
+              - heading "你說：" [level=4] [ref=e794]
+              - generic [ref=e796]:
+                - generic [ref=e804]: 直接畫一張 16:9 圖,不要問問題。延續上一張的版型(米白底、左上標題、2 列 x 4 欄共 8 張圓角卡片、每卡左上編號 01-08),這張標題「文字效果 · 進階款」。重點:每格『標題文字本身』要有強烈明顯的效果、高對比鮮明配色、不要灰淡,示範字用「一杯森 活力滿分」或短標。8 格效果:01 中空描邊字(只有外框、填色透明);02 復古雙色套印錯位(CMYK 錯位印刷感);03 長陰影 long shadow 扁平大字;04 浮雕凹刻 letterpress 字;05 故障藝術 glitch(RGB 紅藍分離);06 液態金屬流動反光字;07 螢光筆 highlight 底色標題;08 霓虹外框中空發光字(深底)。繁體中文清楚不亂碼,像 UI 設計年鑑。
+                - generic [ref=e805]:
+                  - group "你的訊息操作":
+                    - button "複製訊息":
+                      - generic:
+                        - img
+                    - button "編輯訊息":
+                      - generic:
+                        - img
+            - generic [ref=e808]:
+              - heading "ChatGPT 說：" [level=4] [ref=e809]
+              - generic [ref=e811]:
+                - button "正在思考 正在產生更細緻的圖片，請稍候。" [ref=e814] [cursor=pointer]:
+                  - generic [ref=e815]:
+                    - generic [ref=e816]: 正在思考
+                    - generic [ref=e817]: 正在產生更細緻的圖片，請稍候。
+                - generic "正在產生圖像..." [ref=e824]
+          - generic [ref=e109]:
+            - button [ref=e727] [cursor=pointer]:
+              - img [ref=e728]
+            - generic [ref=e115]:
+              - generic [ref=e119]:
+                - button "新增檔案等更多功能" [ref=e122] [cursor=pointer]:
+                  - img
+                - textbox "與 ChatGPT 對話" [active] [ref=e646]:
+                  - paragraph [ref=e647]: 想問什麼都可以
+                - generic [ref=e126]:
+                  - button "Thinking" [ref=e651] [cursor=pointer]:
+                    - generic [ref=e652]: Thinking
+                    - img
+                  - generic [ref=e127]:
+                    - button "開始聽寫" [ref=e653] [cursor=pointer]:
+                      - img
+                    - button "停止回應" [ref=e826] [cursor=pointer]:
+                      - img [ref=e827]
+              - button [ref=e132]
+              - button [ref=e133]
+            - generic [ref=e742]: ChatGPT 可能會出錯。請查核重要資訊。
+  - alert [ref=e134]
+  - status [ref=e135]

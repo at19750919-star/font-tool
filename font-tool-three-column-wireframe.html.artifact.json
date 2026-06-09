@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "kind": "html",
+  "title": "字型工具三欄桌面線框",
+  "entry": "font-tool-three-column-wireframe.html",
+  "renderer": "html",
+  "status": "complete",
+  "exports": [
+    "html",
+    "pdf",
+    "zip"
+  ],
+  "createdAt": "2026-06-06T22:44:25.458Z",
+  "updatedAt": "2026-06-06T22:44:25.474Z",
+  "metadata": {
+    "identifier": "font-tool-three-column-wireframe",
+    "artifactType": "text/html",
+    "inferred": false
+  }
+}

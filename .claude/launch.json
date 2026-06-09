@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Vite dev server (font-preview-tool)",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "century-server",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5502", "--directory", "C:/Users/at197/OneDrive/Desktop/世紀"],
+      "port": 5502
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - heading "效果參考菜單" [level=1] [ref=e3]
+    - paragraph [ref=e4]: 挑好哪一張,跟我說它的檔名(或描述),我用真 CSS 寫進工具。點圖可放大;點圖下方文字可編輯說明;滑到圖右上角可刪除;也可拖曳圖片進視窗或按「上傳圖片」新增。
+    - generic [ref=e5]:
+      - button "＋ 上傳圖片" [ref=e6] [cursor=pointer]
+      - button "↻ 重新整理" [ref=e7] [cursor=pointer]
+      - generic [ref=e8]: 40 張
+  - generic [ref=e9]:
+    - figure "02.png 網頁元件總覽(灰階線框):Hero/CTA、價格卡、表單、搜尋、分頁、Tab、上傳、確認框、浮動按鈕、工具列" [ref=e10]:
+      - img "02.png"
+      - button "✕" [ref=e11] [cursor=pointer]
+      - generic [ref=e12]:
+        - generic [ref=e13]: 02.png
+        - generic "點此編輯說明" [ref=e14]: 網頁元件總覽(灰階線框):Hero/CTA、價格卡、表單、搜尋、分頁、Tab、上傳、確認框、浮動按鈕、工具列
+    - figure "03.png 版面布局型錄(線框):單欄/雙欄Sidebar/三欄Dashboard/卡片網格/Masonry/Hero+區塊/聖杯/固定側欄/管理Grid/表單分區/價格表/內容列表" [ref=e15]:
+      - img "03.png"
+      - button "✕" [ref=e16] [cursor=pointer]
+      - generic [ref=e17]:
+        - generic [ref=e18]: 03.png
+        - generic "點此編輯說明" [ref=e19]: 版面布局型錄(線框):單欄/雙欄Sidebar/三欄Dashboard/卡片網格/Masonry/Hero+區塊/聖杯/固定側欄/管理Grid/表單分區/價格表/內容列表
+    - figure "04.png UI 元件型錄(線框):彈窗/訊息框/進度條/Badge/提示框/搜尋/Switch/星級評分/麵包屑/導航/下拉/全螢幕選單" [ref=e20]:
+      - img "04.png"
+      - button "✕" [ref=e21] [cursor=pointer]
+      - generic [ref=e22]:
+        - generic [ref=e23]: 04.png
+        - generic "點此編輯說明" [ref=e24]: UI 元件型錄(線框):彈窗/訊息框/進度條/Badge/提示框/搜尋/Switch/星級評分/麵包屑/導航/下拉/全螢幕選單
+    - figure "05.png 視覺技巧 + 布局技巧對照:卡片設計、主標重點、彈窗、字體範例 / 黃金分割、格線、表單分區、行距留白、資料分析" [ref=e25]:
+      - img "05.png"
+      - button "✕" [ref=e26] [cursor=pointer]
+      - generic [ref=e27]:
+        - generic [ref=e28]: 05.png
+        - generic "點此編輯說明" [ref=e29]: 視覺技巧 + 布局技巧對照:卡片設計、主標重點、彈窗、字體範例 / 黃金分割、格線、表單分區、行距留白、資料分析
+    - figure "06.png 交互技巧 + 組件技巧:Hover回饋、動態統計、即時預覽、拖拉排序、訊息提示 / 按鈕、輸入框、日曆、Tab、Avatar、Badge、卡片" [ref=e30]:
+      - img "06.png"
+      - button "✕" [ref=e31] [cursor=pointer]
+      - generic [ref=e32]:
+        - generic [ref=e33]: 06.png
+        - generic "點此編輯說明" [ref=e34]: 交互技巧 + 組件技巧:Hover回饋、動態統計、即時預覽、拖拉排序、訊息提示 / 按鈕、輸入框、日曆、Tab、Avatar、Badge、卡片
+    - figure "07.png Figma 教學:質感網頁 CTA 按鈕 6 步驟拆解(底色/外緣線/內陰影/高光/投影/漸層反光,附 CSS 數值)" [ref=e35]:
+      - img "07.png"
+      - button "✕" [ref=e36] [cursor=pointer]
+      - generic [ref=e37]:
+        - generic [ref=e38]: 07.png
+        - generic "點此編輯說明" [ref=e39]: Figma 教學:質感網頁 CTA 按鈕 6 步驟拆解(底色/外緣線/內陰影/高光/投影/漸層反光,附 CSS 數值)
+    - figure "12種設計風格.png 咖啡品牌海報 12 種設計風格對照(彌散/C4D/極簡/扁平/插畫/國潮/復古/酸性/孟菲斯/波普/像素/故障)" [ref=e40]:
+      - img "12種設計風格.png"
+      - button "✕" [ref=e41] [cursor=pointer]
+      - generic [ref=e42]:
+        - generic [ref=e43]: 12種設計風格.png
+        - generic "點此編輯說明" [ref=e44]: 咖啡品牌海報 12 種設計風格對照(彌散/C4D/極簡/扁平/插畫/國潮/復古/酸性/孟菲斯/波普/像素/故障)
+    - figure "手機搜尋框.png 手機搜尋框設計拆解(位置/尺寸/背景色/搜尋圖示/Placeholder/即時建議/清除鈕/搜尋按鈕)" [ref=e45]:
+      - img "手機搜尋框.png"
+      - button "✕" [ref=e46] [cursor=pointer]
+      - generic [ref=e47]:
+        - generic [ref=e48]: 手機搜尋框.png
+        - generic "點此編輯說明" [ref=e49]: 手機搜尋框設計拆解(位置/尺寸/背景色/搜尋圖示/Placeholder/即時建議/清除鈕/搜尋按鈕)
+    - figure "出圖提示慈.png AI 出圖提示詞萬能公式(主體+場景+風格+色彩+構圖+細節 套用模板)" [ref=e50]:
+      - img "出圖提示慈.png"
+      - button "✕" [ref=e51] [cursor=pointer]
+      - generic [ref=e52]:
+        - generic [ref=e53]: 出圖提示慈.png
+        - generic "點此編輯說明" [ref=e54]: AI 出圖提示詞萬能公式(主體+場景+風格+色彩+構圖+細節 套用模板)
+    - figure "外框.png 咖啡卡片 16 種外框(細線/雙線/圓角/虛線/角標/陰影/票券/貼紙/手繪/霓虹/裁切/裝飾)" [ref=e55]:
+      - img "外框.png"
+      - button "✕" [ref=e56] [cursor=pointer]
+      - generic [ref=e57]:
+        - generic [ref=e58]: 外框.png
+        - generic "點此編輯說明" [ref=e59]: 咖啡卡片 16 種外框(細線/雙線/圓角/虛線/角標/陰影/票券/貼紙/手繪/霓虹/裁切/裝飾)
+    - figure "外框03.png 冷泡茶卡片 16 種外框(細線/雙線/角標/不對稱/虛線/網格/貼紙/筆記/雜誌/裁切/陰影盒/裝飾花/對話框/票券/霓虹/手繪)" [ref=e60]:
+      - img "外框03.png"
+      - button "✕" [ref=e61] [cursor=pointer]
+      - generic [ref=e62]:
+        - generic [ref=e63]: 外框03.png
+        - generic "點此編輯說明" [ref=e64]: 冷泡茶卡片 16 種外框(細線/雙線/角標/不對稱/虛線/網格/貼紙/筆記/雜誌/裁切/陰影盒/裝飾花/對話框/票券/霓虹/手繪)
+    - figure "光影.png 光影教學:設計與攝影光影基本功(光源方向/反射光/明暗交界/投影/高光)" [ref=e65]:
+      - img "光影.png"
+      - button "✕" [ref=e66] [cursor=pointer]
+      - generic [ref=e67]:
+        - generic [ref=e68]: 光影.png
+        - generic "點此編輯說明" [ref=e69]: 光影教學:設計與攝影光影基本功(光源方向/反射光/明暗交界/投影/高光)
+    - figure "底部導覽.png 手機底部導覽列 7 種(文字加圖示/純圖示/凸起按鈕/膠囊提中/浮動島/玻璃底欄/品牌色高亮)" [ref=e70]:
+      - img "底部導覽.png"
+      - button "✕" [ref=e71] [cursor=pointer]
+      - generic [ref=e72]:
+        - generic [ref=e73]: 底部導覽.png
+        - generic "點此編輯說明" [ref=e74]: 手機底部導覽列 7 種(文字加圖示/純圖示/凸起按鈕/膠囊提中/浮動島/玻璃底欄/品牌色高亮)
+    - figure "按鈕.png START 按鈕 12 形狀(圓形/膠囊/方角/三角/菱形/波浪/貼紙/雙層/等距立體/粗外框/柔和陰影/雙色切片)" [ref=e75]:
+      - img "按鈕.png"
+      - button "✕" [ref=e76] [cursor=pointer]
+      - generic [ref=e77]:
+        - generic [ref=e78]: 按鈕.png
+        - generic "點此編輯說明" [ref=e79]: START 按鈕 12 形狀(圓形/膠囊/方角/三角/菱形/波浪/貼紙/雙層/等距立體/粗外框/柔和陰影/雙色切片)
+    - figure "按鈕03.png START 按鈕 12 風格(分頁/切換/緞帶/徽章/票券/積木/像素/霓虹/手繪/爆炸形/箭頭形/遊戲風)" [ref=e80]:
+      - img "按鈕03.png"
+      - button "✕" [ref=e81] [cursor=pointer]
+      - generic [ref=e82]:
+        - generic [ref=e83]: 按鈕03.png
+        - generic "點此編輯說明" [ref=e84]: START 按鈕 12 風格(分頁/切換/緞帶/徽章/票券/積木/像素/霓虹/手繪/爆炸形/箭頭形/遊戲風)
+    - figure "按鈕04.png 按鈕 12 種狀態與類型(主要/次要/外框/幽靈/文字/圖示/圖示加字/危險/成功/停用/載入中/下拉)" [ref=e85]:
+      - img "按鈕04.png"
+      - button "✕" [ref=e86] [cursor=pointer]
+      - generic [ref=e87]:
+        - generic [ref=e88]: 按鈕04.png
+        - generic "點此編輯說明" [ref=e89]: 按鈕 12 種狀態與類型(主要/次要/外框/幽靈/文字/圖示/圖示加字/危險/成功/停用/載入中/下拉)
+    - figure "時間排法.png 日期時間排版 12 種(大數字/直排/圓圈框/卡片式/票券式/時間線/橫間距字/粗體海報/角落標籤/分割線/最大字/品牌底紋)" [ref=e90]:
+      - img "時間排法.png"
+      - button "✕" [ref=e91] [cursor=pointer]
+      - generic [ref=e92]:
+        - generic [ref=e93]: 時間排法.png
+        - generic "點此編輯說明" [ref=e94]: 日期時間排版 12 種(大數字/直排/圓圈框/卡片式/票券式/時間線/橫間距字/粗體海報/角落標籤/分割線/最大字/品牌底紋)
+    - figure "時間軸.png 12 種 Timeline 時間軸 UI 設計(垂直/水平/卡片式/群點式/左右交錯/進度條式/日期軸/圖示軸/里程碑/流程步驟/標籤卡/Dashboard)" [ref=e95]:
+      - img "時間軸.png"
+      - button "✕" [ref=e96] [cursor=pointer]
+      - generic [ref=e97]:
+        - generic [ref=e98]: 時間軸.png
+        - generic "點此編輯說明" [ref=e99]: 12 種 Timeline 時間軸 UI 設計(垂直/水平/卡片式/群點式/左右交錯/進度條式/日期軸/圖示軸/里程碑/流程步驟/標籤卡/Dashboard)
+    - figure "高級玻璃.png 玻璃質感 UI 介面設計展示(深藍儀表板:營運數據/圖表/個人化卡/天氣/快捷工具 + 手機版,高級玻璃擬態)" [ref=e100]:
+      - img "高級玻璃.png"
+      - button "✕" [ref=e101] [cursor=pointer]
+      - generic [ref=e102]:
+        - generic [ref=e103]: 高級玻璃.png
+        - generic "點此編輯說明" [ref=e104]: 玻璃質感 UI 介面設計展示(深藍儀表板:營運數據/圖表/個人化卡/天氣/快捷工具 + 手機版,高級玻璃擬態)
+    - figure "搜尋欄.png 12 種搜尋欄 Search Input 設計(基礎/圓角/圖示左側/展開式/語音/篩選下拉/搜尋建議/歷史紀錄/分類/全寬/浮動/行動裝置)" [ref=e105]:
+      - img "搜尋欄.png"
+      - button "✕" [ref=e106] [cursor=pointer]
+      - generic [ref=e107]:
+        - generic [ref=e108]: 搜尋欄.png
+        - generic "點此編輯說明" [ref=e109]: 12 種搜尋欄 Search Input 設計(基礎/圓角/圖示左側/展開式/語音/篩選下拉/搜尋建議/歷史紀錄/分類/全寬/浮動/行動裝置)
+    - figure "擬物玻璃.png 擬物玻璃質感 UI 元件庫(手機桌面/Icon/Button/Slider/音樂播放/天氣/通知/設定,毛玻璃透明質感)" [ref=e110]:
+      - img "擬物玻璃.png"
+      - button "✕" [ref=e111] [cursor=pointer]
+      - generic [ref=e112]:
+        - generic [ref=e113]: 擬物玻璃.png
+        - generic "點此編輯說明" [ref=e114]: 擬物玻璃質感 UI 元件庫(手機桌面/Icon/Button/Slider/音樂播放/天氣/通知/設定,毛玻璃透明質感)
+    - figure "雙按鈕.png 網站常見區塊與雙鈕 CTA(確認取消/登入註冊/購買返回/保存/同意拒絕/開始導覽/付款優惠/表單送出/卡片CTA/Hero雙CTA)" [ref=e115]:
+      - img "雙按鈕.png"
+      - button "✕" [ref=e116] [cursor=pointer]
+      - generic [ref=e117]:
+        - generic [ref=e118]: 雙按鈕.png
+        - generic "點此編輯說明" [ref=e119]: 網站常見區塊與雙鈕 CTA(確認取消/登入註冊/購買返回/保存/同意拒絕/開始導覽/付款優惠/表單送出/卡片CTA/Hero雙CTA)
+    - figure "AI插畫風格.png 同一街角咖啡店 6 種 AI 插畫畫風(二維矢量/多巴胺/極簡矢量/高端插畫/國潮幾何/冰箱貼)" [ref=e120]:
+      - img "AI插畫風格.png"
+      - button "✕" [ref=e121] [cursor=pointer]
+      - generic [ref=e122]:
+        - generic [ref=e123]: AI插畫風格.png
+        - generic "點此編輯說明" [ref=e124]: 同一街角咖啡店 6 種 AI 插畫畫風(二維矢量/多巴胺/極簡矢量/高端插畫/國潮幾何/冰箱貼)
+    - figure "IMAGE2實用.png GPT-Image2 9 種實用用途(修圖/換背景/統一頭像風/海報排版/產品場景/封面標題/內容配圖/草圖變成品/多版本測試)" [ref=e125]:
+      - img "IMAGE2實用.png"
+      - button "✕" [ref=e126] [cursor=pointer]
+      - generic [ref=e127]:
+        - generic [ref=e128]: IMAGE2實用.png
+        - generic "點此編輯說明" [ref=e129]: GPT-Image2 9 種實用用途(修圖/換背景/統一頭像風/海報排版/產品場景/封面標題/內容配圖/草圖變成品/多版本測試)
+    - figure "ref-01.png 草稿:文字設計處理(深色海報感,偏花俏)" [ref=e130]:
+      - img "ref-01.png"
+      - button "✕" [ref=e131] [cursor=pointer]
+      - generic [ref=e132]:
+        - generic [ref=e133]: ref-01.png
+        - generic "點此編輯說明" [ref=e134]: 草稿:文字設計處理(深色海報感,偏花俏)
+    - figure "ref-02.png 草稿:網頁標題風(低調網頁標題)" [ref=e135]:
+      - img "ref-02.png"
+      - button "✕" [ref=e136] [cursor=pointer]
+      - generic [ref=e137]:
+        - generic [ref=e138]: ref-02.png
+        - generic "點此編輯說明" [ref=e139]: 草稿:網頁標題風(低調網頁標題)
+    - figure "ref-03.png 草稿:文字設計處理(淺色版)" [ref=e140]:
+      - img "ref-03.png"
+      - button "✕" [ref=e141] [cursor=pointer]
+      - generic [ref=e142]:
+        - generic [ref=e143]: ref-03.png
+        - generic "點此編輯說明" [ref=e144]: 草稿:文字設計處理(淺色版)
+    - figure "ref-04.png 草稿:網頁情境(偏平,效果不明顯,已淘汰)" [ref=e145]:
+      - img "ref-04.png"
+      - button "✕" [ref=e146] [cursor=pointer]
+      - generic [ref=e147]:
+        - generic [ref=e148]: ref-04.png
+        - generic "點此編輯說明" [ref=e149]: 草稿:網頁情境(偏平,效果不明顯,已淘汰)
+    - figure "ref-05.png 文字效果主菜單:金屬漸層 / 藍重點字 / 霓虹 / 漸層 / 3D / 鍍鉻 / 發光按鈕 / 金色襯線" [ref=e150]:
+      - img "ref-05.png"
+      - button "✕" [ref=e151] [cursor=pointer]
+      - generic [ref=e152]:
+        - generic [ref=e153]: ref-05.png
+        - generic "點此編輯說明" [ref=e154]: 文字效果主菜單:金屬漸層 / 藍重點字 / 霓虹 / 漸層 / 3D / 鍍鉻 / 發光按鈕 / 金色襯線
+    - figure "ref-06.png 文字效果進階:中空描邊 / CMYK套印錯位 / 長陰影 / 浮雕 / glitch / 液態金屬 / 螢光筆 / 霓虹中空" [ref=e155]:
+      - img "ref-06.png"
+      - button "✕" [ref=e156] [cursor=pointer]
+      - generic [ref=e157]:
+        - generic [ref=e158]: ref-06.png
+        - generic "點此編輯說明" [ref=e159]: 文字效果進階:中空描邊 / CMYK套印錯位 / 長陰影 / 浮雕 / glitch / 液態金屬 / 螢光筆 / 霓虹中空
+    - figure "ref-07.png 按鈕效果:玻璃擬態 / 漸層光暈 / 新擬態 / neo-brutalism / 霓虹邊框 / 3D按下 / ghost / 金屬" [ref=e160]:
+      - img "ref-07.png"
+      - button "✕" [ref=e161] [cursor=pointer]
+      - generic [ref=e162]:
+        - generic [ref=e163]: ref-07.png
+        - generic "點此編輯說明" [ref=e164]: 按鈕效果:玻璃擬態 / 漸層光暈 / 新擬態 / neo-brutalism / 霓虹邊框 / 3D按下 / ghost / 金屬
+    - figure "ref-08.png 邊框與卡片:漸層描邊 / 霓虹外框 / 票券缺角 / 復古雙線 / 內凹 / 四角裝飾 / 手繪粗框 / 彩色標籤" [ref=e165]:
+      - img "ref-08.png"
+      - button "✕" [ref=e166] [cursor=pointer]
+      - generic [ref=e167]:
+        - generic [ref=e168]: ref-08.png
+        - generic "點此編輯說明" [ref=e169]: 邊框與卡片:漸層描邊 / 霓虹外框 / 票券缺角 / 復古雙線 / 內凹 / 四角裝飾 / 手繪粗框 / 彩色標籤
+    - figure "Tab設計.png 儀表板分頁標題列 12 種設計(底線/膠囊/卡片/圖示加字/側邊/頂部導航/分段控制/浮動/徽章/icon/玻璃/疊卡)" [ref=e170]:
+      - img "Tab設計.png"
+      - button "✕" [ref=e171] [cursor=pointer]
+      - generic [ref=e172]:
+        - generic [ref=e173]: Tab設計.png
+        - generic "點此編輯說明" [ref=e174]: 儀表板分頁標題列 12 種設計(底線/膠囊/卡片/圖示加字/側邊/頂部導航/分段控制/浮動/徽章/icon/玻璃/疊卡)
+    - figure "UI元素01.png UI 元素詞庫①輸入與控制(按鈕/文字輸入/密碼/搜尋/文字域/日期選擇/上傳/滑桿/單選多選/開關)" [ref=e175]:
+      - img "UI元素01.png"
+      - button "✕" [ref=e176] [cursor=pointer]
+      - generic [ref=e177]:
+        - generic [ref=e178]: UI元素01.png
+        - generic "點此編輯說明" [ref=e179]: UI 元素詞庫①輸入與控制(按鈕/文字輸入/密碼/搜尋/文字域/日期選擇/上傳/滑桿/單選多選/開關)
+    - figure "UI元素02.png UI 元素詞庫②(進度條/徽章/標籤/提示框/頭像/卡片/工具提示/Tab/麵包屑/分頁/空狀態/通知)" [ref=e180]:
+      - img "UI元素02.png"
+      - button "✕" [ref=e181] [cursor=pointer]
+      - generic [ref=e182]:
+        - generic [ref=e183]: UI元素02.png
+        - generic "點此編輯說明" [ref=e184]: UI 元素詞庫②(進度條/徽章/標籤/提示框/頭像/卡片/工具提示/Tab/麵包屑/分頁/空狀態/通知)
+    - figure "UI元素03.png 完整後台 UI kit(側欄導航/按鈕/輸入/卡片/圖示/通知 toast/手機卡片/dashboard 元件)" [ref=e185]:
+      - img "UI元素03.png"
+      - button "✕" [ref=e186] [cursor=pointer]
+      - generic [ref=e187]:
+        - generic [ref=e188]: UI元素03.png
+        - generic "點此編輯說明" [ref=e189]: 完整後台 UI kit(側欄導航/按鈕/輸入/卡片/圖示/通知 toast/手機卡片/dashboard 元件)
+    - figure "UI按鈕.png 18 種按鈕風格①(主要/次要/外框/幽靈/文字/圖示/圖示加字/危險/成功)" [ref=e190]:
+      - img "UI按鈕.png"
+      - button "✕" [ref=e191] [cursor=pointer]
+      - generic [ref=e192]:
+        - generic [ref=e193]: UI按鈕.png
+        - generic "點此編輯說明" [ref=e194]: 18 種按鈕風格①(主要/次要/外框/幽靈/文字/圖示/圖示加字/危險/成功)
+    - figure "UI按鈕02.png 18 種按鈕風格②(停用/載入中/下拉/分段/工具列/浮動/雙按鈕/全寬提交/CTA)" [ref=e195]:
+      - img "UI按鈕02.png"
+      - button "✕" [ref=e196] [cursor=pointer]
+      - generic [ref=e197]:
+        - generic [ref=e198]: UI按鈕02.png
+        - generic "點此編輯說明" [ref=e199]: 18 種按鈕風格②(停用/載入中/下拉/分段/工具列/浮動/雙按鈕/全寬提交/CTA)
+    - figure "UI風格02.png 音樂App付費卡 7 風格①(醒目化/扁平/Material/新擬態/玻璃擬態/黏土/液態玻璃)" [ref=e200]:
+      - img "UI風格02.png"
+      - button "✕" [ref=e201] [cursor=pointer]
+      - generic [ref=e202]:
+        - generic [ref=e203]: UI風格02.png
+        - generic "點此編輯說明" [ref=e204]: 音樂App付費卡 7 風格①(醒目化/扁平/Material/新擬態/玻璃擬態/黏土/液態玻璃)
+    - figure "UI風格03.png 音樂App付費卡 7 風格②(新粗野/極簡/包浩斯/復古未來/粗野/反設計/酸性)" [ref=e205]:
+      - img "UI風格03.png"
+      - button "✕" [ref=e206] [cursor=pointer]
+      - generic [ref=e207]:
+        - generic [ref=e208]: UI風格03.png
+        - generic "點此編輯說明" [ref=e209]: 音樂App付費卡 7 風格②(新粗野/極簡/包浩斯/復古未來/粗野/反設計/酸性)

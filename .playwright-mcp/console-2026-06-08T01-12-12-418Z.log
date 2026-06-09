@@ -1,0 +1,13 @@
+[     155ms] [LOG] Mon Jun 08 2026 09:12:12 GMT+0800 (台北標準時間) @ https://g.alicdn.com/AWSC/et/1.84.2/et_f.js:2
+[     227ms] [INFO] ################# [locale] getLocale in csr, pageName: zh-TW false @ https://g.alicdn.com/code/npm/@ali/pegasus-project-tmw-seo/0.0.51/js/main.js:0
+[     227ms] [INFO] [getLocale] | final lang | zh-TW @ https://g.alicdn.com/code/npm/@ali/pegasus-project-tmw-seo/0.0.51/js/main.js:0
+[     319ms] [WARNING] The PerformanceObserver does not support buffered flag with the entryTypes argument. @ https://g.alicdn.com/tb/tracker/index.js:0
+[     350ms] [WARNING] [requestData] 当前环境不支持 Mega JSBridge, 已使用 @ali/lib-mtop 降级为 Windvane / H5 请求 @ https://g.alicdn.com/code/npm/@ali/pegasus-project-tmw-seo/0.0.51/js/p_pdp-pc-index.js:0
+[     379ms] [LOG] %c [APLUS] -- APLUS INIT SUCCESS background:#3B82FE; padding: 4px; padding-right: 8px; border-radius: 4px; color: #fff; @ :1
+[    9117ms] [WARNING] The ScriptProcessorNode is deprecated. Use AudioWorkletNode instead. (https://bit.ly/audio-worklet) @ https://g.alicdn.com/AWSC/uab/1.140.0/collina.js:8
+[   12907ms] [LOG] Mon Jun 08 2026 09:12:25 GMT+0800 (台北標準時間) @ https://g.alicdn.com/AWSC/et/1.84.2/et_f.js:2
+[   12996ms] [WARNING] It is recommended that a robustness level be specified. Not specifying the robustness level could result in unexpected behavior. @ https://g.alicdn.com/AWSC/fireyejs/1.234.24/fireyejs.js:0
+[   14227ms] [ERROR] Permissions policy violation: gyroscope is not allowed in this document. @ https://g.alicdn.com/secdev/sufei_data/3.9.14/index.js:0
+[   14228ms] [ERROR] Permissions policy violation: accelerometer is not allowed in this document. @ https://g.alicdn.com/secdev/sufei_data/3.9.14/index.js:0
+[   14228ms] [WARNING] The deviceorientation events are blocked by permissions policy. See https://github.com/w3c/webappsec-permissions-policy/blob/master/features.md#sensor-features @ https://g.alicdn.com/secdev/sufei_data/3.9.14/index.js:0
+[   14593ms] [LOG] Mon Jun 08 2026 09:12:26 GMT+0800 (台北標準時間) @ https://g.alicdn.com/AWSC/et/1.83.41/et_f.js:1

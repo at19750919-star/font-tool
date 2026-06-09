@@ -1,0 +1,3082 @@
+import { useState, useMemo, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Card } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Copy, Check, Trash2, Sparkles, X, LayoutGrid, Eye, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
+import { useLocalFonts } from "@/hooks/useLocalFonts";
+import { FontUploader } from "@/components/FontUploader";
+import { LocalFontRow } from "@/components/LocalFontRow";
+
+// 與 dashboard 一致的網路字型（Google Fonts + CDN，已在 index.html 載入）
+// script 標註此字型主要涵蓋的字元：中文(含日文漢字) / 英文(拉丁)
+const WEB_FONTS: { family: string; script: "中文" | "英文"; cn?: string }[] = [
+  // 中文 / 日文（含漢字）
+  { family: "Dela Gothic One", script: "中文", cn: "演唱會海報黑體" },
+  { family: "DotGothic16", script: "中文", cn: "像素點陣黑體" },
+  { family: "Zen Old Mincho", script: "中文", cn: "金色裝飾明朝" },
+  { family: "Rampart One", script: "中文", cn: "中空立體" },
+  { family: "Reggae One", script: "中文", cn: "複古反白" },
+  { family: "Hachi Maru Pop", script: "中文", cn: "手寫圓滑" },
+  { family: "Stick", script: "中文", cn: "骨架細體" },
+  { family: "Potta One", script: "中文", cn: "超粗膨脹黑體" },
+  { family: "RocknRoll One", script: "中文", cn: "活力手感黑體" },
+  { family: "Palette Mosaic", script: "中文", cn: "馬賽克拼貼" },
+  { family: "Kaisei Opti", script: "中文", cn: "日式優雅明朝" },
+  { family: "Chocolate Classical Sans", script: "中文", cn: "優雅現代" },
+  { family: "LXGW WenKai TC", script: "中文", cn: "霞鶩文楷" },
+  { family: "LXGW WenKai Mono TC", script: "中文", cn: "等寬楷書" },
+  { family: "Taipei Sans TC", script: "中文", cn: "台北黑體" },
+  { family: "Chiron Sung HK WS", script: "中文", cn: "港式現代宋" },
+  // 本機下載字型（檔案放 public/fonts/，@font-face 定義在 index.html）
+  { family: "ChenYuluoyan Thin", script: "中文", cn: "極細毛筆楷書" },
+  { family: "GenWanMin2 TC", script: "中文", cn: "文鼎開源宋體" },
+  { family: "Glow Sans TC Extended", script: "中文", cn: "多字重無襯線" },
+  { family: "Satsuki Gendai Mincho", script: "中文", cn: "現代感明朝" },
+  { family: "Swei Spring CJK TC", script: "中文", cn: "台灣手感黑體" },
+  { family: "ToneOZ Tsuipita TC", script: "中文", cn: "注音符號標注" },
+  { family: "香萃刻宋", script: "中文", cn: "精刻宋體" },
+  { family: "哥特式字體", script: "中文", cn: "西式哥特裝飾" },
+  { family: "漢儀彩雲體繁", script: "中文", cn: "雲朵裝飾輪廓" },
+  { family: "漢儀齊黑繁", script: "中文", cn: "方正均勻黑體" },
+  { family: "山海黑奇式格特", script: "中文", cn: "奇幻哥特黑體" },
+  { family: "山海星夜格特", script: "中文", cn: "星夜哥特黑體" },
+  { family: "Gen Ei Gothic P Heavy", script: "中文", cn: "源暎圓角超粗黑" },
+  { family: "AR RomanMinchoJP UL", script: "中文", cn: "日系超細明朝" },
+  // 英文（拉丁）
+  { family: "Monoton", script: "英文" },
+  { family: "Bebas Neue", script: "英文" },
+  { family: "Pacifico", script: "英文" },
+  { family: "Press Start 2P", script: "英文" },
+  { family: "Orbitron", script: "英文" },
+  { family: "Audiowide", script: "英文" },
+  { family: "Russo One", script: "英文" },
+  { family: "Major Mono Display", script: "英文" },
+  { family: "Abril Fatface", script: "英文" },
+  { family: "Rubik Glitch", script: "英文" },
+  { family: "Bungee Shade", script: "英文" },
+  { family: "Rubik Wet Paint", script: "英文" },
+  { family: "Cherry Bomb One", script: "英文" },
+  { family: "Kablammo", script: "英文" },
+  { family: "Faster One", script: "英文" },
+  { family: "Wallpoet", script: "英文" },
+  { family: "Iceberg", script: "英文" },
+  { family: "Rubik Mono One", script: "英文" },
+  { family: "Modak", script: "英文" },
+  { family: "Playfair Display", script: "英文" },
+  { family: "DM Serif Display", script: "英文" },
+  { family: "Bodoni Moda", script: "英文" },
+  { family: "Yeseva One", script: "英文" },
+  { family: "Libre Bodoni", script: "英文" },
+  { family: "Roboto Slab", script: "英文" },
+  { family: "Old Standard TT", script: "英文" },
+  { family: "Cormorant SC", script: "英文" },
+  { family: "Source Serif 4", script: "英文" },
+  { family: "Fraunces", script: "英文" },
+  { family: "Instrument Serif", script: "英文" },
+  { family: "Caveat", script: "英文" },
+  { family: "Patrick Hand", script: "英文" },
+  { family: "DM Sans", script: "英文" },
+  { family: "JetBrains Mono", script: "英文" },
+];
+
+// 把字型清單依「中文 / 英文 / 數字 / 其他」分組（固定顯示順序）
+const SCRIPT_ORDER = ["中文", "英文", "數字", "其他"] as const;
+function groupByScript<T extends { script?: string }>(items: T[]) {
+  const groups: Record<string, T[]> = {};
+  items.forEach((it) => {
+    const k = it.script || "其他";
+    (groups[k] = groups[k] || []).push(it);
+  });
+  return SCRIPT_ORDER.filter((k) => groups[k]?.length).map(
+    (k) => [k, groups[k]] as [string, T[]],
+  );
+}
+
+// 常見的中文字型列表
+const FONT_LIST = [
+  { name: "系統預設", value: "system-ui", category: "系統" },
+  { name: "微軟雅黑", value: "'Microsoft YaHei', sans-serif", category: "系統" },
+  { name: "蘋果字體", value: "'-apple-system', BlinkMacSystemFont, 'Segoe UI', sans-serif", category: "系統" },
+  { name: "Noto Sans TC", value: "'Noto Sans TC', sans-serif", category: "Google Fonts" },
+  { name: "Noto Serif TC", value: "'Noto Serif TC', serif", category: "Google Fonts" },
+  { name: "思源黑體", value: "'Source Han Sans TC', sans-serif", category: "Adobe" },
+  { name: "思源宋體", value: "'Source Han Serif TC', serif", category: "Adobe" },
+  { name: "文泉驛微米黑", value: "'WenQuanYi Micro Hei', sans-serif", category: "開源" },
+  { name: "文泉驛正黑", value: "'WenQuanYi Zen Hei', sans-serif", category: "開源" },
+];
+
+const DEFAULT_PREVIEW_TEXT = "一杯森活力滿分";
+
+// 效果預設定義
+interface TextEffectPreset {
+  name: string;
+  label: string;
+  shadowEnabled: boolean;
+  shadowX: number;
+  shadowY: number;
+  shadowBlur: number;
+  shadowColor: string;
+  shadowOpacity: number;
+  strokeEnabled: boolean;
+  strokeWidth: number;
+  strokeColor: string;
+}
+
+const EFFECT_PRESETS: TextEffectPreset[] = [
+  {
+    name: "neon",
+    label: "霓虹燈",
+    shadowEnabled: true,
+    shadowX: 0,
+    shadowY: 0,
+    shadowBlur: 20,
+    shadowColor: "#ff00ff",
+    shadowOpacity: 1,
+    strokeEnabled: false,
+    strokeWidth: 0,
+    strokeColor: "#000000",
+  },
+  {
+    name: "3d",
+    label: "立體",
+    shadowEnabled: true,
+    shadowX: 4,
+    shadowY: 4,
+    shadowBlur: 8,
+    shadowColor: "#000000",
+    shadowOpacity: 0.8,
+    strokeEnabled: true,
+    strokeWidth: 0.5,
+    strokeColor: "#333333",
+  },
+  {
+    name: "emboss",
+    label: "浮雕",
+    shadowEnabled: true,
+    shadowX: -2,
+    shadowY: -2,
+    shadowBlur: 4,
+    shadowColor: "#ffffff",
+    shadowOpacity: 0.8,
+    strokeEnabled: true,
+    strokeWidth: 0.3,
+    strokeColor: "#cccccc",
+  },
+  {
+    name: "engrave",
+    label: "陰刻",
+    shadowEnabled: true,
+    shadowX: 2,
+    shadowY: 2,
+    shadowBlur: 4,
+    shadowColor: "#000000",
+    shadowOpacity: 0.6,
+    strokeEnabled: false,
+    strokeWidth: 0,
+    strokeColor: "#000000",
+  },
+  {
+    name: "metal",
+    label: "金屬",
+    shadowEnabled: true,
+    shadowX: 0,
+    shadowY: 0,
+    shadowBlur: 10,
+    shadowColor: "#ffcc00",
+    shadowOpacity: 0.7,
+    strokeEnabled: true,
+    strokeWidth: 1,
+    strokeColor: "#cc9900",
+  },
+  {
+    name: "glow",
+    label: "發光",
+    shadowEnabled: true,
+    shadowX: 0,
+    shadowY: 0,
+    shadowBlur: 15,
+    shadowColor: "#00ffff",
+    shadowOpacity: 0.9,
+    strokeEnabled: false,
+    strokeWidth: 0,
+    strokeColor: "#000000",
+  },
+];
+
+// 產生「長陰影」用的多層 text-shadow 字串
+const longShadow = (color: string, n = 16) =>
+  Array.from({ length: n }, (_, i) => `${i + 1}px ${i + 1}px 0 ${color}`).join(", ");
+
+// 設計文字效果：一鍵套用「整組」樣式（漸層 / 中空 / 多層陰影 / 螢光筆）
+interface DesignPreset {
+  name: string;
+  label: string;
+  gradient?: { type: "linear" | "radial"; angle: number; c1: string; c2: string };
+  color?: string; // 純色文字（無漸層時）
+  fillTransparent?: boolean; // 中空（只留描邊）
+  stroke?: { width: number; color: string };
+  shadow?: string; // 多層 text-shadow 字串
+  highlight?: string; // 螢光筆底色
+}
+
+const DESIGN_PRESETS: DesignPreset[] = [
+  // 金屬金漸層：金色漸層 + 頂部高光 + 落地陰影
+  { name: "gold", label: "金屬金漸層", gradient: { type: "linear", angle: 100, c1: "#fff3b0", c2: "#b8860b" }, stroke: { width: 0.5, color: "#6b4e00" }, shadow: "0 1px 0 #fff8d8, 0 2px 4px rgba(0,0,0,.32)" },
+  // 鮮豔漸層：紫→粉 + 柔光
+  { name: "vivid", label: "鮮豔漸層", gradient: { type: "linear", angle: 95, c1: "#7c3aed", c2: "#fb7185" }, shadow: "0 2px 7px rgba(124,58,237,.35)" },
+  // 鍍鉻銀：上白下灰 + 上下金屬邊 + 落地陰影
+  { name: "chrome", label: "鍍鉻銀", gradient: { type: "linear", angle: 180, c1: "#ffffff", c2: "#6b7280" }, stroke: { width: 0.5, color: "#4b5563" }, shadow: "0 1px 0 #ffffff, 0 -1px 0 #cbd5e1, 0 3px 5px rgba(0,0,0,.4)" },
+  // 霓虹發光：白色核心 + 多層粉光暈
+  { name: "neon", label: "霓虹發光", color: "#ff2db6", shadow: "0 0 2px #ffffff, 0 0 6px #ff2db6, 0 0 14px #ff2db6, 0 0 28px #ff2db6, 0 0 52px #ff2db6" },
+  // 立體 3D：米白面 + 左上亮邊 + 多層暗面擠出 + 落地陰影
+  { name: "extrude3d", label: "立體 3D", color: "#ece3cf", shadow: "-1px -1px 0 #ffffff, 1px 1px 0 #c9bd99, 2px 2px 0 #c0b48f, 3px 3px 0 #b6aa85, 4px 4px 0 #ac9f7a, 5px 5px 0 #a29570, 6px 6px 0 #988b66, 7px 7px 0 #8d815b, 8px 8px 0 #837751, 11px 11px 17px rgba(0,0,0,.38)" },
+  // 長陰影：亮面 + 22 層 45° 半透明長陰影
+  { name: "longshadow", label: "長陰影", color: "#14b8a6", shadow: longShadow("rgba(13,90,84,.45)", 22) },
+  // 中空描邊:粗外框 + 透明填色 + 淡位移陰影
+  { name: "hollow", label: "中空描邊", fillTransparent: true, stroke: { width: 2.5, color: "#111827" }, shadow: "3px 3px 0 rgba(17,24,39,.12)" },
+  // 霓虹中空:粉外框 + 透明填色 + 多層光暈
+  { name: "neonHollow", label: "霓虹中空", fillTransparent: true, stroke: { width: 1.6, color: "#ff2d95" }, shadow: "0 0 6px #ff2d95, 0 0 14px #ff2d95, 0 0 28px #ff2d95" },
+  // 套印錯位:青 / 洋紅雙色錯位
+  { name: "misprint", label: "套印錯位", color: "#111827", shadow: "3px 3px 0 #00b4d8, -3px -3px 0 #ff006e" },
+  // 故障 glitch:紅藍 RGB 分離
+  { name: "glitch", label: "故障 glitch", color: "#111827", shadow: "3px 0 #ff006e, -3px 0 #00e5ff, 0 2px 0 #00e5ff" },
+  // 浮雕:近底色面 + 上亮下暗壓印
+  { name: "emboss2", label: "浮雕", color: "#d8dde3", shadow: "0 1px 0 #ffffff, 0 -1px 1px rgba(0,0,0,.25)" },
+  // 螢光筆:深字 + 黃色底線色塊
+  { name: "marker", label: "螢光筆", color: "#1f2937", highlight: "#fde047" },
+];
+
+// 設計按鈕效果：一鍵套用整顆按鈕的外觀
+interface ButtonPreset {
+  name: string;
+  label: string;
+  grad?: { angle: number; c1: string; c2: string };
+  bg?: string; // 純色背景（可用 rgba / transparent）
+  radius: number;
+  border?: { width: number; color: string };
+  boxShadow?: string;
+  backdropBlur?: number;
+  textColor: string;
+  px?: number;
+  py?: number;
+}
+
+const BUTTON_PRESETS: ButtonPreset[] = [
+  { name: "glass", label: "玻璃擬態", bg: "rgba(255,255,255,0.35)", radius: 16, border: { width: 1, color: "rgba(255,255,255,0.7)" }, boxShadow: "0 8px 32px rgba(31,38,135,0.18)", backdropBlur: 8, textColor: "#1f2937", px: 28, py: 14 },
+  { name: "gradGlow", label: "漸層光暈", grad: { angle: 95, c1: "#a855f7", c2: "#ec4899" }, radius: 999, boxShadow: "0 10px 28px rgba(168,85,247,0.5)", textColor: "#ffffff", px: 30, py: 14 },
+  { name: "neu", label: "新擬態", bg: "#e0e5ec", radius: 16, boxShadow: "8px 8px 16px #b8bcc4, -8px -8px 16px #ffffff", textColor: "#555f6d", px: 28, py: 14 },
+  { name: "brutal", label: "neo-brutalism", bg: "#ffde59", radius: 4, border: { width: 2, color: "#111111" }, boxShadow: "5px 5px 0 #111111", textColor: "#111111", px: 26, py: 13 },
+  { name: "neonBorder", label: "霓虹邊框", bg: "#0b0f1a", radius: 10, border: { width: 2, color: "#22d3ee" }, boxShadow: "0 0 8px #22d3ee, 0 0 18px #22d3ee, inset 0 0 8px rgba(34,211,238,0.45)", textColor: "#22d3ee", px: 28, py: 13 },
+  { name: "press3d", label: "3D 按下", bg: "#ff7a18", radius: 12, boxShadow: "0 6px 0 #b3530f", textColor: "#ffffff", px: 28, py: 13 },
+  { name: "ghost", label: "Ghost 描邊", bg: "transparent", radius: 8, border: { width: 2, color: "#3b82f6" }, textColor: "#3b82f6", px: 26, py: 12 },
+  { name: "metal", label: "金屬質感", grad: { angle: 180, c1: "#f7f7f7", c2: "#9aa0a6" }, radius: 8, border: { width: 1, color: "#7c7c7c" }, boxShadow: "inset 0 1px 0 #ffffff, 0 2px 5px rgba(0,0,0,0.35)", textColor: "#2b2f33", px: 28, py: 13 },
+  { name: "clay", label: "黏土擬態", bg: "#c9a7ff", radius: 26, boxShadow: "10px 10px 22px rgba(0,0,0,0.2), inset -5px -5px 10px rgba(0,0,0,0.18), inset 5px 6px 14px rgba(255,255,255,0.7)", textColor: "#4c1d95", px: 30, py: 15 },
+];
+
+// 把 React.CSSProperties 轉成 CSS 文字字串（camelCase→kebab-case，數字補 px）
+const styleToCss = (style: React.CSSProperties): string =>
+  Object.entries(style)
+    .map(([k, v]) => {
+      const prop = k
+        .replace(/^Webkit/, "webkit")
+        .replace(/^Moz/, "moz")
+        .replace(/^ms/, "ms")
+        .replace(/([A-Z])/g, "-$1")
+        .toLowerCase()
+        .replace(/^webkit/, "-webkit")
+        .replace(/^moz/, "-moz")
+        .replace(/^ms/, "-ms");
+      const val = typeof v === "number" ? `${v}px` : v;
+      return `${prop}: ${val};`;
+    })
+    .join(" ");
+
+// 設計卡片效果：一鍵套用整張卡片的外觀（外框 / 樣式）
+interface CardPreset { name: string; label: string; style: React.CSSProperties; textColor: string; badges?: boolean; }
+
+const CARD_PRESETS: CardPreset[] = [
+  { name: "gradBorder", label: "漸層描邊", textColor: "#1f2937", style: { background: "linear-gradient(#fff,#fff) padding-box, linear-gradient(135deg,#a855f7,#ec4899) border-box", border: "3px solid transparent", borderRadius: 16 } },
+  { name: "neonBorder", label: "霓虹外框", textColor: "#22d3ee", style: { background: "#0b0f1a", border: "2px solid #22d3ee", borderRadius: 12, boxShadow: "0 0 10px #22d3ee, 0 0 24px rgba(34,211,238,.5), inset 0 0 12px rgba(34,211,238,.25)" } },
+  { name: "doubleLine", label: "復古雙線", textColor: "#6b5b4a", style: { background: "#fdf6e3", border: "4px double #6b5b4a", borderRadius: 6 } },
+  { name: "inset", label: "內凹卡片", textColor: "#555f6d", style: { background: "#e8eaed", borderRadius: 14, boxShadow: "inset 6px 6px 12px #c4c7cc, inset -6px -6px 12px #ffffff" } },
+  { name: "ticket", label: "票券缺角", textColor: "#1f2937", style: { background: "#ffffff", borderRadius: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.12)", maskImage: "radial-gradient(circle 13px at left center, transparent 12px, #000 13px), radial-gradient(circle 13px at right center, transparent 12px, #000 13px)", WebkitMaskImage: "radial-gradient(circle 13px at left center, transparent 12px, #000 13px), radial-gradient(circle 13px at right center, transparent 12px, #000 13px)", maskComposite: "intersect", WebkitMaskComposite: "source-in" } },
+  { name: "corner", label: "四角裝飾", textColor: "#111111", style: { backgroundColor: "#ffffff", background: "linear-gradient(#111,#111) left top/20px 2px no-repeat, linear-gradient(#111,#111) left top/2px 20px no-repeat, linear-gradient(#111,#111) right top/20px 2px no-repeat, linear-gradient(#111,#111) right top/2px 20px no-repeat, linear-gradient(#111,#111) left bottom/20px 2px no-repeat, linear-gradient(#111,#111) left bottom/2px 20px no-repeat, linear-gradient(#111,#111) right bottom/20px 2px no-repeat, linear-gradient(#111,#111) right bottom/2px 20px no-repeat, #ffffff", borderRadius: 2 } },
+  { name: "brutal", label: "手繪粗框", textColor: "#111111", style: { background: "#fffef5", border: "2.5px solid #111111", borderRadius: "255px 15px 225px 15px / 15px 225px 15px 255px", boxShadow: "3px 4px 0 rgba(17,17,17,0.85)" } },
+  { name: "frosted", label: "毛玻璃", textColor: "#1f2937", style: { background: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.7)", borderRadius: 18, boxShadow: "0 8px 32px rgba(31,38,135,0.15)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" } },
+  { name: "liquidGlass", label: "液態玻璃", textColor: "#1f2937", style: { background: "linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15))", border: "1px solid rgba(255,255,255,0.8)", borderRadius: 28, boxShadow: "0 12px 40px rgba(0,0,0,0.18), inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -10px 22px rgba(255,255,255,0.25)", backdropFilter: "blur(14px) saturate(160%)", WebkitBackdropFilter: "blur(14px) saturate(160%)" } },
+  { name: "neumorph", label: "新擬物", textColor: "#555f6d", style: { background: "#e0e5ec", borderRadius: 20, boxShadow: "9px 9px 18px #b8bcc4, -9px -9px 18px #ffffff" } },
+  { name: "clay", label: "黏土擬態", textColor: "#4c1d95", style: { background: "#c9a7ff", borderRadius: 32, boxShadow: "30px 30px 60px rgba(0,0,0,0.22), inset -8px -8px 16px rgba(0,0,0,0.18), inset 8px 10px 22px rgba(255,255,255,0.65)" } },
+  { name: "softui", label: "柔感 UI", textColor: "#4b5563", style: { background: "#eef1f6", borderRadius: 20, boxShadow: "6px 6px 14px #d1d6e0, -6px -6px 14px #ffffff" } },
+  { name: "darkmode", label: "深色模式", textColor: "#e2e8f0", style: { background: "#1e293b", borderRadius: 14, border: "1px solid #334155", boxShadow: "0 8px 24px rgba(0,0,0,0.4)" } },
+  { name: "stripe", label: "Stripe 風", textColor: "#635bff", style: { background: "#ffffff", borderRadius: 16, border: "1px solid #eef0f5", boxShadow: "0 7px 14px rgba(50,50,93,0.1), 0 3px 6px rgba(0,0,0,0.08)" } },
+  { name: "kawaii", label: "可愛粉嫩", textColor: "#d6336c", style: { background: "#ffe3ef", borderRadius: 30, border: "2px solid #ffb6d5", boxShadow: "0 6px 0 #ffb6d5" } },
+  { name: "tropical", label: "熱帶漸層", textColor: "#ffffff", style: { background: "linear-gradient(135deg,#34d399,#06b6d4 50%,#fbbf24)", borderRadius: 20, boxShadow: "0 10px 24px rgba(6,182,212,0.35)" } },
+  { name: "apple", label: "Apple 風", textColor: "#1d1d1f", style: { background: "rgba(255,255,255,0.9)", borderRadius: 22, border: "1px solid #ececec", boxShadow: "0 12px 30px rgba(0,0,0,0.1)" } },
+  { name: "flat", label: "極簡扁平", textColor: "#111827", style: { background: "#ffffff", borderRadius: 6, border: "1px solid #e5e7eb" } },
+  { name: "notion", label: "Notion 風", textColor: "#37352f", style: { background: "#ffffff", borderRadius: 6, border: "1px solid #e9e9e7", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" } },
+  { name: "japaneseFresh", label: "日系清新", textColor: "#4b6b46", style: { background: "#f7fbf5", borderRadius: 16, border: "1px solid #dcebd6", boxShadow: "0 6px 16px rgba(120,160,110,0.18)" } },
+  { name: "scandinavian", label: "北歐極簡", textColor: "#4a463f", style: { background: "#f3efe9", borderRadius: 10, border: "1px solid #e0d8cc" } },
+  { name: "monochrome", label: "黑白", textColor: "#111111", style: { background: "#ffffff", borderRadius: 4, border: "2px solid #111111" } },
+  { name: "koreanMinimal", label: "韓系極簡", textColor: "#6b6b6b", style: { background: "#fafafa", borderRadius: 18, boxShadow: "0 8px 20px rgba(0,0,0,0.06)" } },
+  { name: "swiss", label: "瑞士風", textColor: "#e3000f", style: { background: "#ffffff", borderRadius: 0, border: "2px solid #111111" } },
+  { name: "github", label: "GitHub 風", textColor: "#1f2328", style: { background: "#ffffff", borderRadius: 6, border: "1px solid #d0d7de", boxShadow: "0 1px 0 rgba(27,31,36,0.04)" } },
+  { name: "corporateClean", label: "企業簡潔", textColor: "#1e3a5f", style: { background: "#ffffff", borderRadius: 8, border: "1px solid #e3e8ef", boxShadow: "0 4px 12px rgba(16,42,80,0.08)" } },
+  { name: "editorialCard", label: "雜誌編輯", textColor: "#2b2b2b", style: { background: "#fbf7ef", borderRadius: 2, border: "1px solid #e5dccb" } },
+  { name: "terracotta", label: "陶土色", textColor: "#ffffff", style: { background: "#e2725b", borderRadius: 16, boxShadow: "0 8px 20px rgba(226,114,91,0.4)" } },
+  { name: "naturalOrganic", label: "自然有機", textColor: "#4a5c3a", style: { background: "#eaf0e4", borderRadius: "40px 24px 40px 24px", border: "1px solid #cdd9c0" } },
+  { name: "material", label: "材料設計", textColor: "#6200ee", style: { background: "#ffffff", borderRadius: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.2), 0 4px 8px rgba(0,0,0,0.12)" } },
+  { name: "vaporwaveCard", label: "蒸氣波", textColor: "#2d0a4e", style: { background: "linear-gradient(135deg,#ff71ce,#01cdfe)", borderRadius: 14, boxShadow: "0 0 18px rgba(255,113,206,0.6)" } },
+  { name: "retroVintage", label: "復古懷舊", textColor: "#6b4f2a", style: { background: "#f4e4c1", borderRadius: 6, border: "3px double #8a6d3b" } },
+  { name: "y2kCard", label: "Y2K 千禧", textColor: "#3a3a5a", style: { background: "linear-gradient(135deg,#c0c0c0,#e8e8e8 50%,#a0a0a0)", borderRadius: 18, border: "1px solid #b0b0b0", boxShadow: "inset 0 1px 2px #ffffff, 0 4px 10px rgba(0,0,0,0.3)" } },
+  { name: "skeuomorphCard", label: "擬物質感", textColor: "#333333", style: { background: "linear-gradient(180deg,#fdfdfd,#dcdcdc)", borderRadius: 12, border: "1px solid #b9b9b9", boxShadow: "inset 0 1px 0 #ffffff, 0 3px 6px rgba(0,0,0,0.3)" } },
+  { name: "synthwave", label: "合成波", textColor: "#ff6ad5", style: { background: "linear-gradient(180deg,#241734,#43225b)", borderRadius: 12, border: "1px solid #ff2d95", boxShadow: "0 0 20px rgba(255,45,149,0.5)" } },
+  { name: "outrun", label: "Outrun", textColor: "#f72585", style: { background: "linear-gradient(180deg,#0d0221,#3a0ca3)", borderRadius: 10, boxShadow: "0 0 20px rgba(247,37,133,0.5)" } },
+  { name: "frutigerAero", label: "清新水感", textColor: "#0a558c", style: { background: "linear-gradient(180deg,#cdefff,#9fe3ff)", borderRadius: 18, border: "1px solid #ffffff", boxShadow: "inset 0 2px 6px rgba(255,255,255,0.8), 0 8px 18px rgba(60,160,220,0.35)" } },
+  { name: "neoBrutalist", label: "新野獸派", textColor: "#111111", style: { background: "#ffffff", borderRadius: 2, border: "3px solid #111111", boxShadow: "6px 6px 0 #ff4d4d" } },
+  { name: "neonTokyo", label: "霓虹東京", textColor: "#22d3ee", style: { background: "#0a0a12", borderRadius: 12, border: "1px solid #ff2d95", boxShadow: "0 0 12px #ff2d95, 0 0 24px rgba(34,211,238,0.5)" } },
+  { name: "modernGradient", label: "現代漸層", textColor: "#ffffff", style: { background: "linear-gradient(135deg,#667eea,#764ba2)", borderRadius: 18, boxShadow: "0 10px 24px rgba(118,75,162,0.4)" } },
+  { name: "cyberpunkNeon", label: "賽博霓虹", textColor: "#00ffff", style: { background: "#0d0d0d", borderRadius: 8, border: "1px solid #ff00ff", boxShadow: "0 0 10px #00ffff, inset 0 0 10px rgba(255,0,255,0.3)" } },
+  { name: "holographicCard", label: "全像虹彩", textColor: "#3a2d55", style: { background: "linear-gradient(135deg,#a1c4fd,#c2e9fb 30%,#fbc2eb 60%,#fda085)", borderRadius: 18, boxShadow: "0 8px 24px rgba(0,0,0,0.15)" } },
+  { name: "glitchCard", label: "故障藝術", textColor: "#ffffff", style: { background: "#0d0d0d", borderRadius: 4, boxShadow: "3px 0 #ff006e, -3px 0 #00e5ff" } },
+  { name: "badges", label: "彩色標籤", textColor: "#1f2937", badges: true, style: { background: "transparent" } },
+];
+
+// 設計滑桿效果：一鍵套用滑軌 / 已填段 / 把手樣式
+interface SliderPreset { name: string; label: string; track: React.CSSProperties; fill: React.CSSProperties; thumb: React.CSSProperties; }
+
+const SLIDER_PRESETS: SliderPreset[] = [
+  { name: "neon", label: "霓虹內外光", track: { height: 8, background: "#0b0f1a", borderRadius: 999, boxShadow: "inset 0 0 6px rgba(34,211,238,0.4)" }, fill: { background: "#22d3ee", boxShadow: "0 0 8px #22d3ee, 0 0 16px #22d3ee" }, thumb: { width: 22, height: 22, background: "#0b0f1a", border: "2px solid #22d3ee", boxShadow: "0 0 10px #22d3ee, inset 0 0 6px #22d3ee" } },
+  { name: "insetTrack", label: "內凹軌道", track: { height: 10, background: "#e0e5ec", borderRadius: 999, boxShadow: "inset 3px 3px 6px #b8bcc4, inset -3px -3px 6px #ffffff" }, fill: { background: "#94a3b8" }, thumb: { width: 22, height: 22, background: "#f0f3f7", boxShadow: "3px 3px 6px #b8bcc4, -3px -3px 6px #ffffff" } },
+  { name: "neumorph", label: "新擬態凸起", track: { height: 10, background: "#e0e5ec", borderRadius: 999, boxShadow: "3px 3px 6px #b8bcc4, -3px -3px 6px #ffffff" }, fill: { background: "#a3aab8" }, thumb: { width: 22, height: 22, background: "#e0e5ec", boxShadow: "3px 3px 6px #b8bcc4, -3px -3px 6px #ffffff" } },
+  { name: "gradient", label: "漸層軌道", track: { height: 8, background: "#e5e7eb", borderRadius: 999 }, fill: { background: "linear-gradient(90deg,#a855f7,#ec4899)" }, thumb: { width: 22, height: 22, background: "#ffffff", boxShadow: "0 2px 6px rgba(0,0,0,0.3)" } },
+  { name: "glass", label: "玻璃", track: { height: 10, background: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.7)", borderRadius: 999 }, fill: { background: "rgba(168,85,247,0.55)" }, thumb: { width: 22, height: 22, background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.85)", boxShadow: "0 4px 10px rgba(0,0,0,0.2)" } },
+  { name: "solid3d", label: "立體把手", track: { height: 8, background: "#e5e7eb", borderRadius: 999 }, fill: { background: "#3b82f6" }, thumb: { width: 24, height: 24, background: "#3b82f6", boxShadow: "0 4px 0 #1e40af" } },
+  { name: "thick", label: "粗描邊", track: { height: 12, background: "#ffffff", border: "2px solid #111111", borderRadius: 999 }, fill: { background: "#ffde59" }, thumb: { width: 24, height: 24, background: "#ffffff", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111" } },
+  { name: "minimal", label: "極簡", track: { height: 4, background: "#e5e7eb", borderRadius: 999 }, fill: { background: "#111111" }, thumb: { width: 14, height: 14, background: "#111111" } },
+];
+
+interface ComparisonFont {
+  id: string;
+  font: typeof FONT_LIST[0];
+}
+
+export default function Home() {
+  const [previewText, setPreviewText] = useState(DEFAULT_PREVIEW_TEXT);
+  const [selectedFont, setSelectedFont] = useState({ name: "Dela Gothic One", value: "'Dela Gothic One'", category: "網路字型" });
+  const [fontSize, setFontSize] = useState(48);
+  const [lineHeight, setLineHeight] = useState(1.5);
+  const [letterSpacing, setLetterSpacing] = useState(0);
+  const [wordSpacing, setWordSpacing] = useState(0);
+  const [fontWeight, setFontWeight] = useState(400);
+  const [textOpacity, setTextOpacity] = useState(100);
+  const [textColor, setTextColor] = useState("#111827"); // 純色文字顏色（非漸層時）
+  const [previewBgColor, setPreviewBgColor] = useState("#f9fafb"); // 預覽區（按鈕後面那塊）底色
+  const [gallerySample, setGallerySample] = useState("永 國 字體 Aa 123"); // 畫廊中文字型卡片的範例字（可自訂）
+  const [copied, setCopied] = useState(false);
+
+  // 預覽模式：純文字 / 按鈕
+  const [previewMode, setPreviewMode] = useState<"text" | "button" | "card" | "slider">("text");
+
+  // ── 按鈕外框狀態（btn* / bg* 前綴，避開文字漸層 gradient*）──
+  // 盒模型
+  const [btnPaddingX, setBtnPaddingX] = useState(24);
+  const [btnPaddingY, setBtnPaddingY] = useState(12);
+  const [btnBorderRadius, setBtnBorderRadius] = useState(8);
+  const [btnWidth, setBtnWidth] = useState("auto");
+  const [btnHeight, setBtnHeight] = useState("auto");
+  // 邊框
+  const [btnBorderMode, setBtnBorderMode] = useState<"unified" | "separate">("unified");
+  const [btnBorderWidth, setBtnBorderWidth] = useState(0);
+  const [btnBorderTopWidth, setBtnBorderTopWidth] = useState(0);
+  const [btnBorderRightWidth, setBtnBorderRightWidth] = useState(0);
+  const [btnBorderBottomWidth, setBtnBorderBottomWidth] = useState(0);
+  const [btnBorderLeftWidth, setBtnBorderLeftWidth] = useState(0);
+  const [btnBorderColor, setBtnBorderColor] = useState("#000000");
+  const [btnBorderStyle, setBtnBorderStyle] = useState("solid");
+  const [btnBorderGlowEnabled, setBtnBorderGlowEnabled] = useState(false);
+  const [btnBorderGlowColor, setBtnBorderGlowColor] = useState("#0066cc");
+  const [btnBorderGlowBlur, setBtnBorderGlowBlur] = useState(5);
+  const [btnBorderGlowSpread, setBtnBorderGlowSpread] = useState(0);
+  // 背景
+  const [btnBgColor, setBtnBgColor] = useState("#3498db");
+  const [bgUseGradient, setBgUseGradient] = useState(false);
+  const [bgGradColor1, setBgGradColor1] = useState("#3498db");
+  const [bgGradColor2, setBgGradColor2] = useState("#2980b9");
+  const [bgGradAngle, setBgGradAngle] = useState(90);
+  // 懸停
+  const [btnHoverBgColor, setBtnHoverBgColor] = useState("#2980b9");
+  const [btnHoverScale, setBtnHoverScale] = useState(1);
+  const [btnHoverShadow, setBtnHoverShadow] = useState("0px 4px 12px rgba(0, 0, 0, 0.15)");
+  const [btnHoverShadowEnabled, setBtnHoverShadowEnabled] = useState(true);
+  // 過渡
+  const [btnTransitionDuration, setBtnTransitionDuration] = useState(0.3);
+  const [btnTransitionTiming, setBtnTransitionTiming] = useState("ease");
+  // 焦點
+  const [btnFocusBgColor, setBtnFocusBgColor] = useState("#2980b9");
+  const [btnFocusBorderColor, setBtnFocusBorderColor] = useState("#0066cc");
+  const [btnFocusBorderWidth, setBtnFocusBorderWidth] = useState(2);
+  const [btnFocusOutlineEnabled, setBtnFocusOutlineEnabled] = useState(true);
+  const [btnFocusOutlineColor, setBtnFocusOutlineColor] = useState("#0066cc");
+  const [btnFocusOutlineWidth, setBtnFocusOutlineWidth] = useState(2);
+  const [btnFocusShadow, setBtnFocusShadow] = useState("0 0 0 3px rgba(0, 102, 204, 0.25)");
+  const [btnFocusShadowEnabled, setBtnFocusShadowEnabled] = useState(true);
+  // 禁用
+  const [btnDisabledOpacity, setBtnDisabledOpacity] = useState(0.5);
+  const [btnDisabledCursor, setBtnDisabledCursor] = useState("not-allowed");
+  const [btnDisabledEnabled, setBtnDisabledEnabled] = useState(true);
+
+  // 文字效果狀態
+  const [textShadowEnabled, setTextShadowEnabled] = useState(false);
+  const [textShadowX, setTextShadowX] = useState(2);
+  const [textShadowY, setTextShadowY] = useState(2);
+  const [textShadowBlur, setTextShadowBlur] = useState(4);
+  const [textShadowColor, setTextShadowColor] = useState("#000000");
+  const [textShadowOpacity, setTextShadowOpacity] = useState(0.5);
+
+  const [textStrokeEnabled, setTextStrokeEnabled] = useState(false);
+  const [textStrokeWidth, setTextStrokeWidth] = useState(1);
+  const [textStrokeColor, setTextStrokeColor] = useState("#000000");
+
+  // 漸層效果狀態
+  const [gradientEnabled, setGradientEnabled] = useState(false);
+  const [gradientType, setGradientType] = useState<"linear" | "radial">("linear");
+  const [gradientAngle, setGradientAngle] = useState(90);
+  const [gradientColor1, setGradientColor1] = useState("#ff0000");
+  const [gradientColor2, setGradientColor2] = useState("#0000ff");
+
+  // 設計文字效果用的額外狀態
+  const [textFillTransparent, setTextFillTransparent] = useState(false); // 中空（填色透明）
+  const [textHighlightColor, setTextHighlightColor] = useState(""); // 螢光筆底色，"" = 不用
+  const [effectShadow, setEffectShadow] = useState(""); // 多層 text-shadow 字串，"" = 不用
+  const [activeDesignPreset, setActiveDesignPreset] = useState<string | null>(null);
+
+  // 設計按鈕效果用的額外狀態
+  const [btnBoxShadow, setBtnBoxShadow] = useState(""); // 整顆按鈕的 box-shadow（"" = 用發光邊框設定）
+  const [btnBackdropBlur, setBtnBackdropBlur] = useState(0); // 毛玻璃模糊 px（0 = 關）
+  const [activeButtonPreset, setActiveButtonPreset] = useState<string | null>(null);
+
+  // 設計卡片效果用的狀態
+  const [cardStyle, setCardStyle] = useState<React.CSSProperties>(CARD_PRESETS[0].style);
+  const [cardTextColor, setCardTextColor] = useState<string>(CARD_PRESETS[0].textColor);
+  const [activeCardPreset, setActiveCardPreset] = useState<string | null>(null);
+
+  // 卡片外框手動覆蓋層（疊在卡片預設之上；套預設時清空）
+  const [cardOverride, setCardOverride] = useState<React.CSSProperties>({});
+  // 盒模型四項一律生效（預設值剛好等於原本寫死的 padding/width，視覺不變）
+  const [cardPadX, setCardPadX] = useState(32);
+  const [cardPadY, setCardPadY] = useState(28);
+  const [cardRadius, setCardRadius] = useState(16);
+  const [cardWidth, setCardWidth] = useState(360);
+  const [cardHeight, setCardHeight] = useState("auto"); // 高度 auto / px
+  // 邊框 / 背景 / 陰影各自有啟用開關，關閉時不寫進 cardOverride（讓預設透出）
+  const [cardBorderEnabled, setCardBorderEnabled] = useState(false);
+  const [cardBorderMode, setCardBorderMode] = useState<"unified" | "separate">("unified");
+  const [cardBorderWidth, setCardBorderWidth] = useState(2);
+  const [cardBorderTopWidth, setCardBorderTopWidth] = useState(0);
+  const [cardBorderRightWidth, setCardBorderRightWidth] = useState(0);
+  const [cardBorderBottomWidth, setCardBorderBottomWidth] = useState(0);
+  const [cardBorderLeftWidth, setCardBorderLeftWidth] = useState(0);
+  const [cardBorderColor, setCardBorderColor] = useState("#111111");
+  const [cardBorderStyle, setCardBorderStyle] = useState("solid");
+  // 發光邊框（卡片）
+  const [cardBorderGlowEnabled, setCardBorderGlowEnabled] = useState(false);
+  const [cardBorderGlowColor, setCardBorderGlowColor] = useState("#0066cc");
+  const [cardBorderGlowBlur, setCardBorderGlowBlur] = useState(5);
+  const [cardBgEnabled, setCardBgEnabled] = useState(false);
+  const [cardBgColor, setCardBgColor] = useState("#ffffff");
+  const [cardBgUseGradient, setCardBgUseGradient] = useState(false);
+  const [cardBgGradColor1, setCardBgGradColor1] = useState("#a855f7");
+  const [cardBgGradColor2, setCardBgGradColor2] = useState("#ec4899");
+  const [cardBgGradAngle, setCardBgGradAngle] = useState(135);
+  const [cardShadowEnabled, setCardShadowEnabled] = useState(false);
+  const [cardShadow, setCardShadow] = useState("0 8px 24px rgba(0,0,0,0.12)");
+
+  // 設計滑桿效果用的狀態
+  const [sliderTrack, setSliderTrack] = useState<React.CSSProperties>(SLIDER_PRESETS[0].track);
+  const [sliderFill, setSliderFill] = useState<React.CSSProperties>(SLIDER_PRESETS[0].fill);
+  const [sliderThumb, setSliderThumb] = useState<React.CSSProperties>(SLIDER_PRESETS[0].thumb);
+  const [activeSliderPreset, setActiveSliderPreset] = useState<string | null>(null);
+
+  // 字型載入完成後 bump 一次，用來強制預覽重掛 → 讓 background-clip:text 的漸層
+  // 在粗體網路字型 swap 進來後重新裁切(否則漸層會變成一塊底色跑到字後面)
+  const [fontStamp, setFontStamp] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    const fam = selectedFont.value.replace(/['"]/g, "").split(",")[0].trim();
+    const done = () => { if (!cancelled) setFontStamp((n) => n + 1); };
+    if ((document as any).fonts?.load) {
+      (document as any).fonts.load(`48px "${fam}"`).then(done).catch(done);
+    } else {
+      done();
+    }
+    return () => { cancelled = true; };
+  }, [selectedFont]);
+
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+  
+  // 組合效果狀態
+  const [combinedPresets, setCombinedPresets] = useState<string[]>([]);
+  const [combinedShadows, setCombinedShadows] = useState<string[]>([]);
+
+  // 對比模式狀態
+  const [comparisonMode, setComparisonMode] = useState(false);
+  const [comparisonFonts, setComparisonFonts] = useState<ComparisonFont[]>([]);
+
+  // 本地字型管理
+  const { localFonts, isLoading, error, uploadFont, deleteFont, ensureFontLoaded, bulkImportSystemFonts } = useLocalFonts();
+  const [isImporting, setIsImporting] = useState(false);
+  // 各分組的收合狀態（key 例如 "web:中文"、"local:英文"）
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+  const toggleGroup = (k: string) =>
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      next.has(k) ? next.delete(k) : next.add(k);
+      return next;
+    });
+
+  const handleBulkImport = async () => {
+    setIsImporting(true);
+    const toastId = toast.loading("匯入本機字型中…");
+    try {
+      const n = await bulkImportSystemFonts((done, total) => {
+        toast.loading(`匯入本機字型中… ${done}/${total}`, { id: toastId });
+      });
+      toast.success(n > 0 ? `已匯入 ${n} 個本機字型` : "沒有新字型可匯入（都已在清單中）", { id: toastId });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "匯入失敗", { id: toastId });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const fontCategories = useMemo(() => {
+    const categories = new Map<string, typeof FONT_LIST>();
+    FONT_LIST.forEach((font) => {
+      if (!categories.has(font.category)) {
+        categories.set(font.category, []);
+      }
+      categories.get(font.category)!.push(font);
+    });
+
+    // 新增本地字型分類
+    if (localFonts.length > 0) {
+      categories.set("本地字型", localFonts.map((font) => ({
+        name: font.name,
+        value: `'${font.fontFamily}'`,
+        category: "本地字型",
+      })));
+    }
+
+    return categories;
+  }, [localFonts]);
+
+  // 轉換十六進制顏色為 RGB
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : { r: 0, g: 0, b: 0 };
+  };
+
+  // 套用預設效果
+  // 切換組合效果
+  const toggleCombinedPreset = (presetName: string) => {
+    const preset = EFFECT_PRESETS.find((p) => p.name === presetName);
+    if (!preset) return;
+
+    let newCombined = [...combinedPresets];
+    let newShadows = [...combinedShadows];
+
+    if (newCombined.includes(presetName)) {
+      newCombined = newCombined.filter((p) => p !== presetName);
+      newShadows = newShadows.filter((_, i) => newCombined[i] !== undefined);
+    } else {
+      if (newCombined.length >= 3) {
+        toast.error("最多只能組合 3 個效果");
+        return;
+      }
+      newCombined.push(presetName);
+      
+      if (preset.shadowEnabled) {
+        const rgb = hexToRgb(preset.shadowColor);
+        const shadow = `${preset.shadowX}px ${preset.shadowY}px ${preset.shadowBlur}px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${preset.shadowOpacity})`;
+        newShadows.push(shadow);
+      }
+    }
+
+    setCombinedPresets(newCombined);
+    setCombinedShadows(newShadows);
+    setActivePreset(null);
+
+    if (newCombined.length > 0) {
+      if (newShadows.length > 0) {
+        setTextShadowEnabled(true);
+      }
+      
+      const hasStroke = newCombined.some((name) => {
+        const p = EFFECT_PRESETS.find((ep) => ep.name === name);
+        return p?.strokeEnabled;
+      });
+      
+      if (hasStroke) {
+        const strokePreset = EFFECT_PRESETS.find((p) => newCombined.includes(p.name) && p.strokeEnabled);
+        if (strokePreset) {
+          setTextStrokeEnabled(true);
+          setTextStrokeWidth(strokePreset.strokeWidth);
+          setTextStrokeColor(strokePreset.strokeColor);
+        }
+      }
+
+      toast.success(`已組合 ${newCombined.length} 個效果`);
+    } else {
+      setTextShadowEnabled(false);
+      setTextStrokeEnabled(false);
+      toast.success("已清除組合效果");
+    }
+  };
+
+  // 套用一個「設計文字效果」預設（整組覆蓋）
+  const applyDesignPreset = (p: DesignPreset) => {
+    // 清掉舊的組合預設與單一陰影，避免互相干擾
+    setCombinedPresets([]);
+    setCombinedShadows([]);
+    setTextShadowEnabled(false);
+    setActivePreset(null);
+    // 漸層 / 純色
+    if (p.gradient) {
+      setGradientEnabled(true);
+      setGradientType(p.gradient.type);
+      setGradientAngle(p.gradient.angle);
+      setGradientColor1(p.gradient.c1);
+      setGradientColor2(p.gradient.c2);
+    } else {
+      setGradientEnabled(false);
+      if (p.color) setTextColor(p.color);
+    }
+    // 中空（填色透明）
+    setTextFillTransparent(!!p.fillTransparent);
+    // 描邊
+    if (p.stroke) {
+      setTextStrokeEnabled(true);
+      setTextStrokeWidth(p.stroke.width);
+      setTextStrokeColor(p.stroke.color);
+    } else {
+      setTextStrokeEnabled(false);
+    }
+    // 多層陰影 / 螢光筆
+    setEffectShadow(p.shadow || "");
+    setTextHighlightColor(p.highlight || "");
+    setActiveDesignPreset(p.name);
+    toast.success(`已套用「${p.label}」`);
+  };
+
+  // 清除設計文字效果
+  const clearDesignPreset = () => {
+    setGradientEnabled(false);
+    setTextFillTransparent(false);
+    setTextStrokeEnabled(false);
+    setEffectShadow("");
+    setTextHighlightColor("");
+    setActiveDesignPreset(null);
+    toast.success("已清除設計效果");
+  };
+
+  // 套用一個「設計按鈕效果」預設（整顆按鈕外觀覆蓋）
+  const applyButtonPreset = (p: ButtonPreset) => {
+    // 背景
+    if (p.grad) {
+      setBgUseGradient(true);
+      setBgGradAngle(p.grad.angle);
+      setBgGradColor1(p.grad.c1);
+      setBgGradColor2(p.grad.c2);
+    } else {
+      setBgUseGradient(false);
+      if (p.bg) setBtnBgColor(p.bg);
+    }
+    // 盒模型
+    setBtnBorderRadius(p.radius);
+    if (p.px != null) setBtnPaddingX(p.px);
+    if (p.py != null) setBtnPaddingY(p.py);
+    // 邊框
+    setBtnBorderMode("unified");
+    if (p.border) {
+      setBtnBorderWidth(p.border.width);
+      setBtnBorderColor(p.border.color);
+      setBtnBorderStyle("solid");
+    } else {
+      setBtnBorderWidth(0);
+    }
+    setBtnBorderGlowEnabled(false);
+    // 陰影 / 毛玻璃
+    setBtnBoxShadow(p.boxShadow || "");
+    setBtnBackdropBlur(p.backdropBlur || 0);
+    // 按鈕文字：乾淨純色（清掉文字設計效果）
+    setGradientEnabled(false);
+    setTextFillTransparent(false);
+    setTextHighlightColor("");
+    setEffectShadow("");
+    setTextStrokeEnabled(false);
+    setActiveDesignPreset(null);
+    setTextColor(p.textColor);
+    setActiveButtonPreset(p.name);
+    toast.success(`已套用「${p.label}」`);
+  };
+
+  // 清除設計按鈕效果
+  const clearButtonPreset = () => {
+    setBtnBoxShadow("");
+    setBtnBackdropBlur(0);
+    setBgUseGradient(false);
+    setBtnBorderWidth(0);
+    setActiveButtonPreset(null);
+    toast.success("已清除按鈕效果");
+  };
+
+  // 套預設時把卡片外框控制重設回預設值（盒模型回原始寫死值、邊框/背景/陰影關閉、清空覆蓋）
+  const resetCardOverride = () => {
+    setCardOverride({});
+    setCardPadX(32);
+    setCardPadY(28);
+    setCardRadius(16);
+    setCardWidth(360);
+    setCardHeight("auto");
+    setCardBorderEnabled(false);
+    setCardBorderMode("unified");
+    setCardBorderGlowEnabled(false);
+    setCardBgEnabled(false);
+    setCardShadowEnabled(false);
+  };
+
+  // 套用 / 清除設計卡片效果
+  const applyCardPreset = (p: CardPreset) => {
+    setCardStyle(p.style);
+    setCardTextColor(p.textColor);
+    setActiveCardPreset(p.name);
+    resetCardOverride();
+    toast.success(`已套用「${p.label}」`);
+  };
+  const clearCardPreset = () => {
+    setCardStyle(CARD_PRESETS[0].style);
+    setCardTextColor(CARD_PRESETS[0].textColor);
+    setActiveCardPreset(null);
+    resetCardOverride();
+    toast.success("已清除卡片效果");
+  };
+
+  // 套用 / 清除設計滑桿效果
+  const applySliderPreset = (p: SliderPreset) => {
+    setSliderTrack(p.track); setSliderFill(p.fill); setSliderThumb(p.thumb); setActiveSliderPreset(p.name);
+    toast.success(`已套用「${p.label}」`);
+  };
+  const clearSliderPreset = () => {
+    setSliderTrack(SLIDER_PRESETS[0].track); setSliderFill(SLIDER_PRESETS[0].fill); setSliderThumb(SLIDER_PRESETS[0].thumb); setActiveSliderPreset(null);
+    toast.success("已清除滑桿效果");
+  };
+
+  // 新增對比字型
+  const addComparisonFont = (font: typeof FONT_LIST[0]) => {
+    if (comparisonFonts.length >= 3) {
+      toast.error("最多只能對比 3 個字型");
+      return;
+    }
+    
+    const isDuplicate = comparisonFonts.some((cf) => cf.font.name === font.name);
+    if (isDuplicate) {
+      toast.error("該字型已在對比列表中");
+      return;
+    }
+
+    ensureFontLoaded(font.value);
+    setComparisonFonts([...comparisonFonts, { id: Date.now().toString(), font }]);
+    toast.success(`已新增「${font.name}」到對比列表`);
+  };
+
+  // 移除對比字型
+  const removeComparisonFont = (id: string) => {
+    setComparisonFonts(comparisonFonts.filter((cf) => cf.id !== id));
+  };
+
+  // 退出對比模式
+  const exitComparisonMode = () => {
+    setComparisonMode(false);
+    setComparisonFonts([]);
+  };
+
+  // 由卡片外框控制項組出實際要疊加的覆蓋樣式
+  // 盒模型四項一律寫入；邊框/背景/陰影依各自啟用開關決定是否覆蓋
+  const cardOverrideStyle = useMemo<React.CSSProperties>(() => {
+    const o: React.CSSProperties = {
+      padding: `${cardPadY}px ${cardPadX}px`,
+      borderRadius: `${cardRadius}px`,
+      width: `${cardWidth}px`,
+      height: cardHeight === "auto" ? "auto" : `${cardHeight}px`,
+      ...cardOverride,
+    };
+    if (cardBorderEnabled) {
+      if (cardBorderMode === "unified") {
+        o.border = cardBorderWidth > 0 ? `${cardBorderWidth}px ${cardBorderStyle} ${cardBorderColor}` : "none";
+      } else {
+        o.borderTop = `${cardBorderTopWidth}px ${cardBorderStyle} ${cardBorderColor}`;
+        o.borderRight = `${cardBorderRightWidth}px ${cardBorderStyle} ${cardBorderColor}`;
+        o.borderBottom = `${cardBorderBottomWidth}px ${cardBorderStyle} ${cardBorderColor}`;
+        o.borderLeft = `${cardBorderLeftWidth}px ${cardBorderStyle} ${cardBorderColor}`;
+      }
+    }
+    if (cardBgEnabled) {
+      o.background = cardBgUseGradient
+        ? `linear-gradient(${cardBgGradAngle}deg, ${cardBgGradColor1}, ${cardBgGradColor2})`
+        : cardBgColor;
+    }
+    // 發光邊框 + 陰影合併成 box-shadow（兩者皆有時以逗號併接）
+    const glow = cardBorderGlowEnabled ? `0 0 ${cardBorderGlowBlur}px ${cardBorderGlowColor}` : null;
+    const shadow = cardShadowEnabled ? cardShadow : null;
+    const boxShadow = [glow, shadow].filter(Boolean).join(", ");
+    if (boxShadow) {
+      o.boxShadow = boxShadow;
+    }
+    return o;
+  }, [
+    cardOverride,
+    cardPadX,
+    cardPadY,
+    cardRadius,
+    cardWidth,
+    cardHeight,
+    cardBorderEnabled,
+    cardBorderMode,
+    cardBorderWidth,
+    cardBorderTopWidth,
+    cardBorderRightWidth,
+    cardBorderBottomWidth,
+    cardBorderLeftWidth,
+    cardBorderColor,
+    cardBorderStyle,
+    cardBorderGlowEnabled,
+    cardBorderGlowColor,
+    cardBorderGlowBlur,
+    cardBgEnabled,
+    cardBgColor,
+    cardBgUseGradient,
+    cardBgGradColor1,
+    cardBgGradColor2,
+    cardBgGradAngle,
+    cardShadowEnabled,
+    cardShadow,
+  ]);
+
+  const cssCode = useMemo(() => {
+    // 文字樣式片段（純文字模式直接用；按鈕模式包進 .button > span）
+    let text = `font-family: ${selectedFont.value};
+font-size: ${fontSize}px;
+line-height: ${lineHeight};
+letter-spacing: ${letterSpacing}px;
+word-spacing: ${wordSpacing}px;
+font-weight: ${fontWeight};
+opacity: ${(textOpacity / 100).toFixed(2)};`;
+
+    if (gradientEnabled) {
+      const g =
+        gradientType === "linear"
+          ? `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`
+          : `radial-gradient(circle, ${gradientColor1}, ${gradientColor2})`;
+      text += `\nbackground: ${g};
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;`;
+    } else if (textHighlightColor) {
+      text += `\ncolor: ${textColor};
+background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
+    } else {
+      text += `\ncolor: ${textColor};`;
+      if (textFillTransparent) text += `\n-webkit-text-fill-color: transparent;`;
+    }
+
+    if (effectShadow) {
+      text += `\ntext-shadow: ${effectShadow};`;
+    } else if (combinedPresets.length > 0 && combinedShadows.length > 0) {
+      text += `\ntext-shadow: ${combinedShadows.join(", ")};`;
+    } else if (textShadowEnabled) {
+      const rgb = hexToRgb(textShadowColor);
+      text += `\ntext-shadow: ${textShadowX}px ${textShadowY}px ${textShadowBlur}px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${textShadowOpacity});`;
+    }
+
+    if (textStrokeEnabled) {
+      text += `\n-webkit-text-stroke: ${textStrokeWidth}px ${textStrokeColor};`;
+    }
+
+    // 純文字模式：直接輸出文字樣式
+    if (previewMode === "text") return text;
+
+    // 卡片模式：.card 樣式（卡片預設 + 手動外框覆蓋）
+    if (previewMode === "card") {
+      const merged = { ...cardStyle, ...cardOverrideStyle };
+      return `.card {\n${styleToCss(merged).split(";").filter(Boolean).map((s) => "  " + s.trim() + ";").join("\n")}\n  color: ${cardTextColor};\n}`;
+    }
+
+    // 滑桿模式：.slider-track / .slider-fill / .slider-thumb 樣式
+    if (previewMode === "slider") {
+      const blk = (sel: string, obj: React.CSSProperties) => `${sel} {\n${styleToCss(obj).split(";").filter(Boolean).map((s) => "  " + s.trim() + ";").join("\n")}\n}`;
+      return [blk(".slider-track", sliderTrack), blk(".slider-fill", sliderFill), blk(".slider-thumb", sliderThumb)].join("\n\n");
+    }
+
+    // 按鈕模式：.button 外框 + .button > span 文字
+    const bg = bgUseGradient
+      ? `linear-gradient(${bgGradAngle}deg, ${bgGradColor1}, ${bgGradColor2})`
+      : btnBgColor;
+    const hoverBg = bgUseGradient
+      ? `linear-gradient(${bgGradAngle}deg, ${btnHoverBgColor}, ${btnHoverBgColor})`
+      : btnHoverBgColor;
+    const focusBg = bgUseGradient
+      ? `linear-gradient(${bgGradAngle}deg, ${btnFocusBgColor}, ${btnFocusBgColor})`
+      : btnFocusBgColor;
+
+    let css = `.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: ${btnPaddingY}px ${btnPaddingX}px;
+  background: ${bg};${btnBorderMode === "unified" ? `\n  border: ${btnBorderWidth}px ${btnBorderStyle} ${btnBorderColor};` : `\n  border-top: ${btnBorderTopWidth}px ${btnBorderStyle} ${btnBorderColor};\n  border-right: ${btnBorderRightWidth}px ${btnBorderStyle} ${btnBorderColor};\n  border-bottom: ${btnBorderBottomWidth}px ${btnBorderStyle} ${btnBorderColor};\n  border-left: ${btnBorderLeftWidth}px ${btnBorderStyle} ${btnBorderColor};`}
+  border-radius: ${btnBorderRadius}px;
+  width: ${btnWidth === "auto" ? "auto" : `${btnWidth}px`};
+  height: ${btnHeight === "auto" ? "auto" : `${btnHeight}px`};
+  cursor: pointer;
+  transition: all ${btnTransitionDuration}s ${btnTransitionTiming};${btnBoxShadow ? `\n  box-shadow: ${btnBoxShadow};` : btnBorderGlowEnabled ? `\n  box-shadow: 0 0 ${btnBorderGlowBlur}px ${btnBorderGlowSpread}px ${btnBorderGlowColor};` : ""}${btnBackdropBlur > 0 ? `\n  backdrop-filter: blur(${btnBackdropBlur}px);\n  -webkit-backdrop-filter: blur(${btnBackdropBlur}px);` : ""}
+}
+
+.button:hover {
+  background: ${hoverBg};
+  transform: scale(${btnHoverScale});${btnHoverShadowEnabled ? `\n  box-shadow: ${btnHoverShadow};` : ""}
+}
+
+.button:focus {
+  background: ${focusBg};
+  border: ${btnFocusBorderWidth}px ${btnBorderStyle} ${btnFocusBorderColor};${btnFocusOutlineEnabled ? `\n  outline: ${btnFocusOutlineWidth}px solid ${btnFocusOutlineColor};` : ""}${btnFocusShadowEnabled ? `\n  box-shadow: ${btnFocusShadow};` : ""}
+}
+
+.button:focus:not(:focus-visible) {
+  outline: none;
+}`;
+
+    if (btnDisabledEnabled) {
+      css += `\n\n.button:disabled {
+  opacity: ${btnDisabledOpacity};
+  cursor: ${btnDisabledCursor};
+  pointer-events: none;
+}`;
+    }
+
+    const indented = text
+      .split("\n")
+      .map((l) => `  ${l}`)
+      .join("\n");
+    css += `\n\n.button > span {\n${indented}\n}`;
+    return css;
+  }, [
+    previewMode,
+    cardStyle,
+    cardOverrideStyle,
+    cardTextColor,
+    sliderTrack,
+    sliderFill,
+    sliderThumb,
+    selectedFont,
+    fontSize,
+    lineHeight,
+    letterSpacing,
+    wordSpacing,
+    fontWeight,
+    textOpacity,
+    textColor,
+    textShadowEnabled,
+    textShadowX,
+    textShadowY,
+    textShadowBlur,
+    textShadowColor,
+    textShadowOpacity,
+    textStrokeEnabled,
+    textStrokeWidth,
+    textStrokeColor,
+    gradientEnabled,
+    gradientType,
+    gradientAngle,
+    gradientColor1,
+    gradientColor2,
+    textFillTransparent,
+    textHighlightColor,
+    effectShadow,
+    combinedPresets,
+    combinedShadows,
+    btnPaddingX,
+    btnPaddingY,
+    btnBorderRadius,
+    btnWidth,
+    btnHeight,
+    btnBorderMode,
+    btnBorderWidth,
+    btnBorderTopWidth,
+    btnBorderRightWidth,
+    btnBorderBottomWidth,
+    btnBorderLeftWidth,
+    btnBorderColor,
+    btnBorderStyle,
+    btnBorderGlowEnabled,
+    btnBorderGlowColor,
+    btnBorderGlowBlur,
+    btnBorderGlowSpread,
+    btnBoxShadow,
+    btnBackdropBlur,
+    btnBgColor,
+    bgUseGradient,
+    bgGradColor1,
+    bgGradColor2,
+    bgGradAngle,
+    btnHoverBgColor,
+    btnHoverScale,
+    btnHoverShadow,
+    btnHoverShadowEnabled,
+    btnTransitionDuration,
+    btnTransitionTiming,
+    btnFocusBgColor,
+    btnFocusBorderColor,
+    btnFocusBorderWidth,
+    btnFocusOutlineEnabled,
+    btnFocusOutlineColor,
+    btnFocusOutlineWidth,
+    btnFocusShadow,
+    btnFocusShadowEnabled,
+    btnDisabledOpacity,
+    btnDisabledCursor,
+    btnDisabledEnabled,
+  ]);
+
+  const handleCopyCSS = () => {
+    navigator.clipboard.writeText(cssCode);
+    setCopied(true);
+    toast.success("已複製到剪貼板");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleUploadFont = async (file: File) => {
+    return await uploadFont(file);
+  };
+
+  // 計算預覽文字的樣式
+  const getPreviewStyle = (): React.CSSProperties => {
+    const style: React.CSSProperties = {
+      fontFamily: selectedFont.value,
+      fontSize: `${fontSize}px`,
+      lineHeight: lineHeight,
+      letterSpacing: `${letterSpacing}px`,
+      wordSpacing: `${wordSpacing}px`,
+      fontWeight: fontWeight,
+      opacity: textOpacity / 100,
+      wordBreak: "break-all",
+    };
+
+    if (gradientEnabled) {
+      if (gradientType === "linear") {
+        style.background = `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`;
+        (style as any).WebkitBackgroundClip = "text";
+        (style as any).WebkitTextFillColor = "transparent";
+        style.backgroundClip = "text" as any;
+      } else {
+        style.background = `radial-gradient(circle, ${gradientColor1}, ${gradientColor2})`;
+        (style as any).WebkitBackgroundClip = "text";
+        (style as any).WebkitTextFillColor = "transparent";
+        style.backgroundClip = "text" as any;
+      }
+    } else if (textHighlightColor) {
+      style.color = textColor;
+      style.background = `linear-gradient(transparent 55%, ${textHighlightColor} 55%)`;
+    } else {
+      style.color = textColor;
+      if (textFillTransparent) (style as any).WebkitTextFillColor = "transparent";
+    }
+
+    if (effectShadow) {
+      style.textShadow = effectShadow;
+    } else if (combinedPresets.length > 0 && combinedShadows.length > 0) {
+      style.textShadow = combinedShadows.join(", ");
+    } else if (textShadowEnabled) {
+      const rgb = hexToRgb(textShadowColor);
+      style.textShadow = `${textShadowX}px ${textShadowY}px ${textShadowBlur}px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${textShadowOpacity})`;
+    }
+
+    if (textStrokeEnabled) {
+      (style as any).WebkitTextStroke = `${textStrokeWidth}px ${textStrokeColor}`;
+    }
+
+    return style;
+  };
+
+  const previewStyle = getPreviewStyle();
+
+  // 邊框相關的共用樣式片段（依「四邊一致 / 分別設定」與「發光」產生）
+  // scale 用於縮小版預覽（按鈕狀態卡片），讓邊框寬度等比例縮小
+  const getBorderStyle = (scale = 1): React.CSSProperties => {
+    const s: React.CSSProperties = {
+      borderStyle: btnBorderStyle as React.CSSProperties["borderStyle"],
+      borderColor: btnBorderColor,
+      borderWidth: 0,
+    };
+    if (btnBorderMode === "unified") {
+      s.borderWidth = `${btnBorderWidth * scale}px`;
+    } else {
+      s.borderTopWidth = `${btnBorderTopWidth * scale}px`;
+      s.borderRightWidth = `${btnBorderRightWidth * scale}px`;
+      s.borderBottomWidth = `${btnBorderBottomWidth * scale}px`;
+      s.borderLeftWidth = `${btnBorderLeftWidth * scale}px`;
+    }
+    return s;
+  };
+
+  // 發光邊框 box-shadow 字串（未開啟時回傳 null）
+  const glowShadow = (scale = 1): string | null =>
+    btnBorderGlowEnabled
+      ? `0 0 ${btnBorderGlowBlur * scale}px ${btnBorderGlowSpread * scale}px ${btnBorderGlowColor}`
+      : null;
+
+  // 按鈕外框樣式（不含任何文字屬性，文字由內層 span 負責）
+  const getButtonBoxStyle = (): React.CSSProperties => {
+    return {
+      padding: `${btnPaddingY}px ${btnPaddingX}px`,
+      background: bgUseGradient
+        ? `linear-gradient(${bgGradAngle}deg, ${bgGradColor1}, ${bgGradColor2})`
+        : btnBgColor,
+      ...getBorderStyle(),
+      borderRadius: `${btnBorderRadius}px`,
+      width: btnWidth === "auto" ? "auto" : `${btnWidth}px`,
+      height: btnHeight === "auto" ? "auto" : `${btnHeight}px`,
+      cursor: "pointer",
+      transition: `all ${btnTransitionDuration}s ${btnTransitionTiming}`,
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      boxShadow: btnBoxShadow || (glowShadow() ?? "none"),
+      ...(btnBackdropBlur > 0
+        ? { backdropFilter: `blur(${btnBackdropBlur}px)`, WebkitBackdropFilter: `blur(${btnBackdropBlur}px)` as any }
+        : {}),
+    };
+  };
+
+  return (
+    <div className="min-h-screen overflow-x-auto bg-[#f7f4ed] text-gray-900">
+      {/* 主要內容區域 */}
+      <div className="mx-auto min-h-screen w-[2520px] max-w-[calc(100vw-24px)] p-3">
+        {comparisonMode ? (
+          // 對比模式
+          <div className="space-y-6">
+            {/* 對比字型選擇 */}
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-purple-900">選擇要對比的字型</h2>
+                <button
+                  onClick={exitComparisonMode}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+                >
+                  <Eye className="w-4 h-4" />
+                  返回編輯
+                </button>
+              </div>
+              <p className="text-sm text-purple-800 mb-4">最多可選擇 3 個字型進行並排對比 ({comparisonFonts.length}/3)</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                {Array.from(fontCategories.entries()).map(([category, fonts]) => (
+                  <div key={category}>
+                    <h3 className="text-xs font-semibold text-purple-700 mb-2 uppercase">{category}</h3>
+                    <div className="space-y-1">
+                      {fonts.map((font) => {
+                        const isSelected = comparisonFonts.some((cf) => cf.font.name === font.name);
+                        return (
+                          <button
+                            key={font.name}
+                            onClick={() => addComparisonFont(font)}
+                            disabled={isSelected || (comparisonFonts.length >= 3 && !isSelected)}
+                            className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                              isSelected
+                                ? "bg-purple-600 text-white font-medium"
+                                : comparisonFonts.length >= 3
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                : "bg-white text-purple-900 border border-purple-200 hover:border-purple-400"
+                            }`}
+                          >
+                            {font.name}
+                            {isSelected && <Check className="w-3 h-3 inline ml-2" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 對比預覽區域 */}
+            {comparisonFonts.length > 0 && (
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold text-gray-900">並排對比預覽</h2>
+                <div className={`grid gap-4 ${comparisonFonts.length === 1 ? "grid-cols-1" : comparisonFonts.length === 2 ? "grid-cols-2" : "grid-cols-3"}`}>
+                  {comparisonFonts.map((cf) => {
+                    const style: React.CSSProperties = {
+                      fontFamily: cf.font.value,
+                      fontSize: `${fontSize}px`,
+                      lineHeight: lineHeight,
+                      letterSpacing: `${letterSpacing}px`,
+                      wordSpacing: `${wordSpacing}px`,
+                      fontWeight: fontWeight,
+                      opacity: textOpacity / 100,
+                      wordBreak: "break-all",
+                    };
+
+                    if (gradientEnabled) {
+                      if (gradientType === "linear") {
+                        style.background = `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`;
+                        (style as any).WebkitBackgroundClip = "text";
+                        (style as any).WebkitTextFillColor = "transparent";
+                        style.backgroundClip = "text" as any;
+                      } else {
+                        style.background = `radial-gradient(circle, ${gradientColor1}, ${gradientColor2})`;
+                        (style as any).WebkitBackgroundClip = "text";
+                        (style as any).WebkitTextFillColor = "transparent";
+                        style.backgroundClip = "text" as any;
+                      }
+                    }
+
+                    if (combinedPresets.length > 0 && combinedShadows.length > 0) {
+                      style.textShadow = combinedShadows.join(", ");
+                    } else if (textShadowEnabled) {
+                      const rgb = hexToRgb(textShadowColor);
+                      style.textShadow = `${textShadowX}px ${textShadowY}px ${textShadowBlur}px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${textShadowOpacity})`;
+                    }
+
+                    if (textStrokeEnabled) {
+                      (style as any).WebkitTextStroke = `${textStrokeWidth}px ${textStrokeColor}`;
+                    }
+
+                    return (
+                      <Card key={cf.id} className="p-6 border-gray-200 shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="font-semibold text-gray-900">{cf.font.name}</h3>
+                          <button
+                            onClick={() => removeComparisonFont(cf.id)}
+                            className="p-1 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="p-6 bg-gray-50 rounded border border-gray-200 min-h-48 flex items-center justify-center">
+                          <div style={style} className="text-center text-gray-900">
+                            {previewText}
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {comparisonFonts.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500">請選擇至少 1 個字型開始對比</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          // 編輯模式
+          <>
+          <header className="mb-3 grid min-h-[92px] grid-cols-[1fr_auto] items-center gap-6 rounded-lg border border-gray-200 bg-white px-6 py-4 shadow-sm">
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">2560 × 1080 Desktop Workspace</p>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-950">字型預覽測試器</h1>
+              <p className="mt-1 text-sm text-gray-500">左側選字型，中間看 500px 預覽，右側集中調整樣式。</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href="/refs/gallery.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-full border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-800 transition-colors hover:bg-purple-100"
+              >
+                <LayoutGrid className="h-4 w-4" />
+                效果參考圖
+              </a>
+              <span className="rounded-full border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-semibold text-gray-700">三欄式版面</span>
+              <span className="rounded-full border border-green-200 bg-green-50 px-4 py-2 text-sm font-semibold text-green-800">
+                {selectedFont.name}
+              </span>
+            </div>
+          </header>
+
+          <div
+            className="grid h-[720px] gap-3"
+            style={{
+              gridTemplateColumns: "320px 700px minmax(0, 1fr)",
+            }}
+          >
+            {/* 左：設計效果欄（設計文字效果 / 設計按鈕效果 / 快速效果） */}
+            <aside className="min-h-0 max-h-[720px] space-y-4 overflow-y-auto pr-1">
+              {/* 設計效果（單一面板，依目前元件自動顯示對應效果） */}
+              {(() => {
+                const cfg: { sub: string; list: any[]; active: string | null; apply: (p: any) => void; clear: () => void } =
+                  previewMode === "text"
+                    ? { sub: "文字效果:漸層 / 中空 / 多層陰影 / 螢光筆", list: DESIGN_PRESETS, active: activeDesignPreset, apply: applyDesignPreset, clear: clearDesignPreset }
+                    : previewMode === "button"
+                    ? { sub: "按鈕效果:玻璃 / 漸層光暈 / 新擬態 / 立體 / 霓虹…(套完可用下方控制微調)", list: BUTTON_PRESETS, active: activeButtonPreset, apply: applyButtonPreset, clear: clearButtonPreset }
+                    : previewMode === "card"
+                    ? { sub: "卡片效果:外框 / 質感 / 玻璃 / 霓虹 / 黏土…", list: CARD_PRESETS, active: activeCardPreset, apply: applyCardPreset, clear: clearCardPreset }
+                    : { sub: "滑桿效果:滑軌與把手樣式(含內外光暈)", list: SLIDER_PRESETS, active: activeSliderPreset, apply: applySliderPreset, clear: clearSliderPreset };
+                return (
+                  <div className="rounded-lg border border-purple-200 bg-purple-50 p-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <div>
+                        <h3 className="text-sm font-semibold text-purple-900">設計效果</h3>
+                        <p className="text-xs text-purple-700">{cfg.sub}</p>
+                      </div>
+                      {cfg.active && (
+                        <button
+                          onClick={cfg.clear}
+                          className="flex items-center gap-1 rounded bg-red-100 px-2 py-1 text-xs font-medium text-red-900 hover:bg-red-200"
+                        >
+                          <X className="h-3 w-3" />
+                          清除
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2">
+                      {cfg.list.map((p) => (
+                        <button
+                          key={`fx-${p.name}`}
+                          onClick={() => cfg.apply(p)}
+                          className={`relative rounded px-2 py-2 text-xs font-medium transition-all ${
+                            cfg.active === p.name
+                              ? "bg-purple-600 text-white shadow-sm"
+                              : "border border-purple-200 bg-white text-purple-900 hover:border-purple-400"
+                          }`}
+                        >
+                          {p.label}
+                          {cfg.active === p.name && <Check className="absolute right-1 top-1 h-3 w-3" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+
+
+              {/* 快速效果（可疊加最多 3 個預設） */}
+              <section className="min-h-0 rounded-lg border border-blue-200 bg-blue-50 p-4 shadow-sm">
+                <div className="mb-3 flex items-center justify-between">
+                  <div>
+                    <h2 className="text-sm font-semibold text-blue-900">快速效果</h2>
+                    <p className="text-xs text-blue-800">可疊加最多 3 個預設</p>
+                  </div>
+                  {combinedPresets.length > 0 && (
+                    <span className="rounded bg-blue-600 px-2 py-1 text-xs text-white">{combinedPresets.length}/3</span>
+                  )}
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {EFFECT_PRESETS.map((preset) => (
+                    <button
+                      key={`footer-effect-${preset.name}`}
+                      onClick={() => toggleCombinedPreset(preset.name)}
+                      className={`relative rounded px-3 py-2 text-xs font-medium transition-all ${
+                        combinedPresets.includes(preset.name)
+                          ? "bg-blue-600 text-white shadow-sm"
+                          : "border border-blue-200 bg-white text-blue-900 hover:border-blue-400"
+                      }`}
+                    >
+                      {preset.label}
+                      {combinedPresets.includes(preset.name) && <Check className="absolute right-1 top-1 h-3 w-3" />}
+                    </button>
+                  ))}
+                </div>
+                {combinedPresets.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setCombinedPresets([]);
+                      setCombinedShadows([]);
+                      setTextShadowEnabled(false);
+                      setTextStrokeEnabled(false);
+                      toast.success("已清除組合效果");
+                    }}
+                    className="mt-3 flex w-full items-center justify-center gap-1 rounded bg-red-100 px-3 py-2 text-xs font-medium text-red-900 transition-colors hover:bg-red-200"
+                  >
+                    <X className="h-3 w-3" />
+                    清除組合
+                  </button>
+                )}
+              </section>
+            </aside>
+
+            {/* 中：500px 預覽區域 */}
+            <div className="min-h-0">
+              <Card className="h-full overflow-y-auto border-gray-200 p-5 shadow-sm">
+                {/* 預覽模式切換 + 對比模式 */}
+                <div className="mb-6 flex gap-2">
+                  {(["text", "button", "card", "slider"] as const).map((m) => (
+                    <button
+                      key={m}
+                      onClick={() => setPreviewMode(m)}
+                      className={`flex-1 px-4 py-2 rounded text-sm font-medium transition-colors ${
+                        previewMode === m
+                          ? "bg-green-600 text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {m === "text" ? "純文字" : m === "button" ? "按鈕" : m === "card" ? "卡片" : "滑桿"}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setComparisonMode(true)}
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded text-sm font-medium bg-purple-100 text-purple-900 hover:bg-purple-200 transition-colors"
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                    對比
+                  </button>
+                </div>
+
+                {/* 預覽文字輸入 */}
+                <div className="mb-8">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    {previewMode === "text" ? "預覽文字" : previewMode === "card" ? "卡片標題文字" : previewMode === "slider" ? "滑桿說明文字" : "按鈕文字"}
+                  </label>
+                  <Input
+                    value={previewText}
+                    onChange={(e) => setPreviewText(e.target.value)}
+                    placeholder="輸入要預覽的文字"
+                    className="text-base border-gray-200 focus:border-green-500 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* 預覽區域 */}
+                <div
+                  style={{ backgroundColor: previewBgColor }}
+                  className="mb-3 p-8 rounded border border-gray-200 min-h-64 flex items-center justify-center"
+                >
+                  {previewMode === "text" ? (
+                    <div key={`pv-${fontStamp}`} style={previewStyle} className="text-center">
+                      {previewText}
+                    </div>
+                  ) : previewMode === "card" ? (
+                    <div className="relative flex items-center justify-center">
+                      {(activeCardPreset === "frosted" || activeCardPreset === "liquidGlass") && (
+                        <div aria-hidden style={{ position: "absolute", inset: "-12px", borderRadius: 24, overflow: "hidden", background: "linear-gradient(135deg,#c7d2fe,#fbcfe8 45%,#fde68a)" }}>
+                          <div style={{ position: "absolute", width: 130, height: 130, borderRadius: "50%", background: "#a78bfa", filter: "blur(6px)", top: 8, left: 18, opacity: 0.75 }} />
+                          <div style={{ position: "absolute", width: 150, height: 150, borderRadius: "50%", background: "#f472b6", filter: "blur(8px)", bottom: -10, right: 8, opacity: 0.6 }} />
+                        </div>
+                      )}
+                      <div key={`card-${fontStamp}`} style={{ ...cardStyle, ...cardOverrideStyle, position: "relative", minHeight: 130, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
+                      {activeCardPreset === "badges" ? (
+                        <div className="flex flex-wrap gap-2 justify-center">
+                          {[["新品", "#22c55e"], ["熱門", "#ef4444"], ["限量", "#a855f7"], ["推薦", "#3b82f6"], ["精選", "#f59e0b"]].map(([t, c]) => (
+                            <span key={t} style={{ background: c as string, color: "#fff", padding: "4px 12px", borderRadius: 999, fontSize: 14, fontWeight: 600 }}>{t}</span>
+                          ))}
+                        </div>
+                      ) : (
+                        <>
+                          <div style={{ fontFamily: selectedFont.value, fontWeight: fontWeight, letterSpacing: `${letterSpacing}px`, fontSize: `${Math.min(fontSize, 40)}px`, color: cardTextColor, textAlign: "center", lineHeight: 1.2 }}>{previewText}</div>
+                          <p style={{ color: cardTextColor, opacity: 0.6, fontSize: 13, margin: 0 }}>副標題文字 · Subtitle</p>
+                        </>
+                      )}
+                      </div>
+                    </div>
+                  ) : previewMode === "slider" ? (
+                    <div style={{ width: 320, padding: "20px 0" }}>
+                      <div style={{ position: "relative", ...sliderTrack, width: "100%" }}>
+                        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "62%", borderRadius: 999, ...sliderFill }} />
+                        <div style={{ position: "absolute", left: "62%", top: "50%", transform: "translate(-50%,-50%)", borderRadius: "50%", ...sliderThumb }} />
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      style={getButtonBoxStyle()}
+                      onMouseEnter={(e) => {
+                        const t = e.currentTarget;
+                        t.style.background = bgUseGradient
+                          ? `linear-gradient(${bgGradAngle}deg, ${btnHoverBgColor}, ${btnHoverBgColor})`
+                          : btnHoverBgColor;
+                        t.style.transform = `scale(${btnHoverScale})`;
+                        const g = glowShadow();
+                        if (btnHoverShadowEnabled) {
+                          t.style.boxShadow = g ? `${g}, ${btnHoverShadow}` : btnHoverShadow;
+                        } else {
+                          t.style.boxShadow = g ?? "none";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        const t = e.currentTarget;
+                        t.style.background = bgUseGradient
+                          ? `linear-gradient(${bgGradAngle}deg, ${bgGradColor1}, ${bgGradColor2})`
+                          : btnBgColor;
+                        t.style.transform = "scale(1)";
+                        t.style.boxShadow = glowShadow() ?? "none";
+                      }}
+                    >
+                      <span style={{ ...previewStyle, display: "inline-block" }}>
+                        {previewText}
+                      </span>
+                    </button>
+                  )}
+                </div>
+
+                {/* 按鈕狀態並排預覽（僅按鈕模式顯示） */}
+                {previewMode === "button" && (
+                  <div className="mb-6">
+                    <div className="mb-3">
+                      <label className="text-sm font-semibold text-gray-700 mb-1 block">不同使用狀況下的按鈕外觀</label>
+                      <p className="text-xs text-gray-500">這裡只顯示結果；請到右側調整背景、邊框、懸停、焦點與禁用設定。</p>
+                    </div>
+                    <div className="flex gap-3 flex-wrap items-end justify-start">
+                      {/* 平常看到的樣子 */}
+                      <div className="flex flex-col items-center gap-2">
+                        <div
+                          style={{
+                            padding: `${btnPaddingY * 0.5}px ${btnPaddingX * 0.5}px`,
+                            background: bgUseGradient
+                              ? `linear-gradient(${bgGradAngle}deg, ${bgGradColor1}, ${bgGradColor2})`
+                              : btnBgColor,
+                            ...getBorderStyle(0.5),
+                            borderRadius: `${btnBorderRadius}px`,
+                            cursor: "default",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: glowShadow(0.5) ?? "none",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          <span style={{ ...previewStyle, display: "inline-block", fontSize: "11px" }}>
+                            {previewText}
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-600 font-medium">平常看到的樣子</span>
+                      </div>
+
+                      {/* 滑鼠移上去 */}
+                      <div className="flex flex-col items-center gap-2">
+                        <div
+                          style={{
+                            padding: `${btnPaddingY * 0.5}px ${btnPaddingX * 0.5}px`,
+                            background: bgUseGradient
+                              ? `linear-gradient(${bgGradAngle}deg, ${btnHoverBgColor}, ${btnHoverBgColor})`
+                              : btnHoverBgColor,
+                            ...getBorderStyle(0.5),
+                            borderRadius: `${btnBorderRadius}px`,
+                            cursor: "default",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            transform: `scale(${btnHoverScale})`,
+                            boxShadow: [glowShadow(0.5), btnHoverShadowEnabled ? btnHoverShadow : null].filter(Boolean).join(", ") || "none",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          <span style={{ ...previewStyle, display: "inline-block", fontSize: "11px" }}>
+                            {previewText}
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-600 font-medium">滑鼠移上去</span>
+                      </div>
+
+                      {/* 點擊瞬間 */}
+                      <div className="flex flex-col items-center gap-2">
+                        <div
+                          style={{
+                            padding: `${btnPaddingY * 0.5}px ${btnPaddingX * 0.5}px`,
+                            background: bgUseGradient
+                              ? `linear-gradient(${bgGradAngle}deg, ${bgGradColor1}, ${bgGradColor2})`
+                              : btnBgColor,
+                            ...getBorderStyle(0.5),
+                            borderRadius: `${btnBorderRadius}px`,
+                            cursor: "default",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            transform: "scale(0.95) translateY(2px)",
+                            boxShadow: glowShadow(0.5) ?? "none",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          <span style={{ ...previewStyle, display: "inline-block", fontSize: "11px" }}>
+                            {previewText}
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-600 font-medium">點擊瞬間</span>
+                      </div>
+
+                      {/* 鍵盤選到時 */}
+                      <div className="flex flex-col items-center gap-2">
+                        <div
+                          style={{
+                            padding: `${btnPaddingY * 0.5}px ${btnPaddingX * 0.5}px`,
+                            background: bgUseGradient
+                              ? `linear-gradient(${bgGradAngle}deg, ${btnFocusBgColor}, ${btnFocusBgColor})`
+                              : btnFocusBgColor,
+                            border: `${btnFocusBorderWidth}px ${btnBorderStyle} ${btnFocusBorderColor}`,
+                            borderRadius: `${btnBorderRadius}px`,
+                            cursor: "default",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            outline: btnFocusOutlineEnabled ? `${btnFocusOutlineWidth}px solid ${btnFocusOutlineColor}` : "none",
+                            boxShadow: [glowShadow(0.5), btnFocusShadowEnabled ? btnFocusShadow : null].filter(Boolean).join(", ") || "none",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          <span style={{ ...previewStyle, display: "inline-block", fontSize: "11px" }}>
+                            {previewText}
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-600 font-medium">鍵盤選到時</span>
+                      </div>
+
+                      {/* 不能點擊時 */}
+                      <div className="flex flex-col items-center gap-2">
+                        <div
+                          style={{
+                            padding: `${btnPaddingY * 0.5}px ${btnPaddingX * 0.5}px`,
+                            background: bgUseGradient
+                              ? `linear-gradient(${bgGradAngle}deg, ${bgGradColor1}, ${bgGradColor2})`
+                              : btnBgColor,
+                            ...getBorderStyle(0.5),
+                            borderRadius: `${btnBorderRadius}px`,
+                            cursor: "default",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            opacity: btnDisabledOpacity,
+                            boxShadow: glowShadow(0.5) ?? "none",
+                            pointerEvents: "none",
+                          }}
+                        >
+                          <span style={{ ...previewStyle, display: "inline-block", fontSize: "11px" }}>
+                            {previewText}
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-600 font-medium">不能點擊時</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 版面情境預覽 */}
+                <div className="hidden">
+                  <div className="mb-4">
+                    <label className="text-sm font-semibold text-gray-700 mb-1 block">版面情境預覽</label>
+                    <p className="text-xs text-gray-500">預覽在真實網頁中的效果</p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {/* 情境 1: Hero 標題區 */}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50">
+                      <div className="bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-12 flex flex-col items-center justify-center">
+                        <div style={previewMode === "text" ? { ...previewStyle, fontSize: `${Math.min(fontSize * 1.5, 48)}px` } : { ...previewStyle, fontSize: `${Math.min(fontSize * 1.2, 36)}px` }} className="text-center text-white mb-2">
+                          {previewMode === "text" ? previewText : "立即開始"}
+                        </div>
+                        <p className="text-sm text-white opacity-80 text-center">Hero 標題區展示</p>
+                      </div>
+                      <div className="px-6 py-4 bg-white text-xs text-gray-600">
+                        <p className="font-medium mb-1">常見於：</p>
+                        <p>網站首頁大標題、廣告區、品牌宣傳</p>
+                      </div>
+                    </div>
+
+                    {/* 情境 2: 商品卡片按鈕 */}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+                      <div className="p-4 border-b border-gray-200">
+                        <div className="aspect-square bg-gradient-to-br from-gray-200 to-gray-300 rounded mb-3 flex items-center justify-center">
+                          <span className="text-gray-500 text-sm">商品圖片</span>
+                        </div>
+                        {previewMode === "text" ? (
+                          <div style={{ ...previewStyle, fontSize: "14px" }} className="mb-2">
+                            {previewText}
+                          </div>
+                        ) : (
+                          <>
+                            <div className="text-sm font-medium text-gray-900 mb-1">商品名稱</div>
+                            <div className="text-lg font-bold text-blue-600 mb-3">$999</div>
+                          </>
+                        )}
+                      </div>
+                      <div className="p-4 flex gap-2 justify-center">
+                        {previewMode === "button" ? (
+                          <button
+                            style={getButtonBoxStyle()}
+                            className="flex-1"
+                            onClick={(e) => e.preventDefault()}
+                          >
+                            <span style={{ ...previewStyle, display: "inline-block" }}>
+                              {previewText}
+                            </span>
+                          </button>
+                        ) : (
+                          <div className="text-xs text-gray-500 text-center">按鈕模式才顯示</div>
+                        )}
+                      </div>
+                      <div className="px-4 py-3 bg-gray-50 text-xs text-gray-600 border-t border-gray-200">
+                        <p className="font-medium mb-1">常見於：</p>
+                        <p>電商商品卡片、購物推薦</p>
+                      </div>
+                    </div>
+
+                    {/* 情境 3: 表單送出按鈕 */}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+                      <div className="p-6 bg-gradient-to-b from-white to-gray-50">
+                        <div className="space-y-4 mb-6">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">電子郵件</label>
+                            <input
+                              type="email"
+                              placeholder="you@example.com"
+                              disabled
+                              className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-50 text-gray-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">訊息</label>
+                            <textarea
+                              placeholder="輸入您的訊息…"
+                              disabled
+                              className="w-full px-3 py-2 border border-gray-300 rounded text-sm bg-gray-50 text-gray-500 resize-none"
+                              rows={3}
+                            />
+                          </div>
+                        </div>
+                        <div className="flex justify-center">
+                          {previewMode === "button" ? (
+                            <button
+                              style={getButtonBoxStyle()}
+                              onClick={(e) => e.preventDefault()}
+                            >
+                              <span style={{ ...previewStyle, display: "inline-block" }}>
+                                {previewText}
+                              </span>
+                            </button>
+                          ) : (
+                            <div className="text-xs text-gray-500">按鈕模式才顯示</div>
+                          )}
+                        </div>
+                      </div>
+                      <div className="px-6 py-3 bg-gray-50 text-xs text-gray-600 border-t border-gray-200">
+                        <p className="font-medium mb-1">常見於：</p>
+                        <p>聯絡表單、訂閱表單、登入表單</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 預覽背景色（按鈕後面那塊） */}
+                <div className="mb-8 flex items-center gap-3">
+                  <label className="text-sm font-semibold text-gray-700 shrink-0">預覽背景</label>
+                  <input
+                    type="color"
+                    value={previewBgColor}
+                    onChange={(e) => setPreviewBgColor(e.target.value)}
+                    className="h-8 w-12 rounded cursor-pointer"
+                  />
+                  <Input
+                    value={previewBgColor}
+                    onChange={(e) => setPreviewBgColor(e.target.value)}
+                    className="flex-1 text-sm"
+                  />
+                </div>
+
+                {/* 字型資訊 */}
+                <div className="bg-blue-50 border border-blue-200 rounded p-4 text-sm text-blue-900">
+                  <p className="font-medium mb-1">當前字型：{selectedFont.name}</p>
+                  <p className="text-xs text-blue-800 font-mono break-all">{selectedFont.value}</p>
+                  {combinedPresets.length > 0 && (
+                    <p className="text-xs text-blue-800 mt-2">
+                      組合效果：{combinedPresets.map((name) => EFFECT_PRESETS.find((p) => p.name === name)?.label).join(" + ")}
+                    </p>
+                  )}
+                </div>
+              </Card>
+              </div>
+
+            {/* 右：控制面板（多欄排列，減少捲動） */}
+            <div className="min-h-0 rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+              <div
+                className="grid max-h-[714px] items-start gap-3 overflow-y-auto pr-1 [&>*]:min-w-0 grid-cols-[repeat(auto-fit,minmax(260px,1fr))]"
+              >
+                {/* 按鈕外框控制（僅按鈕模式顯示） */}
+                {previewMode === "button" && (
+                  <div className="border border-gray-200 rounded-lg p-4 col-span-full">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-3">按鈕外框</h3>
+
+                    {/* 外觀：盒模型 / 邊框 / 背景 */}
+                    <div className="columns-1 sm:columns-2 xl:columns-3 gap-x-6 [&>*]:mb-5 [&>*]:break-inside-avoid">
+
+                    {/* 盒模型 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 盒模型
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <div>
+                          <Label className="text-xs text-gray-600">水平內距：{btnPaddingX}px</Label>
+                          <Slider value={[btnPaddingX]} onValueChange={(v) => setBtnPaddingX(v[0])} min={0} max={64} step={1} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">垂直內距：{btnPaddingY}px</Label>
+                          <Slider value={[btnPaddingY]} onValueChange={(v) => setBtnPaddingY(v[0])} min={0} max={40} step={1} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">圓角：{btnBorderRadius}px</Label>
+                          <Slider value={[btnBorderRadius]} onValueChange={(v) => setBtnBorderRadius(v[0])} min={0} max={50} step={1} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">寬度</Label>
+                          <select value={btnWidth} onChange={(e) => setBtnWidth(e.target.value)} className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm">
+                            <option value="auto">自動</option>
+                            <option value="100">100px</option>
+                            <option value="150">150px</option>
+                            <option value="200">200px</option>
+                            <option value="250">250px</option>
+                          </select>
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">高度</Label>
+                          <select value={btnHeight} onChange={(e) => setBtnHeight(e.target.value)} className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm">
+                            <option value="auto">自動</option>
+                            <option value="40">40px</option>
+                            <option value="50">50px</option>
+                            <option value="60">60px</option>
+                          </select>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* 邊框 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 邊框
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        {/* 邊框模式切換 */}
+                        <div className="space-y-2">
+                          <Label className="text-xs text-gray-600">邊框設定模式</Label>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setBtnBorderMode("unified")}
+                              className={`flex-1 px-3 py-2 rounded text-xs font-medium transition-colors ${
+                                btnBorderMode === "unified"
+                                  ? "bg-green-600 text-white"
+                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
+                            >
+                              四邊一致
+                            </button>
+                            <button
+                              onClick={() => setBtnBorderMode("separate")}
+                              className={`flex-1 px-3 py-2 rounded text-xs font-medium transition-colors ${
+                                btnBorderMode === "separate"
+                                  ? "bg-green-600 text-white"
+                                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                              }`}
+                            >
+                              分別設定
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* 邊框寬度 */}
+                        {btnBorderMode === "unified" ? (
+                          <div>
+                            <Label className="text-xs text-gray-600">邊框寬度：{btnBorderWidth}px</Label>
+                            <Slider value={[btnBorderWidth]} onValueChange={(v) => setBtnBorderWidth(v[0])} min={0} max={10} step={1} />
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <div>
+                              <Label className="text-xs text-gray-600">上邊框：{btnBorderTopWidth}px</Label>
+                              <Slider value={[btnBorderTopWidth]} onValueChange={(v) => setBtnBorderTopWidth(v[0])} min={0} max={10} step={1} />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">右邊框：{btnBorderRightWidth}px</Label>
+                              <Slider value={[btnBorderRightWidth]} onValueChange={(v) => setBtnBorderRightWidth(v[0])} min={0} max={10} step={1} />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">下邊框：{btnBorderBottomWidth}px</Label>
+                              <Slider value={[btnBorderBottomWidth]} onValueChange={(v) => setBtnBorderBottomWidth(v[0])} min={0} max={10} step={1} />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">左邊框：{btnBorderLeftWidth}px</Label>
+                              <Slider value={[btnBorderLeftWidth]} onValueChange={(v) => setBtnBorderLeftWidth(v[0])} min={0} max={10} step={1} />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 邊框顏色 */}
+                        <div>
+                          <Label className="text-xs text-gray-600">邊框顏色</Label>
+                          <input type="color" value={btnBorderColor} onChange={(e) => setBtnBorderColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                        </div>
+
+                        {/* 邊框樣式 */}
+                        <div>
+                          <Label className="text-xs text-gray-600">邊框樣式</Label>
+                          <select value={btnBorderStyle} onChange={(e) => setBtnBorderStyle(e.target.value)} className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm">
+                            <option value="solid">實線</option>
+                            <option value="dashed">虛線</option>
+                            <option value="dotted">點線</option>
+                            <option value="double">雙線</option>
+                          </select>
+                        </div>
+
+                        {/* 發光邊框 */}
+                        <button
+                          onClick={() => setBtnBorderGlowEnabled(!btnBorderGlowEnabled)}
+                          className={`w-full px-3 py-2 rounded text-xs font-medium transition-colors ${
+                            btnBorderGlowEnabled
+                              ? "bg-green-600 text-white"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {btnBorderGlowEnabled ? "發光邊框：開啟" : "發光邊框：關閉"}
+                        </button>
+
+                        {/* 發光邊框設定 */}
+                        {btnBorderGlowEnabled && (
+                          <div className="space-y-2 border-t border-gray-200 pt-3">
+                            <div>
+                              <Label className="text-xs text-gray-600">發光顏色</Label>
+                              <input type="color" value={btnBorderGlowColor} onChange={(e) => setBtnBorderGlowColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">模糊程度：{btnBorderGlowBlur}px</Label>
+                              <Slider value={[btnBorderGlowBlur]} onValueChange={(v) => setBtnBorderGlowBlur(v[0])} min={0} max={20} step={1} />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">擴散程度：{btnBorderGlowSpread}px</Label>
+                              <Slider value={[btnBorderGlowSpread]} onValueChange={(v) => setBtnBorderGlowSpread(v[0])} min={0} max={10} step={1} />
+                            </div>
+                          </div>
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* 背景 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 背景
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <button
+                          onClick={() => setBgUseGradient(!bgUseGradient)}
+                          className={`w-full px-3 py-1.5 rounded text-xs font-medium ${bgUseGradient ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700"}`}
+                        >
+                          {bgUseGradient ? "漸層：開啟" : "漸層：關閉"}
+                        </button>
+                        {bgUseGradient ? (
+                          <>
+                            <div>
+                              <Label className="text-xs text-gray-600">角度：{bgGradAngle}°</Label>
+                              <Slider value={[bgGradAngle]} onValueChange={(v) => setBgGradAngle(v[0])} min={0} max={360} step={1} />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">起始色</Label>
+                              <input type="color" value={bgGradColor1} onChange={(e) => setBgGradColor1(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">結束色</Label>
+                              <input type="color" value={bgGradColor2} onChange={(e) => setBgGradColor2(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                            </div>
+                          </>
+                        ) : (
+                          <div>
+                            <Label className="text-xs text-gray-600">背景顏色</Label>
+                            <input type="color" value={btnBgColor} onChange={(e) => setBtnBgColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                          </div>
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+                    </div>
+
+                    {/* 互動狀態：懸停 / 過渡 / 焦點 / 禁用 */}
+                    <h4 className="text-sm font-semibold text-gray-800 mt-6 mb-3">互動狀態</h4>
+                    <div className="columns-1 sm:columns-2 xl:columns-3 gap-x-6 [&>*]:mb-5 [&>*]:break-inside-avoid">
+
+                    {/* 懸停 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 懸停效果
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <div>
+                          <Label className="text-xs text-gray-600">懸停背景色</Label>
+                          <input type="color" value={btnHoverBgColor} onChange={(e) => setBtnHoverBgColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">縮放：{btnHoverScale.toFixed(2)}</Label>
+                          <Slider value={[btnHoverScale * 100]} onValueChange={(v) => setBtnHoverScale(v[0] / 100)} min={80} max={130} step={1} />
+                        </div>
+                        <button
+                          onClick={() => setBtnHoverShadowEnabled(!btnHoverShadowEnabled)}
+                          className={`w-full px-3 py-1.5 rounded text-xs font-medium ${btnHoverShadowEnabled ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700"}`}
+                        >
+                          {btnHoverShadowEnabled ? "懸停陰影：開啟" : "懸停陰影：關閉"}
+                        </button>
+                        {btnHoverShadowEnabled && (
+                          <Input value={btnHoverShadow} onChange={(e) => setBtnHoverShadow(e.target.value)} className="text-xs" />
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* 過渡 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 過渡動畫
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <div>
+                          <Label className="text-xs text-gray-600">持續時間：{btnTransitionDuration.toFixed(1)}s</Label>
+                          <Slider value={[btnTransitionDuration * 10]} onValueChange={(v) => setBtnTransitionDuration(v[0] / 10)} min={0} max={20} step={1} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">緩動函數</Label>
+                          <select value={btnTransitionTiming} onChange={(e) => setBtnTransitionTiming(e.target.value)} className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm">
+                            <option value="ease">ease</option>
+                            <option value="linear">linear</option>
+                            <option value="ease-in">ease-in</option>
+                            <option value="ease-out">ease-out</option>
+                            <option value="ease-in-out">ease-in-out</option>
+                          </select>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* 焦點 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 焦點狀態
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <div>
+                          <Label className="text-xs text-gray-600">焦點背景色</Label>
+                          <input type="color" value={btnFocusBgColor} onChange={(e) => setBtnFocusBgColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">焦點邊框寬度：{btnFocusBorderWidth}px</Label>
+                          <Slider value={[btnFocusBorderWidth]} onValueChange={(v) => setBtnFocusBorderWidth(v[0])} min={0} max={10} step={1} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">焦點邊框色</Label>
+                          <input type="color" value={btnFocusBorderColor} onChange={(e) => setBtnFocusBorderColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                        </div>
+                        <button
+                          onClick={() => setBtnFocusOutlineEnabled(!btnFocusOutlineEnabled)}
+                          className={`w-full px-3 py-1.5 rounded text-xs font-medium ${btnFocusOutlineEnabled ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700"}`}
+                        >
+                          {btnFocusOutlineEnabled ? "外框線：開啟" : "外框線：關閉"}
+                        </button>
+                        {btnFocusOutlineEnabled && (
+                          <>
+                            <div>
+                              <Label className="text-xs text-gray-600">外框線寬度：{btnFocusOutlineWidth}px</Label>
+                              <Slider value={[btnFocusOutlineWidth]} onValueChange={(v) => setBtnFocusOutlineWidth(v[0])} min={0} max={10} step={1} />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">外框線顏色</Label>
+                              <input type="color" value={btnFocusOutlineColor} onChange={(e) => setBtnFocusOutlineColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                            </div>
+                          </>
+                        )}
+                        <button
+                          onClick={() => setBtnFocusShadowEnabled(!btnFocusShadowEnabled)}
+                          className={`w-full px-3 py-1.5 rounded text-xs font-medium ${btnFocusShadowEnabled ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700"}`}
+                        >
+                          {btnFocusShadowEnabled ? "焦點陰影：開啟" : "焦點陰影：關閉"}
+                        </button>
+                        {btnFocusShadowEnabled && (
+                          <Input value={btnFocusShadow} onChange={(e) => setBtnFocusShadow(e.target.value)} className="text-xs" />
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* 禁用 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 禁用狀態
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <button
+                          onClick={() => setBtnDisabledEnabled(!btnDisabledEnabled)}
+                          className={`w-full px-3 py-1.5 rounded text-xs font-medium ${btnDisabledEnabled ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700"}`}
+                        >
+                          {btnDisabledEnabled ? "禁用樣式：開啟" : "禁用樣式：關閉"}
+                        </button>
+                        {btnDisabledEnabled && (
+                          <>
+                            <div>
+                              <Label className="text-xs text-gray-600">透明度：{btnDisabledOpacity.toFixed(2)}</Label>
+                              <Slider value={[btnDisabledOpacity * 100]} onValueChange={(v) => setBtnDisabledOpacity(v[0] / 100)} min={0} max={100} step={1} />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">游標</Label>
+                              <select value={btnDisabledCursor} onChange={(e) => setBtnDisabledCursor(e.target.value)} className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm">
+                                <option value="not-allowed">not-allowed</option>
+                                <option value="default">default</option>
+                                <option value="wait">wait</option>
+                              </select>
+                            </div>
+                          </>
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+                    </div>
+                  </div>
+                )}
+
+                {/* 卡片外框控制（僅卡片模式顯示） */}
+                {previewMode === "card" && (
+                  <div className="border border-gray-200 rounded-lg p-4 col-span-full">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-3">卡片外框</h3>
+                    <div className="columns-1 sm:columns-2 xl:columns-3 gap-x-6 [&>*]:mb-5 [&>*]:break-inside-avoid">
+
+                    {/* 盒模型 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 盒模型
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <div>
+                          <Label className="text-xs text-gray-600">水平內距：{cardPadX}px</Label>
+                          <Slider value={[cardPadX]} onValueChange={(v) => setCardPadX(v[0])} min={0} max={64} step={1} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">垂直內距：{cardPadY}px</Label>
+                          <Slider value={[cardPadY]} onValueChange={(v) => setCardPadY(v[0])} min={0} max={48} step={1} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">圓角：{cardRadius}px</Label>
+                          <Slider value={[cardRadius]} onValueChange={(v) => setCardRadius(v[0])} min={0} max={60} step={1} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">寬度：{cardWidth}px</Label>
+                          <Slider value={[cardWidth]} onValueChange={(v) => setCardWidth(v[0])} min={200} max={520} step={1} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">高度</Label>
+                          <select value={cardHeight} onChange={(e) => setCardHeight(e.target.value)} className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm">
+                            <option value="auto">自動</option>
+                            <option value="160">160px</option>
+                            <option value="200">200px</option>
+                            <option value="240">240px</option>
+                            <option value="300">300px</option>
+                          </select>
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* 邊框 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 邊框
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <button
+                          onClick={() => setCardBorderEnabled(!cardBorderEnabled)}
+                          className={`w-full px-3 py-1.5 rounded text-xs font-medium ${cardBorderEnabled ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700"}`}
+                        >
+                          {cardBorderEnabled ? "邊框覆蓋：開啟" : "邊框覆蓋：關閉"}
+                        </button>
+                        {cardBorderEnabled && (
+                          <>
+                            {/* 邊框模式切換 */}
+                            <div className="space-y-2">
+                              <Label className="text-xs text-gray-600">邊框設定模式</Label>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => setCardBorderMode("unified")}
+                                  className={`flex-1 px-3 py-2 rounded text-xs font-medium transition-colors ${
+                                    cardBorderMode === "unified"
+                                      ? "bg-green-600 text-white"
+                                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                  }`}
+                                >
+                                  四邊一致
+                                </button>
+                                <button
+                                  onClick={() => setCardBorderMode("separate")}
+                                  className={`flex-1 px-3 py-2 rounded text-xs font-medium transition-colors ${
+                                    cardBorderMode === "separate"
+                                      ? "bg-green-600 text-white"
+                                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                  }`}
+                                >
+                                  分別設定
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* 邊框寬度 */}
+                            {cardBorderMode === "unified" ? (
+                              <div>
+                                <Label className="text-xs text-gray-600">邊框寬度：{cardBorderWidth}px</Label>
+                                <Slider value={[cardBorderWidth]} onValueChange={(v) => setCardBorderWidth(v[0])} min={0} max={10} step={1} />
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                <div>
+                                  <Label className="text-xs text-gray-600">上邊框：{cardBorderTopWidth}px</Label>
+                                  <Slider value={[cardBorderTopWidth]} onValueChange={(v) => setCardBorderTopWidth(v[0])} min={0} max={10} step={1} />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-gray-600">右邊框：{cardBorderRightWidth}px</Label>
+                                  <Slider value={[cardBorderRightWidth]} onValueChange={(v) => setCardBorderRightWidth(v[0])} min={0} max={10} step={1} />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-gray-600">下邊框：{cardBorderBottomWidth}px</Label>
+                                  <Slider value={[cardBorderBottomWidth]} onValueChange={(v) => setCardBorderBottomWidth(v[0])} min={0} max={10} step={1} />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-gray-600">左邊框：{cardBorderLeftWidth}px</Label>
+                                  <Slider value={[cardBorderLeftWidth]} onValueChange={(v) => setCardBorderLeftWidth(v[0])} min={0} max={10} step={1} />
+                                </div>
+                              </div>
+                            )}
+
+                            {/* 邊框顏色 */}
+                            <div>
+                              <Label className="text-xs text-gray-600">邊框顏色</Label>
+                              <input type="color" value={cardBorderColor} onChange={(e) => setCardBorderColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                            </div>
+
+                            {/* 邊框樣式 */}
+                            <div>
+                              <Label className="text-xs text-gray-600">邊框樣式</Label>
+                              <select value={cardBorderStyle} onChange={(e) => setCardBorderStyle(e.target.value)} className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm">
+                                <option value="solid">實線</option>
+                                <option value="dashed">虛線</option>
+                                <option value="dotted">點線</option>
+                                <option value="double">雙線</option>
+                              </select>
+                            </div>
+                          </>
+                        )}
+
+                        {/* 發光邊框 */}
+                        <button
+                          onClick={() => setCardBorderGlowEnabled(!cardBorderGlowEnabled)}
+                          className={`w-full px-3 py-2 rounded text-xs font-medium transition-colors ${
+                            cardBorderGlowEnabled
+                              ? "bg-green-600 text-white"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {cardBorderGlowEnabled ? "發光邊框：開啟" : "發光邊框：關閉"}
+                        </button>
+
+                        {/* 發光邊框設定 */}
+                        {cardBorderGlowEnabled && (
+                          <div className="space-y-2 border-t border-gray-200 pt-3">
+                            <div>
+                              <Label className="text-xs text-gray-600">發光顏色</Label>
+                              <input type="color" value={cardBorderGlowColor} onChange={(e) => setCardBorderGlowColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                            </div>
+                            <div>
+                              <Label className="text-xs text-gray-600">模糊程度：{cardBorderGlowBlur}px</Label>
+                              <Slider value={[cardBorderGlowBlur]} onValueChange={(v) => setCardBorderGlowBlur(v[0])} min={0} max={20} step={1} />
+                            </div>
+                          </div>
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* 背景 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 背景
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <button
+                          onClick={() => setCardBgEnabled(!cardBgEnabled)}
+                          className={`w-full px-3 py-1.5 rounded text-xs font-medium ${cardBgEnabled ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700"}`}
+                        >
+                          {cardBgEnabled ? "背景覆蓋：開啟" : "背景覆蓋：關閉"}
+                        </button>
+                        {cardBgEnabled && (
+                          <>
+                            <button
+                              onClick={() => setCardBgUseGradient(!cardBgUseGradient)}
+                              className={`w-full px-3 py-1.5 rounded text-xs font-medium ${cardBgUseGradient ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700"}`}
+                            >
+                              {cardBgUseGradient ? "漸層：開啟" : "漸層：關閉"}
+                            </button>
+                            {cardBgUseGradient ? (
+                              <>
+                                <div>
+                                  <Label className="text-xs text-gray-600">角度：{cardBgGradAngle}°</Label>
+                                  <Slider value={[cardBgGradAngle]} onValueChange={(v) => setCardBgGradAngle(v[0])} min={0} max={360} step={1} />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-gray-600">起始色</Label>
+                                  <input type="color" value={cardBgGradColor1} onChange={(e) => setCardBgGradColor1(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                                </div>
+                                <div>
+                                  <Label className="text-xs text-gray-600">結束色</Label>
+                                  <input type="color" value={cardBgGradColor2} onChange={(e) => setCardBgGradColor2(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                                </div>
+                              </>
+                            ) : (
+                              <div>
+                                <Label className="text-xs text-gray-600">背景顏色</Label>
+                                <input type="color" value={cardBgColor} onChange={(e) => setCardBgColor(e.target.value)} className="w-full h-8 rounded cursor-pointer" />
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    {/* 陰影 */}
+                    <Collapsible open>
+                      <CollapsibleTrigger className="flex items-center gap-1 text-sm font-medium text-gray-700 w-full">
+                        <ChevronDown className="w-4 h-4" /> 陰影
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-3 mt-3">
+                        <button
+                          onClick={() => setCardShadowEnabled(!cardShadowEnabled)}
+                          className={`w-full px-3 py-1.5 rounded text-xs font-medium ${cardShadowEnabled ? "bg-green-600 text-white" : "bg-gray-100 text-gray-700"}`}
+                        >
+                          {cardShadowEnabled ? "陰影覆蓋：開啟" : "陰影覆蓋：關閉"}
+                        </button>
+                        {cardShadowEnabled && (
+                          <Input value={cardShadow} onChange={(e) => setCardShadow(e.target.value)} className="text-xs" />
+                        )}
+                      </CollapsibleContent>
+                    </Collapsible>
+                    </div>
+                  </div>
+                )}
+
+                {/* 多重效果組合 */}
+                <div className="hidden">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-blue-900">多重效果</h3>
+                    {combinedPresets.length > 0 && (
+                      <span className="text-xs bg-blue-600 text-white px-2 py-1 rounded">
+                        {combinedPresets.length}/3
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-blue-800 mb-3">點擊選擇多個預設進行疊加（最多 3 個）</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {EFFECT_PRESETS.map((preset) => (
+                      <button
+                        key={`combined-${preset.name}`}
+                        onClick={() => toggleCombinedPreset(preset.name)}
+                        className={`px-3 py-2 rounded text-xs font-medium transition-all relative ${
+                          combinedPresets.includes(preset.name)
+                            ? "bg-blue-600 text-white shadow-md"
+                            : "bg-white text-blue-900 border border-blue-200 hover:border-blue-400"
+                        }`}
+                      >
+                        {preset.label}
+                        {combinedPresets.includes(preset.name) && (
+                          <Check className="w-3 h-3 absolute top-1 right-1" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {combinedPresets.length > 0 && (
+                    <button
+                      onClick={() => {
+                        setCombinedPresets([]);
+                        setCombinedShadows([]);
+                        setTextShadowEnabled(false);
+                        setTextStrokeEnabled(false);
+                        toast.success("已清除組合效果");
+                      }}
+                      className="w-full mt-3 px-3 py-2 rounded text-xs font-medium bg-red-100 text-red-900 hover:bg-red-200 transition-colors flex items-center justify-center gap-1"
+                    >
+                      <X className="w-3 h-3" />
+                      清除組合
+                    </button>
+                  )}
+                </div>
+
+                {/* 字型大小 */}
+                <div className="flex min-h-[72px] items-center gap-3 rounded-lg border border-gray-200 px-4 py-3">
+                  <label className="text-sm font-semibold text-gray-700 w-16 shrink-0 whitespace-nowrap">字型大小</label>
+                  <Slider
+                    value={[fontSize]}
+                    onValueChange={(value) => setFontSize(value[0])}
+                    min={12}
+                    max={120}
+                    step={1}
+                    className="flex-1"
+                  />
+                  <span className="text-sm font-mono text-gray-600 w-12 text-right shrink-0">{fontSize}px</span>
+                </div>
+
+                {/* 行高 */}
+                <div className="flex min-h-[72px] items-center gap-3 rounded-lg border border-gray-200 px-4 py-3">
+                  <label className="text-sm font-semibold text-gray-700 w-16 shrink-0 whitespace-nowrap">行高</label>
+                  <Slider
+                    value={[lineHeight * 10]}
+                    onValueChange={(value) => setLineHeight(value[0] / 10)}
+                    min={10}
+                    max={30}
+                    step={1}
+                    className="flex-1"
+                  />
+                  <span className="text-sm font-mono text-gray-600 w-12 text-right shrink-0">{lineHeight.toFixed(1)}</span>
+                </div>
+
+                {/* 字距 */}
+                <div className="flex min-h-[72px] items-center gap-3 rounded-lg border border-gray-200 px-4 py-3">
+                  <label className="text-sm font-semibold text-gray-700 w-16 shrink-0 whitespace-nowrap">字距</label>
+                  <Slider
+                    value={[letterSpacing]}
+                    onValueChange={(value) => setLetterSpacing(value[0])}
+                    min={-2}
+                    max={10}
+                    step={0.5}
+                    className="flex-1"
+                  />
+                  <span className="text-sm font-mono text-gray-600 w-12 text-right shrink-0">{letterSpacing.toFixed(1)}</span>
+                </div>
+
+                {/* 詞距 */}
+                <div className="flex min-h-[72px] items-center gap-3 rounded-lg border border-gray-200 px-4 py-3">
+                  <label className="text-sm font-semibold text-gray-700 w-16 shrink-0 whitespace-nowrap">詞距</label>
+                  <Slider
+                    value={[wordSpacing]}
+                    onValueChange={(value) => setWordSpacing(value[0])}
+                    min={-2}
+                    max={10}
+                    step={0.5}
+                    className="flex-1"
+                  />
+                  <span className="text-sm font-mono text-gray-600 w-12 text-right shrink-0">{wordSpacing.toFixed(1)}</span>
+                </div>
+
+                {/* 字重 */}
+                <div className="rounded-lg border border-gray-200 p-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    字重
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[300, 400, 500, 600, 700, 800].map((weight) => (
+                      <button
+                        key={weight}
+                        onClick={() => setFontWeight(weight)}
+                        className={`py-2 px-3 rounded text-xs font-medium transition-colors ${
+                          fontWeight === weight
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {weight}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 透明度 */}
+                <div className="flex min-h-[72px] items-center gap-3 rounded-lg border border-gray-200 px-4 py-3">
+                  <label className="text-sm font-semibold text-gray-700 w-16 shrink-0 whitespace-nowrap">透明度</label>
+                  <Slider
+                    value={[textOpacity]}
+                    onValueChange={(value) => setTextOpacity(value[0])}
+                    min={0}
+                    max={100}
+                    step={5}
+                    className="flex-1"
+                  />
+                  <span className="text-sm font-mono text-gray-600 w-12 text-right shrink-0">{textOpacity}%</span>
+                </div>
+
+                {/* 文字顏色（非漸層時生效） */}
+                <div className="rounded-lg border border-gray-200 p-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    文字顏色
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="color"
+                      value={textColor}
+                      onChange={(e) => setTextColor(e.target.value)}
+                      className="h-9 w-12 rounded cursor-pointer"
+                    />
+                    <Input
+                      value={textColor}
+                      onChange={(e) => setTextColor(e.target.value)}
+                      className="flex-1 text-sm"
+                    />
+                  </div>
+                  {gradientEnabled && (
+                    <p className="text-xs text-gray-400 mt-1.5">目前開了文字漸層，文字顏色暫時不生效</p>
+                  )}
+                </div>
+
+                {/* 文字填充漸層 */}
+                <div className="rounded-lg border border-gray-200 p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="text-sm font-semibold text-gray-700">文字漸層</label>
+                    <button
+                      onClick={() => setGradientEnabled(!gradientEnabled)}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                        gradientEnabled
+                          ? "bg-green-100 text-green-900"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {gradientEnabled ? "開啟" : "關閉"}
+                    </button>
+                  </div>
+
+                  {gradientEnabled && (
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs text-gray-600 mb-2 block">漸層類型</label>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setGradientType("linear")}
+                            className={`flex-1 px-3 py-2 rounded text-xs font-medium transition-colors ${
+                              gradientType === "linear"
+                                ? "bg-green-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                          >
+                            線性
+                          </button>
+                          <button
+                            onClick={() => setGradientType("radial")}
+                            className={`flex-1 px-3 py-2 rounded text-xs font-medium transition-colors ${
+                              gradientType === "radial"
+                                ? "bg-green-600 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            }`}
+                          >
+                            徑向
+                          </button>
+                        </div>
+                      </div>
+
+                      {gradientType === "linear" && (
+                        <div>
+                          <label className="text-xs text-gray-600 mb-1 block">漸層角度</label>
+                          <Slider
+                            value={[gradientAngle]}
+                            onValueChange={(value) => setGradientAngle(value[0])}
+                            min={0}
+                            max={360}
+                            step={15}
+                          />
+                          <span className="text-xs text-gray-500">{gradientAngle}°</span>
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="text-xs text-gray-600 mb-1 block">起始顏色</label>
+                        <input
+                          type="color"
+                          value={gradientColor1}
+                          onChange={(e) => setGradientColor1(e.target.value)}
+                          className="w-full h-8 rounded cursor-pointer"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs text-gray-600 mb-1 block">結束顏色</label>
+                        <input
+                          type="color"
+                          value={gradientColor2}
+                          onChange={(e) => setGradientColor2(e.target.value)}
+                          className="w-full h-8 rounded cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 文字陰影效果 */}
+                {combinedPresets.length === 0 && (
+                  <div className="rounded-lg border border-gray-200 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="text-sm font-semibold text-gray-700">文字陰影</label>
+                      <button
+                        onClick={() => setTextShadowEnabled(!textShadowEnabled)}
+                        className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                          textShadowEnabled
+                            ? "bg-green-100 text-green-900"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {textShadowEnabled ? "開啟" : "關閉"}
+                      </button>
+                    </div>
+
+                    {textShadowEnabled && (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs text-gray-600 mb-1 block">X 偏移</label>
+                          <Slider
+                            value={[textShadowX]}
+                            onValueChange={(value) => setTextShadowX(value[0])}
+                            min={-10}
+                            max={10}
+                            step={1}
+                          />
+                          <span className="text-xs text-gray-500">{textShadowX}px</span>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-600 mb-1 block">Y 偏移</label>
+                          <Slider
+                            value={[textShadowY]}
+                            onValueChange={(value) => setTextShadowY(value[0])}
+                            min={-10}
+                            max={10}
+                            step={1}
+                          />
+                          <span className="text-xs text-gray-500">{textShadowY}px</span>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-600 mb-1 block">模糊度</label>
+                          <Slider
+                            value={[textShadowBlur]}
+                            onValueChange={(value) => setTextShadowBlur(value[0])}
+                            min={0}
+                            max={20}
+                            step={1}
+                          />
+                          <span className="text-xs text-gray-500">{textShadowBlur}px</span>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-600 mb-1 block">顏色</label>
+                          <input
+                            type="color"
+                            value={textShadowColor}
+                            onChange={(e) => setTextShadowColor(e.target.value)}
+                            className="w-full h-8 rounded cursor-pointer"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-600 mb-1 block">透明度</label>
+                          <Slider
+                            value={[textShadowOpacity * 100]}
+                            onValueChange={(value) => setTextShadowOpacity(value[0] / 100)}
+                            min={0}
+                            max={100}
+                            step={5}
+                          />
+                          <span className="text-xs text-gray-500">{(textShadowOpacity * 100).toFixed(0)}%</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 文字描邊效果 */}
+                {combinedPresets.length === 0 && (
+                  <div className="rounded-lg border border-gray-200 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <label className="text-sm font-semibold text-gray-700">文字描邊</label>
+                      <button
+                        onClick={() => setTextStrokeEnabled(!textStrokeEnabled)}
+                        className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                          textStrokeEnabled
+                            ? "bg-green-100 text-green-900"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {textStrokeEnabled ? "開啟" : "關閉"}
+                      </button>
+                    </div>
+
+                    {textStrokeEnabled && (
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs text-gray-600 mb-1 block">描邊寬度</label>
+                          <Slider
+                            value={[textStrokeWidth * 10]}
+                            onValueChange={(value) => setTextStrokeWidth(value[0] / 10)}
+                            min={1}
+                            max={50}
+                            step={1}
+                          />
+                          <span className="text-xs text-gray-500">{textStrokeWidth.toFixed(1)}px</span>
+                        </div>
+                        <div>
+                          <label className="text-xs text-gray-600 mb-1 block">描邊顏色</label>
+                          <input
+                            type="color"
+                            value={textStrokeColor}
+                            onChange={(e) => setTextStrokeColor(e.target.value)}
+                            className="w-full h-8 rounded cursor-pointer"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* CSS 代碼 */}
+                <div className="rounded-lg border border-gray-200 p-4">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-3">CSS 代碼</h3>
+                  <div className="bg-gray-900 text-gray-100 p-4 rounded font-mono text-xs overflow-auto max-h-40 mb-3">
+                    {cssCode.split("\n").map((line, i) => (
+                      <div key={i}>{line}</div>
+                    ))}
+                  </div>
+                  <Button
+                    onClick={handleCopyCSS}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4 mr-2" />
+                        已複製
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4 mr-2" />
+                        複製 CSS
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+            {/* 字型選擇（由左欄移到下方）：上傳 + 一鍵匯入 + 內建字型列表 */}
+            <div className="hidden">
+              <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">選擇字型</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                  <FontUploader onUpload={handleUploadFont} isLoading={isLoading} error={error} />
+                </div>
+                <div className="flex flex-col justify-center">
+                  <button
+                    onClick={handleBulkImport}
+                    disabled={isImporting}
+                    className="w-full px-3 py-2 rounded text-sm font-medium border border-green-300 bg-green-50 text-green-800 hover:bg-green-100 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isImporting ? "匯入中…" : "一鍵匯入我已安裝的字型"}
+                  </button>
+                  <p className="text-xs text-gray-400 mt-1.5">
+                    讀取你電腦已安裝的字型（需開發伺服器執行中）
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {Array.from(fontCategories.entries())
+                  .filter(([category]) => category !== "本地字型")
+                  .map(([category, fonts]) => (
+                    <div key={category}>
+                      <h4 className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+                        {category}
+                      </h4>
+                      <div className="space-y-1">
+                        {fonts.map((font) => (
+                          <button
+                            key={font.name}
+                            onClick={() => {
+                              ensureFontLoaded(font.value);
+                              setSelectedFont(font);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                              selectedFont.name === font.name
+                                ? "bg-green-100 text-green-900 font-medium"
+                                : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                          >
+                            {font.name}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            {/* 畫廊範例字（中文字型卡片，可隨時自訂） */}
+            <div className="hidden">
+              <label className="text-sm font-semibold text-gray-700 shrink-0">畫廊範例字</label>
+              <Input
+                value={gallerySample}
+                onChange={(e) => setGallerySample(e.target.value)}
+                placeholder="輸入想顯示在中文字型卡片上的文字"
+                className="max-w-md text-sm"
+              />
+            </div>
+
+            {/* 網路字型畫廊（移到最上面，依中文/英文分組；含哥特體 Dela Gothic One） */}
+            <div className="hidden">
+              <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
+                網路字型（{WEB_FONTS.length}）
+              </h3>
+              {groupByScript(WEB_FONTS).map(([script, fonts]) => (
+                <div key={script} className="mb-6">
+                  <button
+                    onClick={() => toggleGroup(`web:${script}`)}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-green-700 mb-2 tracking-wider hover:text-green-800"
+                  >
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 transition-transform ${
+                        collapsedGroups.has(`web:${script}`) ? "-rotate-90" : ""
+                      }`}
+                    />
+                    {script}（{fonts.length}）
+                  </button>
+                  {!collapsedGroups.has(`web:${script}`) && (
+                  <div className="flex flex-col gap-2">
+                    {fonts.map((f) => {
+                      const value = `'${f.family}'`;
+                      return (
+                        <LocalFontRow
+                          key={f.family}
+                          name={f.family}
+                          cn={f.cn}
+                          row
+                          value={value}
+                          selected={selectedFont.name === f.family}
+                          onSelect={() =>
+                            setSelectedFont({
+                              name: f.family,
+                              value,
+                              category: "網路字型",
+                            })
+                          }
+                          ensureFontLoaded={ensureFontLoaded}
+                          sample={script === "英文" ? "Aa Bb Cc 123" : gallerySample}
+                        />
+                      );
+                    })}
+                  </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* 本地字型畫廊（依中文/英文/數字分組，捲到才載入各字型樣式） */}
+            {localFonts.length > 0 && (
+              <div className="hidden">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">
+                  本地字型（{localFonts.length}）
+                </h3>
+                {groupByScript(localFonts).map(([script, fonts]) => (
+                  <div key={script} className="mb-6">
+                    <button
+                      onClick={() => toggleGroup(`local:${script}`)}
+                      className="flex items-center gap-1.5 text-xs font-semibold text-green-700 mb-2 tracking-wider hover:text-green-800"
+                    >
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 transition-transform ${
+                          collapsedGroups.has(`local:${script}`) ? "-rotate-90" : ""
+                        }`}
+                      />
+                      {script}（{fonts.length}）
+                    </button>
+                    {!collapsedGroups.has(`local:${script}`) && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {fonts.map((lf) => {
+                        const value = `'${lf.fontFamily}'`;
+                        return (
+                          <LocalFontRow
+                            key={lf.id}
+                            name={lf.name}
+                            value={value}
+                            selected={selectedFont.name === lf.name}
+                            onSelect={() => {
+                              ensureFontLoaded(value);
+                              setSelectedFont({
+                                name: lf.name,
+                                value,
+                                category: "本地字型",
+                              });
+                            }}
+                            onDelete={() => deleteFont(lf.id)}
+                            ensureFontLoaded={ensureFontLoaded}
+                            sample={script === "英文" ? "Aa Bb Cc 123" : gallerySample}
+                          />
+                        );
+                      })}
+                    </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            </div>
+          </div>
+          <footer className="mt-3 grid grid-cols-1 gap-3">
+            <section className="min-h-0 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="mb-4">
+                <h2 className="text-sm font-semibold text-gray-900">字型選擇</h2>
+              </div>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <FontUploader onUpload={handleUploadFont} isLoading={isLoading} error={error} />
+
+                  <div className="flex flex-col justify-center">
+                    <button
+                      onClick={handleBulkImport}
+                      disabled={isImporting}
+                      className="w-full rounded-md border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-800 transition-colors hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isImporting ? "匯入中…" : "一鍵匯入我已安裝的字型"}
+                    </button>
+                    <p className="mt-1.5 text-xs text-gray-400">讀取你電腦已安裝的字型（需開發伺服器執行中）</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <label className="shrink-0 text-sm font-semibold text-gray-700">畫廊範例字</label>
+                  <Input
+                    value={gallerySample}
+                    onChange={(e) => setGallerySample(e.target.value)}
+                    placeholder="輸入想顯示在中文字型卡片上的文字"
+                    className="max-w-md text-sm"
+                  />
+                </div>
+
+                <div>
+                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-500">內建字型</h3>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    {Array.from(fontCategories.entries())
+                      .filter(([category]) => category !== "本地字型")
+                      .map(([category, fonts]) => (
+                        <div key={category}>
+                          <h4 className="mb-2 text-xs font-semibold text-gray-500">{category}</h4>
+                          <div className="space-y-1">
+                            {fonts.map((font) => (
+                              <button
+                                key={font.name}
+                                onClick={() => {
+                                  ensureFontLoaded(font.value);
+                                  setSelectedFont(font);
+                                }}
+                                className={`w-full rounded px-3 py-2 text-left text-sm transition-colors ${
+                                  selectedFont.name === font.name
+                                    ? "bg-green-100 font-medium text-green-900"
+                                    : "text-gray-700 hover:bg-gray-100"
+                                }`}
+                              >
+                                {font.name}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-700">
+                    網路字型（{WEB_FONTS.length}）
+                  </h3>
+                  {groupByScript(WEB_FONTS).map(([script, fonts]) => (
+                    <div key={script} className="mb-5">
+                      <button
+                        onClick={() => toggleGroup(`web:${script}`)}
+                        className="mb-2 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-green-700 hover:text-green-800"
+                      >
+                        <ChevronDown
+                          className={`h-3.5 w-3.5 transition-transform ${
+                            collapsedGroups.has(`web:${script}`) ? "-rotate-90" : ""
+                          }`}
+                        />
+                        {script}（{fonts.length}）
+                      </button>
+                      {!collapsedGroups.has(`web:${script}`) && (
+                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                          {fonts.map((f) => {
+                            const value = `'${f.family}'`;
+                            return (
+                              <LocalFontRow
+                                key={f.family}
+                                name={f.family}
+                                cn={f.cn}
+                                row
+                                value={value}
+                                selected={selectedFont.name === f.family}
+                                onSelect={() =>
+                                  setSelectedFont({
+                                    name: f.family,
+                                    value,
+                                    category: "網路字型",
+                                  })
+                                }
+                                ensureFontLoaded={ensureFontLoaded}
+                                sample={script === "英文" ? "Aa Bb Cc 123" : gallerySample}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {localFonts.length > 0 && (
+                  <div>
+                    <h3 className="mb-4 text-xs font-semibold uppercase tracking-wide text-gray-700">
+                      本地字型（{localFonts.length}）
+                    </h3>
+                    {groupByScript(localFonts).map(([script, fonts]) => (
+                      <div key={script} className="mb-5">
+                        <button
+                          onClick={() => toggleGroup(`local:${script}`)}
+                          className="mb-2 flex items-center gap-1.5 text-xs font-semibold tracking-wider text-green-700 hover:text-green-800"
+                        >
+                          <ChevronDown
+                            className={`h-3.5 w-3.5 transition-transform ${
+                              collapsedGroups.has(`local:${script}`) ? "-rotate-90" : ""
+                            }`}
+                          />
+                          {script}（{fonts.length}）
+                        </button>
+                        {!collapsedGroups.has(`local:${script}`) && (
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            {fonts.map((lf) => {
+                              const value = `'${lf.fontFamily}'`;
+                              return (
+                                <LocalFontRow
+                                  key={lf.id}
+                                  name={lf.name}
+                                  value={value}
+                                  selected={selectedFont.name === lf.name}
+                                  onSelect={() => {
+                                    ensureFontLoaded(value);
+                                    setSelectedFont({
+                                      name: lf.name,
+                                      value,
+                                      category: "本地字型",
+                                    });
+                                  }}
+                                  onDelete={() => deleteFont(lf.id)}
+                                  ensureFontLoaded={ensureFontLoaded}
+                                  sample={script === "英文" ? "Aa Bb Cc 123" : gallerySample}
+                                />
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
+          </footer>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

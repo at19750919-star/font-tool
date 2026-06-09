@@ -1,0 +1,6 @@
+[     289ms] [INFO] ################# [locale] getLocale in csr, pageName: zh-TW false @ https://g.alicdn.com/code/npm/@ali/pegasus-project-tmw-seo/0.0.51/js/main.js:0
+[     289ms] [INFO] [getLocale] | final lang | zh-TW @ https://g.alicdn.com/code/npm/@ali/pegasus-project-tmw-seo/0.0.51/js/main.js:0
+[     326ms] [WARNING] The PerformanceObserver does not support buffered flag with the entryTypes argument. @ https://g.alicdn.com/tb/tracker/index.js:0
+[     364ms] [WARNING] [requestData] 当前环境不支持 Mega JSBridge, 已使用 @ali/lib-mtop 降级为 Windvane / H5 请求 @ https://g.alicdn.com/code/npm/@ali/pegasus-project-tmw-seo/0.0.51/js/p_taglist-pc-index.js:0
+[     672ms] [LOG] %c [APLUS] -- APLUS INIT SUCCESS background:#3B82FE; padding: 4px; padding-right: 8px; border-radius: 4px; color: #fff; @ :1
+[    1481ms] [LOG] Mon Jun 08 2026 09:12:08 GMT+0800 (台北標準時間) @ https://g.alicdn.com/AWSC/et/1.83.41/et_f.js:1

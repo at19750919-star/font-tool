@@ -1,0 +1,43 @@
+[  412299ms] [ERROR] WebSocket connection to 'wss://ws.chatgpt.com/p21/ws/user/user-b8qBvDLy0jKavAFMhFMz6X2i?verify=1780918453-vewprzv5J9JWy%252FK9jXL2imWS6uH91Cnc4gU6EwjlKic%253D' failed: Error in connection establishment: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:76
+[  426616ms] [ERROR] WebSocket connection to 'wss://ws.chatgpt.com/p21/ws/user/user-b8qBvDLy0jKavAFMhFMz6X2i?verify=1780918453-vewprzv5J9JWy%252FK9jXL2imWS6uH91Cnc4gU6EwjlKic%253D' failed: Error in connection establishment: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:76
+[  439562ms] [ERROR] WebSocket connection to 'wss://ws.chatgpt.com/p21/ws/user/user-b8qBvDLy0jKavAFMhFMz6X2i?verify=1780918453-vewprzv5J9JWy%252FK9jXL2imWS6uH91Cnc4gU6EwjlKic%253D' failed: Error in connection establishment: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:76
+[  456952ms] [ERROR] WebSocket connection to 'wss://ws.chatgpt.com/p21/ws/user/user-b8qBvDLy0jKavAFMhFMz6X2i?verify=1780918453-vewprzv5J9JWy%252FK9jXL2imWS6uH91Cnc4gU6EwjlKic%253D' failed: Error in connection establishment: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:76
+[  472992ms] [ERROR] WebSocket connection to 'wss://ws.chatgpt.com/p21/ws/user/user-b8qBvDLy0jKavAFMhFMz6X2i?verify=1780918453-vewprzv5J9JWy%252FK9jXL2imWS6uH91Cnc4gU6EwjlKic%253D' failed: Error in connection establishment: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:76
+[  476151ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://chatgpt.com/backend-api/sentinel/heartbeat:0
+[  478751ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3Dcdc8814a-358e-44e1-8dac-39d25c71d579:0
+[  482726ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://chatgpt.com/ces/statsc/flush:0
+[  482727ms] [ERROR] TypeError: Failed to fetch
+    at o (https://chatgpt.com/cdn/assets/2340486e-gcinyz0lluapp74y.js:59:3287)
+    at ioe.postMetrics (https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:3:55052)
+    at https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:3:54444 {json: {"counters":[{"namespace":"ws","metric":"pubsub.fe…,"value":3}],"histograms":[],"client_type":"web"}} @ https://chatgpt.com/cdn/assets/2340486e-gcinyz0lluapp74y.js:60
+[  493746ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3Da4619134-74e9-46c5-93cb-d49f9c24b9ef:0
+[  504830ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3D4ccac121-9831-4817-947e-febd3ebc9ae1:0
+[  513821ms] [ERROR] WebSocket connection to 'wss://ws.chatgpt.com/p21/ws/user/user-b8qBvDLy0jKavAFMhFMz6X2i?verify=1780918453-vewprzv5J9JWy%252FK9jXL2imWS6uH91Cnc4gU6EwjlKic%253D' failed: Error in connection establishment: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:76
+[  516223ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/backend-api/sentinel/heartbeat:0
+[  520604ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3Dd9d17ffb-9402-4fb4-8a6d-1c811e234e33:0
+[  521145ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://chatgpt.com/ces/statsc/flush:0
+[  521145ms] [ERROR] TypeError: Failed to fetch
+    at o (https://chatgpt.com/cdn/assets/2340486e-gcinyz0lluapp74y.js:59:3287)
+    at ioe.postMetrics (https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:3:55052)
+    at https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:3:54444 {json: {"counters":[{"namespace":"ws","metric":"pubsub.fe…,"value":1}],"histograms":[],"client_type":"web"}} @ https://chatgpt.com/cdn/assets/2340486e-gcinyz0lluapp74y.js:60
+[  538372ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3Db8989fea-885d-4aa2-893d-c265ac51d141:0
+[  549450ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3D794445fe-6c40-4f36-ba5c-3f84fd5740bf:0
+[  549452ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/backend-api/sentinel/heartbeat:0
+[  557600ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://chatgpt.com/ces/statsc/flush:0
+[  557601ms] [ERROR] TypeError: Failed to fetch
+    at o (https://chatgpt.com/cdn/assets/2340486e-gcinyz0lluapp74y.js:59:3287)
+    at ioe.postMetrics (https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:3:55052)
+    at https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:3:54444 {json: {"counters":[{"namespace":"internal","metric":"pos…,"value":2}],"histograms":[],"client_type":"web"}} @ https://chatgpt.com/cdn/assets/2340486e-gcinyz0lluapp74y.js:60
+[  557602ms] [ERROR] WebSocket connection to 'wss://ws.chatgpt.com/p21/ws/user/user-b8qBvDLy0jKavAFMhFMz6X2i?verify=1780918453-vewprzv5J9JWy%252FK9jXL2imWS6uH91Cnc4gU6EwjlKic%253D' failed: Error in connection establishment: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:76
+[  585946ms] [ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3D94b36c2e-6a20-43f1-96c8-f4d1c71f69a9:0
+[  593565ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://chatgpt.com/ces/v1/telemetry/intake?ddforward=%2Fapi%2Fv2%2Flogs%3Fddsource%3Dbrowser%26dd-api-key%3Dpub1f79f8ac903a5872ae5f53026d20a77c%26dd-evp-origin-version%3D6.22.0%26dd-evp-origin%3Dbrowser%26dd-request-id%3D3a817531-2046-4ac3-b9ab-b8cf6f90c292:0
+[  593579ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ https://chatgpt.com/ces/statsc/flush:0
+[  593579ms] [ERROR] TypeError: Failed to fetch
+    at o (https://chatgpt.com/cdn/assets/2340486e-gcinyz0lluapp74y.js:59:3287)
+    at ioe.postMetrics (https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:3:55052)
+    at https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:3:54444 {json: {"counters":[{"namespace":"ws","metric":"pubsub.fe…,"value":2}],"histograms":[],"client_type":"web"}} @ https://chatgpt.com/cdn/assets/2340486e-gcinyz0lluapp74y.js:60
+[ 1938510ms] [ERROR] WebSocket connection to 'wss://ws.chatgpt.com/p21/ws/user/user-b8qBvDLy0jKavAFMhFMz6X2i?verify=1780920306-Sj1oPeUlC83TnGJmZJmQhni1YUjLYrwwBlk8kt1Zs2o%253D' failed: Connection closed before receiving a handshake response @ https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:76
+[ 1970881ms] [ERROR] WebSocket connection to 'wss://ws.chatgpt.com/p21/ws/user/user-b8qBvDLy0jKavAFMhFMz6X2i?verify=1780920306-Sj1oPeUlC83TnGJmZJmQhni1YUjLYrwwBlk8kt1Zs2o%253D' failed: Connection closed before receiving a handshake response @ https://chatgpt.com/cdn/assets/4813494d-k4qr4jycivms8d7j.js:76
+[ 2407323ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://chatgpt.com/backend-api/sentinel/heartbeat:0
+[14883166ms] [WARNING] WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost @ https://chatgpt.com/c/6a26a8c4-6ce8-83a5-a833-57dfc164e5ca:0
+[73272305ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://chatgpt.com/backend-api/sentinel/heartbeat:0
