@@ -75,13 +75,13 @@ export function FontUploader({ onUpload, isLoading, error }: FontUploaderProps) 
   const isUploading = Object.keys(uploadProgress).length > 0;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <div
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onClick={handleClick}
-        className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+        className={`flex items-center gap-2 border-2 border-dashed rounded-lg px-3 py-2 cursor-pointer transition-colors ${
           isDragging
             ? 'border-green-500 bg-green-50'
             : 'border-gray-300 hover:border-gray-400 bg-gray-50'
@@ -96,13 +96,13 @@ export function FontUploader({ onUpload, isLoading, error }: FontUploaderProps) 
           disabled={isLoading || isUploading}
           className="hidden"
         />
-        <Upload className="w-5 h-5 mx-auto mb-2 text-gray-600" />
-        <p className="text-sm font-medium text-gray-700">
+        <Upload className="w-4 h-4 flex-shrink-0 text-gray-600" />
+        <span className="text-sm font-medium text-gray-700 whitespace-nowrap">
           {isUploading ? '上傳中...' : '拖拽或點擊上傳字型'}
-        </p>
-        <p className="text-xs text-gray-500 mt-1">
-          支援 TTF、OTF、TTC、WOFF、WOFF2 (最大 100MB)，可一次上傳多個
-        </p>
+        </span>
+        <span className="text-xs text-gray-500 truncate">
+          支援 TTF / OTF / TTC / WOFF / WOFF2，最大 100MB，可多選
+        </span>
       </div>
 
       {error && (

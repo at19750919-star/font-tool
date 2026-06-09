@@ -1,3 +1,15 @@
 node_modules/
 dist/
 *.local
+.claude/
+.playwright-mcp/
+*.png
+*.jpg
+*.jpeg
+*.webp
+參考圖/
+_cleanup_screenshots_*/
+verify-*.png
+layout-*.png
+mq2*.png
+row-*.png

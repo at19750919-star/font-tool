@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Copy, Check, X, LayoutGrid, Eye, ChevronDown } from "lucide-react";
+import { Copy, Check, X, LayoutGrid, Eye, ChevronDown, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useLocalFonts } from "@/hooks/useLocalFonts";
 import { FontUploader } from "@/components/FontUploader";
@@ -359,6 +359,63 @@ interface ComparisonFont {
   font: typeof FONT_LIST[0];
 }
 
+// 字型畫廊的卡片。傳入 onVisible 時，會在卡片捲入可視範圍時才呼叫一次
+// （本地字型用來延遲注入 @font-face，避免一次載入所有字型的二進位）。
+function GalCard({
+  name, value, cn, selected, onSelect, sample, onDelete, onVisible,
+}: {
+  name: string;
+  value: string;
+  cn?: string;
+  selected: boolean;
+  onSelect: () => void;
+  sample: string;
+  onDelete?: () => void;
+  onVisible?: () => void;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const fired = useRef(false);
+  useEffect(() => {
+    if (!onVisible) return;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!fired.current && entries.some((e) => e.isIntersecting)) {
+          fired.current = true;
+          onVisible();
+          io.disconnect();
+        }
+      },
+      { rootMargin: "300px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+    // 僅在掛載時觀察一次；onVisible 每次 render 都是新閉包，但 fired 旗標確保只觸發一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <button ref={ref} className={`gal-card${selected ? " active" : ""}`} onClick={onSelect}>
+      <div className="g-name">
+        <b>{name}</b>
+        {cn && <span className="g-cn">{cn}</span>}
+      </div>
+      <div className="g-sample" style={{ fontFamily: value }}>{sample}</div>
+      {onDelete && (
+        <span
+          className="g-del"
+          role="button"
+          aria-label="刪除"
+          title="刪除"
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+        >
+          <Trash2 size={14} />
+        </span>
+      )}
+    </button>
+  );
+}
+
 export default function Home() {
   const [previewText, setPreviewText] = useState(DEFAULT_PREVIEW_TEXT);
   const [selectedFont, setSelectedFont] = useState({ name: "Dela Gothic One", value: "'Dela Gothic One'", category: "網路字型" });
@@ -372,6 +429,28 @@ export default function Home() {
   const [previewBgColor, setPreviewBgColor] = useState("#f9fafb"); // 預覽區（按鈕後面那塊）底色
   const [gallerySample, setGallerySample] = useState("永 國 字體 Aa 123"); // 畫廊中文字型卡片的範例字（可自訂）
   const [copied, setCopied] = useState(false);
+
+  // 預覽框可拖曳位置（null = 用 CSS 預設固定位置）
+  const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
+  const previewDragRef = useRef<{ dx: number; dy: number } | null>(null);
+  const startPreviewDrag = (e: React.MouseEvent) => {
+    const col = (e.currentTarget as HTMLElement).closest(".col") as HTMLElement | null;
+    if (!col) return;
+    const rect = col.getBoundingClientRect();
+    previewDragRef.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    const move = (ev: MouseEvent) => {
+      if (!previewDragRef.current) return;
+      setPreviewPos({ x: ev.clientX - previewDragRef.current.dx, y: ev.clientY - previewDragRef.current.dy });
+    };
+    const up = () => {
+      previewDragRef.current = null;
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", up);
+    };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+    e.preventDefault();
+  };
 
   // 預覽模式：純文字 / 按鈕
   const [previewMode, setPreviewMode] = useState<"text" | "button" | "card" | "slider">("text");
@@ -601,6 +680,17 @@ export default function Home() {
   // 本地字型管理
   const { localFonts, isLoading, error, uploadFont, deleteFont, ensureFontLoaded, bulkImportSystemFonts } = useLocalFonts();
   const [isImporting, setIsImporting] = useState(false);
+  // 被使用者隱藏的內建／網路字型（key 例如 "builtin:Noto Sans"、"web:Dela Gothic One"），存 localStorage
+  const [hiddenFonts, setHiddenFonts] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem("fontTool:hidden") || "[]"); } catch { return []; }
+  });
+  const hideFont = (key: string) =>
+    setHiddenFonts((prev) => {
+      if (prev.includes(key)) return prev;
+      const next = [...prev, key];
+      try { localStorage.setItem("fontTool:hidden", JSON.stringify(next)); } catch (e) { /* ignore quota */ }
+      return next;
+    });
   // 各分組的收合狀態（key 例如 "web:中文"、"local:英文"）
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const toggleGroup = (k: string) =>
@@ -1428,8 +1518,8 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
 
   // ============ Frosted Studio：搜尋字型用的本地狀態 ============
   const [fontSearch, setFontSearch] = useState("");
-  const [interactOpen, setInteractOpen] = useState(true);
-  const [cssOpen, setCssOpen] = useState(true);
+  const [interactOpen, setInteractOpen] = useState(false);
+  const [cssOpen, setCssOpen] = useState(false);
   // 貼上 CSS 解析回控制項
   const [pasteMode, setPasteMode] = useState(false);
   const [pasteText, setPasteText] = useState("");
@@ -2203,26 +2293,30 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
   // ============ 字型畫廊（內建 / 網路 / 本地，含搜尋過濾） ============
   const fq = fontSearch.trim().toLowerCase();
   const fmatch = (n: string, c?: string) => !fq || (n + (c || "")).toLowerCase().includes(fq);
+  // 本地字型的中文名常夾帶英文字重（如「未来荧黑Extended Heavy」），顯示時把英文字母去掉只留中文/數字；
+  // 若去掉後沒有中日文字（純羅馬名）則回傳 undefined，讓卡片改顯示「本地」。
+  const cnDisplay = (s?: string): string | undefined => {
+    if (!s) return undefined;
+    const c = s.replace(/[A-Za-z]+/g, " ").replace(/\s+/g, " ").trim();
+    return /[㐀-鿿぀-ヿ豈-﫿]/.test(c) ? c : undefined;
+  };
   const galCard = (
     key: string, name: string, value: string, cn: string | undefined,
     selected: boolean, onSelect: () => void, sample: string, onDelete?: () => void,
+    onVisible?: () => void,
   ) => (
-    <button key={key} className={`gal-card${selected ? " active" : ""}`} onClick={onSelect}>
-      <div className="g-name">
-        <b>{name}</b>
-        {cn && <span className="g-cn">{cn}</span>}
-        {onDelete && (
-          <span className="g-cn" style={{ cursor: "pointer" }} onClick={(e) => { e.stopPropagation(); onDelete(); }}>刪除</span>
-        )}
-      </div>
-      <div className="g-sample" style={{ fontFamily: value }}>{sample}</div>
-    </button>
+    <GalCard
+      key={key}
+      name={name}
+      value={value}
+      cn={cn}
+      selected={selected}
+      onSelect={onSelect}
+      sample={sample}
+      onDelete={onDelete}
+      onVisible={onVisible}
+    />
   );
-
-  const builtinFonts = Array.from(fontCategories.entries())
-    .filter(([category]) => category !== "本地字型")
-    .flatMap(([, fonts]) => fonts)
-    .filter((f) => fmatch(f.name));
 
   return comparisonMode ? (
     /* ============ 對比模式 ============ */
@@ -2326,7 +2420,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
         </div>
         <div className="mast-actions">
           <span className="badge font">{selectedFont.name}</span>
-          <a className="btn ghost-accent" href="/refs/gallery.html" target="_blank" rel="noopener noreferrer">
+          <a className="btn ghost-accent" href={`${import.meta.env.BASE_URL}refs/gallery.html`} target="_blank" rel="noopener noreferrer">
             <LayoutGrid className="h-4 w-4" />
             效果參考圖
           </a>
@@ -2391,10 +2485,13 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
         </aside>
 
         {/* 中：預覽 */}
-        <section className="col">
+        <section className="col" style={previewPos ? { left: previewPos.x, top: previewPos.y } : undefined}>
           <div className="panel preview-card">
             <div className="field-wrap">
-              <label className="field-label">{modeInputLabel}</label>
+              <div className="field-head" onMouseDown={startPreviewDrag} title="按住拖曳預覽框">
+                <label className="field-label">{modeInputLabel}</label>
+                {previewPos && <button className="dh-reset" onMouseDown={(e) => e.stopPropagation()} onClick={() => setPreviewPos(null)}>歸位</button>}
+              </div>
               <input className="text-input" value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="輸入要預覽的文字" spellCheck={false} />
             </div>
             <div className="stage" style={{ background: previewBgColor }}>
@@ -2425,22 +2522,36 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
           </section>
 
           <section className="panel">
-            <div className="panel-h" style={{ cursor: "pointer" }} onClick={() => setCssOpen((o) => !o)}>
-              <div>
-                <h2>CSS 輸出</h2>
-                <p className="desc">{previewMode === "text" ? ".heading 文字樣式" : previewMode === "button" ? ".button 樣式" : previewMode === "card" ? ".card 樣式" : ".slider 樣式"}</p>
+            <div className="panel-h" style={{ cursor: "pointer", alignItems: "center" }} onClick={() => setCssOpen((o) => !o)}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <h2 style={{ whiteSpace: "nowrap" }}>CSS 輸出</h2>
+                <div className="mini-seg" onClick={(e) => e.stopPropagation()}>
+                  <button className={!pasteMode ? "on" : ""} onClick={() => { setPasteMode(false); setPasteMsg(""); setCssOpen(true); }}>輸出</button>
+                  <button className={pasteMode ? "on" : ""} onClick={() => { if (!pasteMode) setPasteText(cssCode); setPasteMode(true); setPasteMsg(""); setCssOpen(true); }}>貼上編輯</button>
+                </div>
               </div>
-              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }} onClick={(e) => e.stopPropagation()}>
+                  <input className="text-input" style={{ height: 38, width: 110, fontSize: 13 }} value={styleName} onChange={(e) => setStyleName(e.target.value)} placeholder="樣式名稱" />
+                  <button className="btn primary" style={{ height: 38, whiteSpace: "nowrap" }} onClick={saveCurrentStyle}>儲存樣式</button>
+                </span>
                 <span className="tag">Export</span>
                 <ChevronDown className="h-4 w-4" style={{ transition: "transform .15s", transform: cssOpen ? "none" : "rotate(-90deg)", color: "var(--muted)" }} />
               </span>
             </div>
             {cssOpen && (
               <div className="panel-b">
-                <div className="mini-seg" style={{ marginBottom: 10 }}>
-                  <button className={!pasteMode ? "on" : ""} onClick={() => { setPasteMode(false); setPasteMsg(""); }}>輸出</button>
-                  <button className={pasteMode ? "on" : ""} onClick={() => { if (!pasteMode) setPasteText(cssCode); setPasteMode(true); setPasteMsg(""); }}>貼上編輯</button>
-                </div>
+                {savedStyles.length > 0 && (
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10, marginBottom: 14 }}>
+                    {savedStyles.map((s) => (
+                      <div key={s.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: 12, border: "1px solid var(--glass-line)", background: "var(--glass-2)" }}>
+                        <span style={{ flex: 1, minWidth: 0, fontWeight: 700, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</span>
+                        <button className="btn" style={{ height: 30, padding: "0 12px", fontSize: 12 }} onClick={() => loadStyle(s)}>載入</button>
+                        <button className="clear-link" onClick={() => deleteStyle(s.name)} title="刪除"><X className="h-3 w-3" /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {pasteMode ? (
                   <>
                     <textarea
@@ -2471,75 +2582,27 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
         </aside>
       </div>
 
-      {/* 下：儲存樣式 */}
-      <section className="panel">
-        <div className="panel-h">
-          <div>
-            <h2>儲存樣式</h2>
-            <p className="desc">編輯中的樣式會自動保留——重整網頁不會不見。也可命名存成多組,隨時載入或刪除。</p>
-          </div>
-          <span className="tag">Saved</span>
-        </div>
-        <div className="panel-b">
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: savedStyles.length ? 14 : 0 }}>
-            <input className="text-input" style={{ height: 42, flex: "1 1 240px", maxWidth: 320 }} value={styleName} onChange={(e) => setStyleName(e.target.value)} placeholder="樣式名稱(可留空自動命名)" />
-            <button className="btn primary" onClick={saveCurrentStyle}>儲存目前樣式</button>
-          </div>
-          {savedStyles.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 10 }}>
-              {savedStyles.map((s) => (
-                <div key={s.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: 12, border: "1px solid var(--glass-line)", background: "var(--glass-2)" }}>
-                  <span style={{ flex: 1, minWidth: 0, fontWeight: 700, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</span>
-                  <button className="btn" style={{ height: 30, padding: "0 12px", fontSize: 12 }} onClick={() => loadStyle(s)}>載入</button>
-                  <button className="clear-link" onClick={() => deleteStyle(s.name)} title="刪除"><X className="h-3 w-3" /></button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* 下：字型選擇 */}
       <section className="panel gallery">
-        <div className="panel-h">
-          <div>
-            <h2>字型選擇</h2>
-            <p className="desc">所有字型集中在這裡，點任一卡片即可套用到上方預覽。可上傳本機字型或一鍵匯入。</p>
-          </div>
-          <span className="tag">Fonts · Gallery</span>
-        </div>
         <div className="panel-b">
-          <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap", alignItems: "stretch" }}>
-            <div style={{ flex: "1 1 300px", minWidth: 260 }}>
+          <div className="gal-tools" style={{ flexWrap: "nowrap" }}>
+            <h2 style={{ margin: 0, whiteSpace: "nowrap" }}>字型選擇</h2>
+            <div style={{ flex: 1, minWidth: 160 }}>
               <FontUploader onUpload={handleUploadFont} isLoading={isLoading} error={error} />
             </div>
-            <button className="btn" onClick={handleBulkImport} disabled={isImporting} style={{ alignSelf: "flex-start" }}>
+            <button className="btn" onClick={handleBulkImport} disabled={isImporting} style={{ whiteSpace: "nowrap" }}>
               {isImporting ? "匯入中…" : "一鍵匯入已安裝字型"}
             </button>
-          </div>
-
-          <div className="gal-tools">
-            <div className="fsearch" style={{ maxWidth: 280, flex: 1 }}>
+            <div className="fsearch" style={{ width: 200, flex: "0 0 auto" }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
               <input value={fontSearch} onChange={(e) => setFontSearch(e.target.value)} placeholder="搜尋字型名稱" />
             </div>
             <input id="gallerySample" value={gallerySample} onChange={(e) => setGallerySample(e.target.value)} placeholder="自訂範例字" />
-            <span className="g-cn">自訂範例字</span>
+            <span className="g-cn" style={{ whiteSpace: "nowrap", color: "var(--faint)", fontSize: 11 }}>自訂範例字</span>
           </div>
 
-          {builtinFonts.length > 0 && (
-            <div className="gal-group">
-              <div className="gal-group-h">內建字型 <span>{builtinFonts.length}</span></div>
-              <div className="gal-grid">
-                {builtinFonts.map((font) =>
-                  galCard(`builtin-${font.name}`, font.name, font.value, (font as any).category, selectedFont.name === font.name, () => { ensureFontLoaded(font.value); setSelectedFont(font); }, gallerySample),
-                )}
-              </div>
-            </div>
-          )}
-
           {groupByScript(WEB_FONTS).map(([script, fonts]) => {
-            const items = fonts.filter((f) => fmatch(f.family, f.cn));
+            const items = fonts.filter((f) => fmatch(f.family, f.cn) && !hiddenFonts.includes(`web:${f.family}`));
             if (!items.length) return null;
             return (
               <div className="gal-group" key={`web-${script}`}>
@@ -2548,7 +2611,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                   {items.map((f) => {
                     const value = `'${f.family}'`;
                     const sample = script === "英文" ? "Aa Bb Cc 123" : gallerySample;
-                    return galCard(`web-${f.family}`, f.family, value, f.cn, selectedFont.name === f.family, () => { ensureFontLoaded(value); setSelectedFont({ name: f.family, value, category: "網路字型" }); }, sample);
+                    return galCard(`web-${f.family}`, f.family, value, f.cn, selectedFont.name === f.family, () => { ensureFontLoaded(value); setSelectedFont({ name: f.family, value, category: "網路字型" }); }, sample, () => hideFont(`web:${f.family}`));
                   })}
                 </div>
               </div>
@@ -2565,7 +2628,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                   {items.map((lf) => {
                     const value = `'${lf.fontFamily}'`;
                     const sample = script === "英文" ? "Aa Bb Cc 123" : gallerySample;
-                    return galCard(`local-${lf.id}`, lf.name, value, "本地", selectedFont.name === lf.name, () => { ensureFontLoaded(value); setSelectedFont({ name: lf.name, value, category: "本地字型" }); }, sample, () => deleteFont(lf.id));
+                    return galCard(`local-${lf.id}`, lf.name, value, cnDisplay(lf.cnName) || "本地", selectedFont.name === lf.name, () => { ensureFontLoaded(value); setSelectedFont({ name: lf.name, value, category: "本地字型" }); }, sample, () => deleteFont(lf.id), () => ensureFontLoaded(value));
                   })}
                 </div>
               </div>

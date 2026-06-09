@@ -61,6 +61,57 @@ export function detectScript(buffer: ArrayBuffer): FontScript {
   }
 }
 
+// 讀字型檔的 name 表，取出「在地化名稱」（優先中文，其次日文）。
+// 拉丁字型通常沒有 CJK 名稱記錄，回傳 undefined。
+export function extractCJKName(buffer: ArrayBuffer): string | undefined {
+  try {
+    const dv = new DataView(buffer);
+    let base = 0;
+    if (dv.getUint32(0) === 0x74746366) base = dv.getUint32(12); // 'ttcf' 取集合第一個
+    const numTables = dv.getUint16(base + 4);
+    let nameOff = 0;
+    for (let i = 0; i < numTables; i++) {
+      const rec = base + 12 + i * 16;
+      if (dv.getUint32(rec) === 0x6e616d65) { // 'name'
+        nameOff = dv.getUint32(rec + 8);
+        break;
+      }
+    }
+    if (!nameOff) return undefined;
+
+    const count = dv.getUint16(nameOff + 2);
+    const strOff = nameOff + dv.getUint16(nameOff + 4);
+    const cand: { idRank: number; langPri: number; s: string }[] = [];
+    // 同語系內偏好：Family(1) > Typographic family(16) > Full(4)
+    const idRank: Record<number, number> = { 1: 3, 16: 2, 4: 1 };
+
+    for (let i = 0; i < count; i++) {
+      const r = nameOff + 6 + i * 12;
+      const plat = dv.getUint16(r);
+      const lang = dv.getUint16(r + 4);
+      const nameID = dv.getUint16(r + 6);
+      const len = dv.getUint16(r + 8);
+      const off = dv.getUint16(r + 10);
+      if (plat !== 3) continue; // 只取 Windows 平台（字串為 UTF-16BE）
+      if (!(nameID in idRank)) continue;
+      const primary = lang & 0x3ff;
+      let langPri: number;
+      if (primary === 0x04) langPri = 2; // 中文最優先
+      else if (primary === 0x11) langPri = 1; // 日文次之
+      else continue; // 其餘語系（含英文）略過
+      let s = "";
+      for (let j = 0; j + 1 < len; j += 2) s += String.fromCharCode(dv.getUint16(strOff + off + j));
+      s = s.trim();
+      if (s) cand.push({ idRank: idRank[nameID], langPri, s });
+    }
+    if (!cand.length) return undefined;
+    cand.sort((a, b) => (b.langPri - a.langPri) || (b.idRank - a.idRank));
+    return cand[0].s;
+  } catch {
+    return undefined;
+  }
+}
+
 function cmapHas(dv: DataView, off: number, cp: number): boolean {
   const format = dv.getUint16(off);
 

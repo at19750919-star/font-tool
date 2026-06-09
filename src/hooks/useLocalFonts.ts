@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { detectScript, type FontScript } from '@/lib/fontScript';
+import { detectScript, extractCJKName, type FontScript } from '@/lib/fontScript';
 
 export interface LocalFont {
   id: string;
@@ -7,6 +7,8 @@ export interface LocalFont {
   fontFamily: string;
   format: string; // ttf, otf, ttc, woff, woff2
   script?: FontScript; // 中文 / 英文 / 數字 / 其他
+  cnName?: string; // 從字型 name 表讀到的中文（或日文）名稱
+  cnResolved?: boolean; // 是否已嘗試解析過 cnName（區分「沒有名稱」與「還沒解析」）
 }
 
 const DB_NAME = 'font-preview-db';
@@ -162,21 +164,22 @@ export function useLocalFonts() {
         if (cancelled) return;
         setLocalFonts(metas);
 
-        // 一次性補登：對還沒分類（沒有 script）的字型，讀檔判定中文/英文/數字後存回
-        const need = metas.filter((m) => !m.script);
+        // 一次性補登：對還沒分類（沒有 script）或還沒解析中文名（沒有 cnResolved）的字型，讀檔處理後存回
+        const need = metas.filter((m) => !m.script || !m.cnResolved);
         for (const m of need) {
           if (cancelled) return;
           try {
             const buf = await idbGetData(m.id);
             if (!buf) continue;
-            const script = detectScript(buf);
-            const updated = { ...m, script };
+            const script = m.script || detectScript(buf);
+            const cnName = m.cnResolved ? m.cnName : extractCJKName(buf);
+            const updated = { ...m, script, cnName, cnResolved: true };
             await idbPutMeta(updated);
             setLocalFonts((prev) =>
-              prev.map((x) => (x.id === m.id ? { ...x, script } : x)),
+              prev.map((x) => (x.id === m.id ? updated : x)),
             );
           } catch {
-            /* 單一字型判定失敗就略過 */
+            /* 單一字型處理失敗就略過 */
           }
         }
       } catch (err) {
@@ -229,6 +232,8 @@ export function useLocalFonts() {
           fontFamily: `LocalFont_${fontName.replace(/\s+/g, '_')}`,
           format: fileExtension || 'ttf',
           script: detectScript(buffer),
+          cnName: extractCJKName(buffer),
+          cnResolved: true,
         };
 
         await idbPut(meta, buffer);
@@ -277,6 +282,8 @@ export function useLocalFonts() {
             fontFamily: `LocalFont_${name.replace(/\s+/g, '_')}`,
             format: ext,
             script: detectScript(buffer),
+            cnName: extractCJKName(buffer),
+            cnResolved: true,
           };
           await idbPut(meta, buffer);
           newMetas.push(meta);

@@ -106,7 +106,7 @@ function renderCatsBar(){
 
 function figFor(name){
   const fig = document.createElement('figure');
-  const url = '/refs/' + encodeURIComponent(name);
+  const url = './' + encodeURIComponent(name);
   const desc = captions[name] || '';
   const cur = catOf(name);
   fig.innerHTML =
@@ -185,7 +185,7 @@ function zoom(name){
       o.style.alignItems='center'; o.style.justifyContent='center'; o.scrollTo(0,0);
     }
   }
-  function show(){ const n=list[i]; zoomed=false; big.src='/refs/'+encodeURIComponent(n); cap.textContent=(i+1)+' / '+list.length+'  ·  '+n+'  （點圖放大）'; applyZoom(); }
+  function show(){ const n=list[i]; zoomed=false; big.src='./'+encodeURIComponent(n); cap.textContent=(i+1)+' / '+list.length+'  ·  '+n+'  （點圖放大）'; applyZoom(); }
   function go(d){ i=(i+d+list.length)%list.length; show(); }
   prev.onclick=e=>{e.stopPropagation(); go(-1);};
   next.onclick=e=>{e.stopPropagation(); go(1);};
