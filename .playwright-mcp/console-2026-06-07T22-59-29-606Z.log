@@ -1,3 +1,0 @@
-[    3683ms] [LOG] %c%s color: red; background: yellow; font-size: 24px; 警告！ @ https://www.gstatic.com/_/mss/boq-translate/_/js/k=boq-translate.TranslateWebserverUi.zh_TW.ugDZ5bX5UwE.2018.O/am=AgAAAPgwMAAOwJAA6ChgISA/d=1/excm=_b,_tp,mainview/ed=1/dg=0/wt=2/ujg=1/rs=ANkVxDmbms1a8y1Ma9qP2jtO7jFpG0uiiA/dti=1/m=_b,_tp:376
-[    3684ms] [LOG] %c%s font-size: 18px; 使用這個主控台可能會讓攻擊者有機會利用名為 Self-XSS 的攻擊方式冒用你的身分，然後竊取你的資訊。
-請勿輸入或貼上來路不明的程式碼。 @ https://www.gstatic.com/_/mss/boq-translate/_/js/k=boq-translate.TranslateWebserverUi.zh_TW.ugDZ5bX5UwE.2018.O/am=AgAAAPgwMAAOwJAA6ChgISA/d=1/excm=_b,_tp,mainview/ed=1/dg=0/wt=2/ujg=1/rs=ANkVxDmbms1a8y1Ma9qP2jtO7jFpG0uiiA/dti=1/m=_b,_tp:376

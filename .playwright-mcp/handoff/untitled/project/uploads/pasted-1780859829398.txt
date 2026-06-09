@@ -1,4 +1,0 @@
-交付方式(重要)
-我沒辦法直接寫進你本機那個資料夾。所以我會把改好的檔案(Home.tsx、studio.css、index.css)產生在這個專案裡,你再複製進你的 repo 對應位置 → npm run dev 驗證,有壞我們一起修。
-
-(或者你把 repo 連到 GitHub,我也能用 GitHub 工具直接匯入/改 — 看你方便。)
