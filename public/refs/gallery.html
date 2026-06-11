@@ -11,17 +11,21 @@
   header h1 { margin:0; font-size:22px; }
   header p { margin:6px 0 0; color:#6b7280; font-size:13px; }
   .bar { margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-  .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:1px solid #d1cfc7; background:#fff; font-size:14px; cursor:pointer; }
+  .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:1px solid #d1cfc7; background:#fff; font-size:14px; cursor:pointer; text-decoration:none; color:inherit; }
   .btn.primary { background:#2563eb; color:#fff; border-color:#2563eb; }
   .count { color:#9ca3af; font-size:13px; }
+  .mode-tag { font-size:11px; padding:3px 9px; border-radius:999px; font-weight:700; }
+  .mode-tag.dev { background:#dcfce7; color:#15803d; }
+  .mode-tag.static { background:#e0e7ff; color:#4338ca; }
   .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; padding:18px 32px 80px; }
   figure { margin:0; background:#fff; border:1px solid #e5e3dc; border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.06); position:relative; }
   figure img { display:block; width:100%; height:auto; cursor:zoom-in; background:#faf9f6; }
   figcaption { padding:9px 12px; font-size:13px; word-break:break-all; }
   .fn { color:#9ca3af; font-size:12px; margin-bottom:4px; }
-  .desc { font-size:13px; line-height:1.5; white-space:pre-wrap; cursor:text; min-height:18px; }
+  .desc { font-size:13px; line-height:1.5; white-space:pre-wrap; min-height:18px; }
   .desc.empty { color:#c0bdb4; font-style:italic; }
-  .desc:hover { background:#f6f5f0; border-radius:4px; }
+  body.dev .desc { cursor:text; }
+  body.dev .desc:hover { background:#f6f5f0; border-radius:4px; }
   .editbox textarea { width:100%; box-sizing:border-box; font:inherit; padding:6px 8px; border:1px solid #cfcdc4; border-radius:6px; resize:vertical; min-height:54px; }
   .editbox .acts { display:flex; gap:6px; margin-top:6px; }
   .editbox .acts button { padding:4px 10px; font-size:12px; border-radius:6px; cursor:pointer; border:1px solid #d1cfc7; background:#fff; }
@@ -40,18 +44,21 @@
   .cat-h .n { font-size:12px; color:#9ca3af; font-weight:500; }
   figcaption .catsel { margin-top:6px; }
   figcaption .catsel select { font:inherit; font-size:12px; padding:3px 6px; border:1px solid #d8d5cc; border-radius:6px; background:#faf9f6; color:#4b5563; cursor:pointer; }
+  /* 只有開發模式（dev server 在跑）才顯示上傳 / 刪除 */
+  body:not(.dev) .dev-only { display:none !important; }
 </style>
 </head>
 <body class="drop">
 <header>
   <h1>效果參考菜單</h1>
-  <p>挑好哪一張,跟我說它的檔名(或描述),我用真 CSS 寫進工具。點圖可放大;點圖下方文字可編輯說明;滑到圖右上角可刪除;也可拖曳圖片進視窗或按「上傳圖片」新增。</p>
+  <p>挑好哪一張,跟我說它的檔名(或描述),我用真 CSS 寫進工具。點圖可放大;切換上方分類過濾。<span class="dev-only">（開發模式：可編輯說明 / 拖曳上傳 / 刪除）</span></p>
   <div class="bar">
-    <button class="btn primary" id="uploadBtn">＋ 上傳圖片</button>
+    <button class="btn primary dev-only" id="uploadBtn">＋ 上傳圖片</button>
     <input type="file" id="fileInput" accept="image/*" multiple hidden>
     <button class="btn" id="refreshBtn">↻ 重新整理</button>
-    <a class="btn" href="components.html" style="text-decoration:none;color:inherit">🧩 組件樣式參考(即時 CSS)</a>
+    <a class="btn" href="components.html">🧩 組件樣式參考(即時 CSS)</a>
     <span class="count" id="count"></span>
+    <span class="mode-tag" id="modeTag"></span>
   </div>
   <div class="cats" id="cats"></div>
 </header>
@@ -62,34 +69,53 @@
 const grid = document.getElementById('grid');
 const countEl = document.getElementById('count');
 const catsBar = document.getElementById('cats');
+const modeTag = document.getElementById('modeTag');
 let captions = {};
 let allNames = [];
+let manifestCat = {};       // 來自 manifest.json 的分類（進 repo）
 let visibleOrder = [];
 let currentFilter = '全部';
-const CATS = ['風格/版面','UI組件','文字','插畫風格','效果/其他'];
+let devMode = false;
+let CATS = ['風格/版面','UI組件','文字','插畫風格','效果/其他'];
 let catMap = {}; try { catMap = JSON.parse(localStorage.getItem('refCats')||'{}'); } catch {}
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
 function autoCat(name){
-  if (/插畫|illustration|AI ?插畫/i.test(name)) return '插畫風格';
+  if (/插畫|illustration/i.test(name)) return '插畫風格';
   if (/文字|字效|字體|字型|標題文字/.test(name)) return '文字';
   if (/^風格-|^版面布局-|設計風格/.test(name)) return '風格/版面';
   if (/^組件-|按鈕|外框|導覽|搜尋|Tab|UI ?元素|UI ?按鈕|玻璃|雙按鈕|時間|滑桿|開關|分頁|標籤|徽章|頭像/i.test(name)) return 'UI組件';
   return '效果/其他';
 }
-function catOf(name){ return catMap[name] || autoCat(name); }
+// 優先序：個人 localStorage 覆蓋 > manifest 分類（repo）> 自動推斷
+function catOf(name){ return catMap[name] || manifestCat[name] || autoCat(name); }
 function setCat(name, c){ catMap[name] = c; try { localStorage.setItem('refCats', JSON.stringify(catMap)); } catch {} render(); }
 
 async function load() {
+  // 先嘗試 dev 端點（開發時即時列出 / 可上傳）；失敗則讀靜態 manifest.json（線上版）
+  devMode = false; manifestCat = {};
   try {
-    const [lr, cr] = await Promise.all([
-      fetch('/refs-list', { cache:'no-store' }),
-      fetch('/refs-captions', { cache:'no-store' })
-    ]);
+    const lr = await fetch('/refs-list', { cache:'no-store' });
+    if (!lr.ok) throw 0;
     allNames = await lr.json();
-    captions = await cr.json().catch(()=>({}));
-  } catch { grid.innerHTML = '<div class="empty">讀不到清單(請確認 dev server 在跑)</div>'; return; }
+    captions = await fetch('/refs-captions', { cache:'no-store' }).then(r=>r.json()).catch(()=>({}));
+    devMode = true;
+  } catch {
+    try {
+      const m = await fetch('./manifest.json', { cache:'no-store' }).then(r=>r.json());
+      CATS = m.categories || CATS;
+      allNames = m.items.map(i=>i.file);
+      captions = {};
+      m.items.forEach(i=>{ captions[i.file] = i.caption || ''; manifestCat[i.file] = i.cat; });
+    } catch {
+      grid.innerHTML = '<div class="empty">讀不到清單（manifest.json 不存在，或 dev server 未啟動）</div>';
+      return;
+    }
+  }
+  document.body.classList.toggle('dev', devMode);
+  modeTag.textContent = devMode ? '開發模式' : '靜態清單';
+  modeTag.className = 'mode-tag ' + (devMode ? 'dev' : 'static');
   allNames.sort((a,b)=>a.localeCompare(b,'zh-Hant'));
   render();
 }
@@ -111,15 +137,17 @@ function figFor(name){
   const cur = catOf(name);
   fig.innerHTML =
     '<img loading="lazy" src="'+url+'" alt="'+esc(name)+'">' +
-    '<button class="del" title="刪除">✕</button>' +
+    '<button class="del dev-only" title="刪除">✕</button>' +
     '<figcaption>' +
       '<div class="fn">'+esc(name)+'</div>' +
-      '<div class="desc'+(desc?'':' empty')+'" title="點此編輯說明">'+(desc?esc(desc):'＋ 點此加說明')+'</div>' +
+      '<div class="desc'+(desc?'':' empty')+'" title="'+(devMode?'點此編輯說明':'')+'">'+(desc?esc(desc):(devMode?'＋ 點此加說明':'（無說明）'))+'</div>' +
       '<div class="catsel">分類:<select>'+CATS.map(c=>'<option '+(c===cur?'selected':'')+'>'+esc(c)+'</option>').join('')+'</select></div>' +
     '</figcaption>';
   fig.querySelector('img').addEventListener('click', ()=>zoom(name));
-  fig.querySelector('.del').addEventListener('click', ()=>del(name));
-  fig.querySelector('.desc').addEventListener('click', function(){ editDesc(this, name); });
+  if (devMode) {
+    fig.querySelector('.del').addEventListener('click', ()=>del(name));
+    fig.querySelector('.desc').addEventListener('click', function(){ editDesc(this, name); });
+  }
   fig.querySelector('.catsel select').addEventListener('change', function(){ setCat(name, this.value); });
   return fig;
 }
@@ -128,7 +156,7 @@ function render(){
   countEl.textContent = allNames.length + ' 張';
   renderCatsBar();
   grid.innerHTML = '';
-  if (!allNames.length) { grid.innerHTML = '<div class="empty">還沒有圖片,按「上傳圖片」或拖曳進來。</div>'; return; }
+  if (!allNames.length) { grid.innerHTML = '<div class="empty">還沒有圖片。</div>'; return; }
   const showCats = currentFilter==='全部' ? CATS : [currentFilter];
   let shown = 0;
   visibleOrder = [];
@@ -200,7 +228,7 @@ function zoom(name){
 }
 
 async function del(name){
-  if(!confirm('刪除「'+name+'」?')) return;
+  if(!confirm('刪除「'+name+'」?（記得之後重跑 npm run refs:manifest）')) return;
   await fetch('/refs-delete',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name})});
   load();
 }
@@ -218,9 +246,9 @@ document.getElementById('fileInput').onchange = e=>uploadFiles(e.target.files);
 document.getElementById('refreshBtn').onclick = load;
 
 const body=document.body;
-['dragenter','dragover'].forEach(ev=>body.addEventListener(ev,e=>{e.preventDefault();body.classList.add('over');}));
+['dragenter','dragover'].forEach(ev=>body.addEventListener(ev,e=>{e.preventDefault();if(devMode)body.classList.add('over');}));
 ['dragleave','drop'].forEach(ev=>body.addEventListener(ev,e=>{e.preventDefault();if(ev!=='dragleave')body.classList.remove('over');}));
-body.addEventListener('drop',e=>{ body.classList.remove('over'); if(e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files); });
+body.addEventListener('drop',e=>{ body.classList.remove('over'); if(devMode && e.dataTransfer.files.length) uploadFiles(e.dataTransfer.files); });
 
 load();
 </script>

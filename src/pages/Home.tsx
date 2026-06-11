@@ -216,6 +216,7 @@ interface DesignPreset {
   stroke?: { width: number; color: string };
   shadow?: string; // 多層 text-shadow 字串
   highlight?: string; // 螢光筆底色
+  animate?: "shimmer"; // 動態效果（流光掃過）
 }
 
 const DESIGN_PRESETS: DesignPreset[] = [
@@ -243,6 +244,10 @@ const DESIGN_PRESETS: DesignPreset[] = [
   { name: "emboss2", label: "浮雕", color: "#d8dde3", shadow: "0 1px 0 #ffffff, 0 -1px 1px rgba(0,0,0,.25)" },
   // 螢光筆:深字 + 黃色底線色塊
   { name: "marker", label: "螢光筆", color: "#1f2937", highlight: "#fde047" },
+  // 霓虹漸層:青→洋紅 + 柔光
+  { name: "neonGrad", label: "霓虹漸層", gradient: { type: "linear", angle: 100, c1: "#22d3ee", c2: "#c026d3" }, shadow: "0 0 10px rgba(192,38,211,.45)" },
+  // 流光漸層:漸層 + 掃光動畫
+  { name: "shimmer", label: "流光漸層", gradient: { type: "linear", angle: 100, c1: "#ffffff", c2: "#7c5cff" }, animate: "shimmer" },
 ];
 
 // 設計按鈕效果：一鍵套用整顆按鈕的外觀
@@ -270,6 +275,8 @@ const BUTTON_PRESETS: ButtonPreset[] = [
   { name: "ghost", label: "Ghost 描邊", bg: "transparent", radius: 8, border: { width: 2, color: "#3b82f6" }, textColor: "#3b82f6", px: 26, py: 12 },
   { name: "metal", label: "金屬質感", grad: { angle: 180, c1: "#f7f7f7", c2: "#9aa0a6" }, radius: 8, border: { width: 1, color: "#7c7c7c" }, boxShadow: "inset 0 1px 0 #ffffff, 0 2px 5px rgba(0,0,0,0.35)", textColor: "#2b2f33", px: 28, py: 13 },
   { name: "clay", label: "黏土擬態", bg: "#c9a7ff", radius: 26, boxShadow: "10px 10px 22px rgba(0,0,0,0.2), inset -5px -5px 10px rgba(0,0,0,0.18), inset 5px 6px 14px rgba(255,255,255,0.7)", textColor: "#4c1d95", px: 30, py: 15 },
+  { name: "liquid", label: "液態玻璃", bg: "rgba(255,255,255,0.16)", radius: 18, border: { width: 1, color: "rgba(255,255,255,0.6)" }, boxShadow: "inset 0 1px 1px rgba(255,255,255,0.75), 0 10px 28px rgba(0,0,0,0.25)", backdropBlur: 12, textColor: "#0f172a", px: 28, py: 13 },
+  { name: "aurora", label: "極光漸層", grad: { angle: 110, c1: "#7c5cff", c2: "#22d3ee" }, radius: 14, boxShadow: "0 8px 24px rgba(124,92,255,0.5)", textColor: "#ffffff", px: 28, py: 13 },
 ];
 
 // 把 React.CSSProperties 轉成 CSS 文字字串（camelCase→kebab-case，數字補 px）
@@ -303,6 +310,8 @@ const CARD_PRESETS: CardPreset[] = [
   { name: "brutal", label: "手繪粗框", textColor: "#111111", style: { background: "#fffef5", border: "2.5px solid #111111", borderRadius: "255px 15px 225px 15px / 15px 225px 15px 255px", boxShadow: "3px 4px 0 rgba(17,17,17,0.85)" } },
   { name: "frosted", label: "毛玻璃", textColor: "#1f2937", style: { background: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.7)", borderRadius: 18, boxShadow: "0 8px 32px rgba(31,38,135,0.15)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" } },
   { name: "liquidGlass", label: "液態玻璃", textColor: "#1f2937", style: { background: "linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15))", border: "1px solid rgba(255,255,255,0.8)", borderRadius: 28, boxShadow: "0 12px 40px rgba(0,0,0,0.18), inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -10px 22px rgba(255,255,255,0.25)", backdropFilter: "blur(14px) saturate(160%)", WebkitBackdropFilter: "blur(14px) saturate(160%)" } },
+  { name: "glowEdge", label: "發光邊框", textColor: "#22d3ee", style: { background: "#0b0f1a", border: "1.5px solid #22d3ee", borderRadius: 14, boxShadow: "0 0 14px rgba(34,211,238,0.6), inset 0 0 14px rgba(34,211,238,0.22)" } },
+  { name: "holo", label: "全息漸層", textColor: "#1f2937", style: { background: "linear-gradient(135deg,#a8edea,#fed6e3 55%,#c2b9ff)", borderRadius: 18, boxShadow: "0 12px 30px rgba(124,92,255,0.18)" } },
   { name: "neumorph", label: "新擬物", textColor: "#555f6d", style: { background: "#e0e5ec", borderRadius: 20, boxShadow: "9px 9px 18px #b8bcc4, -9px -9px 18px #ffffff" } },
   { name: "clay", label: "黏土擬態", textColor: "#4c1d95", style: { background: "#c9a7ff", borderRadius: 32, boxShadow: "30px 30px 60px rgba(0,0,0,0.22), inset -8px -8px 16px rgba(0,0,0,0.18), inset 8px 10px 22px rgba(255,255,255,0.65)" } },
   { name: "softui", label: "柔感 UI", textColor: "#4b5563", style: { background: "#eef1f6", borderRadius: 20, boxShadow: "6px 6px 14px #d1d6e0, -6px -6px 14px #ffffff" } },
@@ -439,6 +448,13 @@ export default function Home() {
   const [fontWeight, setFontWeight] = useState(400);
   const [textOpacity, setTextOpacity] = useState(100);
   const [textColor, setTextColor] = useState("#111827"); // 純色文字顏色（非漸層時）
+  // ★ 非破壞性效果：套用左側效果前先把使用者原本的設定拍快照，清除時還原（避免取消後原色跑掉）
+  const [designSnapshot, setDesignSnapshot] = useState<any>(null);
+  const [btnSnapshot, setBtnSnapshot] = useState<any>(null);
+  const [cardSnapshot, setCardSnapshot] = useState<any>(null);
+  const [quickSnapshot, setQuickSnapshot] = useState<any>(null);
+  const [sliderSnapshot, setSliderSnapshot] = useState<any>(null);
+  const [effectAnimate, setEffectAnimate] = useState<string | null>(null); // 文字動態效果（流光）
   const [previewBgColor, setPreviewBgColor] = useState("#f9fafb"); // 預覽區（按鈕後面那塊）底色
   const [gallerySample, setGallerySample] = useState("永 國 字體 Aa 123"); // 畫廊中文字型卡片的範例字（可自訂）
   const [copied, setCopied] = useState(false);
@@ -790,6 +806,11 @@ export default function Home() {
     const preset = EFFECT_PRESETS.find((p) => p.name === presetName);
     if (!preset) return;
 
+    // ★ 從「無組合效果」要加第一個時，先快照手動設定的描邊/陰影
+    if (combinedPresets.length === 0 && !combinedPresets.includes(presetName)) {
+      setQuickSnapshot({ textShadowEnabled, textStrokeEnabled, textStrokeWidth, textStrokeColor });
+    }
+
     let newCombined = [...combinedPresets];
     let newShadows = [...combinedShadows];
 
@@ -835,14 +856,33 @@ export default function Home() {
 
       toast.success(`已組合 ${newCombined.length} 個效果`);
     } else {
-      setTextShadowEnabled(false);
-      setTextStrokeEnabled(false);
+      // ★ 全部移除後，還原手動設定的描邊/陰影（而不是一律關掉）
+      const s = quickSnapshot;
+      if (s) {
+        setTextShadowEnabled(s.textShadowEnabled);
+        setTextStrokeEnabled(s.textStrokeEnabled);
+        setTextStrokeWidth(s.textStrokeWidth);
+        setTextStrokeColor(s.textStrokeColor);
+        setQuickSnapshot(null);
+      } else {
+        setTextShadowEnabled(false);
+        setTextStrokeEnabled(false);
+      }
       toast.success("已清除組合效果");
     }
   };
 
   // 套用一個「設計文字效果」預設（整組覆蓋）
   const applyDesignPreset = (p: DesignPreset) => {
+    // ★ 只在「從無效果 → 套第一個效果」時拍快照，保住使用者原本的設定
+    if (activeDesignPreset === null) {
+      setDesignSnapshot({
+        textColor, gradientEnabled, gradientType, gradientAngle,
+        gradientColor1, gradientColor2, textFillTransparent,
+        textStrokeEnabled, textStrokeWidth, textStrokeColor,
+        effectShadow, textHighlightColor, textShadowEnabled, effectAnimate,
+      });
+    }
     // 清掉舊的組合預設與單一陰影，避免互相干擾
     setCombinedPresets([]);
     setCombinedShadows([]);
@@ -872,23 +912,54 @@ export default function Home() {
     // 多層陰影 / 螢光筆
     setEffectShadow(p.shadow || "");
     setTextHighlightColor(p.highlight || "");
+    setEffectAnimate(p.animate || null);
     setActiveDesignPreset(p.name);
     toast.success(`已套用「${p.label}」`);
   };
 
   // 清除設計文字效果
   const clearDesignPreset = () => {
-    setGradientEnabled(false);
-    setTextFillTransparent(false);
-    setTextStrokeEnabled(false);
-    setEffectShadow("");
-    setTextHighlightColor("");
+    const s = designSnapshot;
+    if (s) {
+      // ★ 還原使用者原本的設定（顏色 / 漸層 / 描邊 / 陰影都回來）
+      setTextColor(s.textColor);
+      setGradientEnabled(s.gradientEnabled);
+      setGradientType(s.gradientType);
+      setGradientAngle(s.gradientAngle);
+      setGradientColor1(s.gradientColor1);
+      setGradientColor2(s.gradientColor2);
+      setTextFillTransparent(s.textFillTransparent);
+      setTextStrokeEnabled(s.textStrokeEnabled);
+      setTextStrokeWidth(s.textStrokeWidth);
+      setTextStrokeColor(s.textStrokeColor);
+      setEffectShadow(s.effectShadow);
+      setTextHighlightColor(s.textHighlightColor);
+      setTextShadowEnabled(s.textShadowEnabled);
+      setEffectAnimate(s.effectAnimate ?? null);
+      setDesignSnapshot(null);
+    } else {
+      setGradientEnabled(false);
+      setTextFillTransparent(false);
+      setTextStrokeEnabled(false);
+      setEffectShadow("");
+      setTextHighlightColor("");
+      setEffectAnimate(null);
+    }
     setActiveDesignPreset(null);
-    toast.success("已清除設計效果");
+    toast.success("已清除效果，原本設定已還原");
   };
 
   // 套用一個「設計按鈕效果」預設（整顆按鈕外觀覆蓋）
   const applyButtonPreset = (p: ButtonPreset) => {
+    // ★ 第一次套用前先快照按鈕原本外觀
+    if (activeButtonPreset === null) {
+      setBtnSnapshot({
+        btnBoxShadow, btnBackdropBlur, bgUseGradient, bgGradColor1, bgGradColor2,
+        bgGradAngle, btnBgColor, btnOpacity, btnBorderMode, btnBorderWidth,
+        btnBorderColor, btnBorderStyle, btnBorderRadius, btnPaddingX, btnPaddingY,
+        btnWidth, btnHeight, btnBorderGlowEnabled, textColor,
+      });
+    }
     // 背景
     if (p.grad) {
       setBgUseGradient(true);
@@ -922,6 +993,7 @@ export default function Home() {
     setTextHighlightColor("");
     setEffectShadow("");
     setTextStrokeEnabled(false);
+    setEffectAnimate(null);
     setActiveDesignPreset(null);
     setTextColor(p.textColor);
     setActiveButtonPreset(p.name);
@@ -930,28 +1002,53 @@ export default function Home() {
 
   // 清除設計按鈕效果
   const clearButtonPreset = () => {
-    // 完整還原按鈕外觀為預設(背景/文字色/圓角/內距/邊框/陰影/透明度都回到初始值)
-    setBtnBoxShadow("");
-    setBtnBackdropBlur(0);
-    setBgUseGradient(false);
-    setBgGradColor1("#3498db");
-    setBgGradColor2("#2980b9");
-    setBgGradAngle(90);
-    setBtnBgColor("#3498db");
-    setBtnOpacity(100);
-    setBtnBorderMode("unified");
-    setBtnBorderWidth(0);
-    setBtnBorderColor("#000000");
-    setBtnBorderStyle("solid");
-    setBtnBorderRadius(8);
-    setBtnPaddingX(24);
-    setBtnPaddingY(12);
-    setBtnWidth("auto");
-    setBtnHeight("auto");
-    setBtnBorderGlowEnabled(false);
-    setTextColor("#111827");
+    const s = btnSnapshot;
+    if (s) {
+      // ★ 還原使用者套效果前的按鈕外觀（而不是重設成出廠值）
+      setBtnBoxShadow(s.btnBoxShadow);
+      setBtnBackdropBlur(s.btnBackdropBlur);
+      setBgUseGradient(s.bgUseGradient);
+      setBgGradColor1(s.bgGradColor1);
+      setBgGradColor2(s.bgGradColor2);
+      setBgGradAngle(s.bgGradAngle);
+      setBtnBgColor(s.btnBgColor);
+      setBtnOpacity(s.btnOpacity);
+      setBtnBorderMode(s.btnBorderMode);
+      setBtnBorderWidth(s.btnBorderWidth);
+      setBtnBorderColor(s.btnBorderColor);
+      setBtnBorderStyle(s.btnBorderStyle);
+      setBtnBorderRadius(s.btnBorderRadius);
+      setBtnPaddingX(s.btnPaddingX);
+      setBtnPaddingY(s.btnPaddingY);
+      setBtnWidth(s.btnWidth);
+      setBtnHeight(s.btnHeight);
+      setBtnBorderGlowEnabled(s.btnBorderGlowEnabled);
+      setTextColor(s.textColor);
+      setBtnSnapshot(null);
+    } else {
+      // 沒快照才回到出廠預設
+      setBtnBoxShadow("");
+      setBtnBackdropBlur(0);
+      setBgUseGradient(false);
+      setBgGradColor1("#3498db");
+      setBgGradColor2("#2980b9");
+      setBgGradAngle(90);
+      setBtnBgColor("#3498db");
+      setBtnOpacity(100);
+      setBtnBorderMode("unified");
+      setBtnBorderWidth(0);
+      setBtnBorderColor("#000000");
+      setBtnBorderStyle("solid");
+      setBtnBorderRadius(8);
+      setBtnPaddingX(24);
+      setBtnPaddingY(12);
+      setBtnWidth("auto");
+      setBtnHeight("auto");
+      setBtnBorderGlowEnabled(false);
+      setTextColor("#111827");
+    }
     setActiveButtonPreset(null);
-    toast.success("已清除按鈕效果");
+    toast.success("已清除按鈕效果，原本設定已還原");
   };
 
   // 套預設時把卡片外框控制重設回預設值（盒模型回原始寫死值、邊框/背景/陰影關閉、清空覆蓋）
@@ -971,6 +1068,14 @@ export default function Home() {
 
   // 套用 / 清除設計卡片效果
   const applyCardPreset = (p: CardPreset) => {
+    // ★ 第一次套用前先快照卡片原本外觀
+    if (activeCardPreset === null) {
+      setCardSnapshot({
+        cardStyle, cardTextColor, cardOverride, cardPadX, cardPadY, cardRadius,
+        cardWidth, cardHeight, cardBorderEnabled, cardBorderMode,
+        cardBorderGlowEnabled, cardBgEnabled, cardShadowEnabled,
+      });
+    }
     setCardStyle(p.style);
     setCardTextColor(p.textColor);
     setActiveCardPreset(p.name);
@@ -978,21 +1083,50 @@ export default function Home() {
     toast.success(`已套用「${p.label}」`);
   };
   const clearCardPreset = () => {
-    setCardStyle(CARD_PRESETS[0].style);
-    setCardTextColor(CARD_PRESETS[0].textColor);
+    const s = cardSnapshot;
+    if (s) {
+      // ★ 還原使用者套效果前的卡片外觀
+      setCardStyle(s.cardStyle);
+      setCardTextColor(s.cardTextColor);
+      setCardOverride(s.cardOverride);
+      setCardPadX(s.cardPadX);
+      setCardPadY(s.cardPadY);
+      setCardRadius(s.cardRadius);
+      setCardWidth(s.cardWidth);
+      setCardHeight(s.cardHeight);
+      setCardBorderEnabled(s.cardBorderEnabled);
+      setCardBorderMode(s.cardBorderMode);
+      setCardBorderGlowEnabled(s.cardBorderGlowEnabled);
+      setCardBgEnabled(s.cardBgEnabled);
+      setCardShadowEnabled(s.cardShadowEnabled);
+      setCardSnapshot(null);
+    } else {
+      setCardStyle(CARD_PRESETS[0].style);
+      setCardTextColor(CARD_PRESETS[0].textColor);
+      resetCardOverride();
+    }
     setActiveCardPreset(null);
-    resetCardOverride();
-    toast.success("已清除卡片效果");
+    toast.success("已清除卡片效果，原本設定已還原");
   };
 
   // 套用 / 清除設計滑桿效果
   const applySliderPreset = (p: SliderPreset) => {
+    if (activeSliderPreset === null) {
+      setSliderSnapshot({ sliderTrack, sliderFill, sliderThumb });
+    }
     setSliderTrack(p.track); setSliderFill(p.fill); setSliderThumb(p.thumb); setActiveSliderPreset(p.name);
     toast.success(`已套用「${p.label}」`);
   };
   const clearSliderPreset = () => {
-    setSliderTrack(SLIDER_PRESETS[0].track); setSliderFill(SLIDER_PRESETS[0].fill); setSliderThumb(SLIDER_PRESETS[0].thumb); setActiveSliderPreset(null);
-    toast.success("已清除滑桿效果");
+    const s = sliderSnapshot;
+    if (s) {
+      setSliderTrack(s.sliderTrack); setSliderFill(s.sliderFill); setSliderThumb(s.sliderThumb);
+      setSliderSnapshot(null);
+    } else {
+      setSliderTrack(SLIDER_PRESETS[0].track); setSliderFill(SLIDER_PRESETS[0].fill); setSliderThumb(SLIDER_PRESETS[0].thumb);
+    }
+    setActiveSliderPreset(null);
+    toast.success("已清除滑桿效果，原本設定已還原");
   };
 
   // 新增對比字型
@@ -1461,6 +1595,10 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
       (style as any).WebkitBackgroundClip = "text";
       (style as any).WebkitTextFillColor = "transparent";
       style.backgroundClip = "text" as any;
+      if (effectAnimate === "shimmer") {
+        (style as any).backgroundSize = "220% auto";
+        style.animation = "pvShimmer 5s linear infinite";
+      }
     } else if (textHighlightColor) {
       style.color = textColor;
       style.background = `linear-gradient(transparent 55%, ${textHighlightColor} 55%)`;
@@ -1658,7 +1796,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     textShadowEnabled: setTextShadowEnabled, textShadowX: setTextShadowX, textShadowY: setTextShadowY, textShadowBlur: setTextShadowBlur, textShadowColor: setTextShadowColor, textShadowOpacity: setTextShadowOpacity,
     textStrokeEnabled: setTextStrokeEnabled, textStrokeWidth: setTextStrokeWidth, textStrokeColor: setTextStrokeColor,
     gradientEnabled: setGradientEnabled, gradientType: setGradientType, gradientAngle: setGradientAngle, gradientColor1: setGradientColor1, gradientColor2: setGradientColor2,
-    textFillTransparent: setTextFillTransparent, textHighlightColor: setTextHighlightColor, effectShadow: setEffectShadow, activeDesignPreset: setActiveDesignPreset,
+    textFillTransparent: setTextFillTransparent, textHighlightColor: setTextHighlightColor, effectShadow: setEffectShadow, effectAnimate: setEffectAnimate, activeDesignPreset: setActiveDesignPreset,
     combinedPresets: setCombinedPresets, combinedShadows: setCombinedShadows, activePreset: setActivePreset,
     cardStyle: setCardStyle, cardTextColor: setCardTextColor, activeCardPreset: setActiveCardPreset, cardOverride: setCardOverride, cardPadX: setCardPadX, cardPadY: setCardPadY, cardRadius: setCardRadius, cardWidth: setCardWidth, cardHeight: setCardHeight, cardBorderEnabled: setCardBorderEnabled, cardBorderMode: setCardBorderMode, cardBorderWidth: setCardBorderWidth, cardBorderTopWidth: setCardBorderTopWidth, cardBorderRightWidth: setCardBorderRightWidth, cardBorderBottomWidth: setCardBorderBottomWidth, cardBorderLeftWidth: setCardBorderLeftWidth, cardBorderColor: setCardBorderColor, cardBorderStyle: setCardBorderStyle, cardBorderGlowEnabled: setCardBorderGlowEnabled, cardBorderGlowColor: setCardBorderGlowColor, cardBorderGlowBlur: setCardBorderGlowBlur, cardBgEnabled: setCardBgEnabled, cardBgColor: setCardBgColor, cardBgUseGradient: setCardBgUseGradient, cardBgGradColor1: setCardBgGradColor1, cardBgGradColor2: setCardBgGradColor2, cardBgGradAngle: setCardBgGradAngle, cardShadowEnabled: setCardShadowEnabled, cardShadow: setCardShadow,
     cardRotate: setCardRotate, cardSkewX: setCardSkewX, cardSkewY: setCardSkewY, cardScaleX: setCardScaleX, cardPerspective: setCardPerspective, cardRotateX: setCardRotateX, cardRotateY: setCardRotateY,
@@ -1677,7 +1815,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     textShadowEnabled, textShadowX, textShadowY, textShadowBlur, textShadowColor, textShadowOpacity,
     textStrokeEnabled, textStrokeWidth, textStrokeColor,
     gradientEnabled, gradientType, gradientAngle, gradientColor1, gradientColor2,
-    textFillTransparent, textHighlightColor, effectShadow, activeDesignPreset,
+    textFillTransparent, textHighlightColor, effectShadow, effectAnimate, activeDesignPreset,
     combinedPresets, combinedShadows, activePreset,
     cardStyle, cardTextColor, activeCardPreset, cardOverride, cardPadX, cardPadY, cardRadius, cardWidth, cardHeight, cardBorderEnabled, cardBorderMode, cardBorderWidth, cardBorderTopWidth, cardBorderRightWidth, cardBorderBottomWidth, cardBorderLeftWidth, cardBorderColor, cardBorderStyle, cardBorderGlowEnabled, cardBorderGlowColor, cardBorderGlowBlur, cardBgEnabled, cardBgColor, cardBgUseGradient, cardBgGradColor1, cardBgGradColor2, cardBgGradAngle, cardShadowEnabled, cardShadow,
     cardRotate, cardSkewX, cardSkewY, cardScaleX, cardPerspective, cardRotateX, cardRotateY,
@@ -1692,7 +1830,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
   // 不動：選取的字型、預覽文字、自訂範例字、目前所在分頁。
   const RESET_KEYS = {
     common: ["fontSize", "lineHeight", "letterSpacing", "wordSpacing", "fontWeight", "textOpacity", "textColor", "previewBgColor"],
-    text: ["textShadowEnabled", "textShadowX", "textShadowY", "textShadowBlur", "textShadowColor", "textShadowOpacity", "textStrokeEnabled", "textStrokeWidth", "textStrokeColor", "gradientEnabled", "gradientType", "gradientAngle", "gradientColor1", "gradientColor2", "textFillTransparent", "textHighlightColor", "effectShadow", "activeDesignPreset", "combinedPresets", "combinedShadows", "activePreset"],
+    text: ["textShadowEnabled", "textShadowX", "textShadowY", "textShadowBlur", "textShadowColor", "textShadowOpacity", "textStrokeEnabled", "textStrokeWidth", "textStrokeColor", "gradientEnabled", "gradientType", "gradientAngle", "gradientColor1", "gradientColor2", "textFillTransparent", "textHighlightColor", "effectShadow", "effectAnimate", "activeDesignPreset", "combinedPresets", "combinedShadows", "activePreset"],
     button: ["btnPaddingX", "btnPaddingY", "btnBorderRadius", "btnWidth", "btnHeight", "btnBorderMode", "btnBorderWidth", "btnBorderTopWidth", "btnBorderRightWidth", "btnBorderBottomWidth", "btnBorderLeftWidth", "btnBorderColor", "btnBorderStyle", "btnBorderGlowEnabled", "btnBorderGlowColor", "btnBorderGlowBlur", "btnBorderGlowSpread", "btnBgColor", "bgUseGradient", "bgGradColor1", "bgGradColor2", "bgGradAngle", "btnHoverBgColor", "btnHoverScale", "btnHoverShadow", "btnHoverShadowEnabled", "btnTransitionDuration", "btnTransitionTiming", "btnFocusBgColor", "btnFocusBorderColor", "btnFocusBorderWidth", "btnFocusOutlineEnabled", "btnFocusOutlineColor", "btnFocusOutlineWidth", "btnFocusShadow", "btnFocusShadowEnabled", "btnDisabledOpacity", "btnDisabledCursor", "btnDisabledEnabled", "btnOpacity", "btnBoxShadow", "btnBackdropBlur", "activeButtonPreset"],
     card: ["cardStyle", "cardTextColor", "activeCardPreset", "cardOverride", "cardPadX", "cardPadY", "cardRadius", "cardWidth", "cardHeight", "cardBorderEnabled", "cardBorderMode", "cardBorderWidth", "cardBorderTopWidth", "cardBorderRightWidth", "cardBorderBottomWidth", "cardBorderLeftWidth", "cardBorderColor", "cardBorderStyle", "cardBorderGlowEnabled", "cardBorderGlowColor", "cardBorderGlowBlur", "cardBgEnabled", "cardBgColor", "cardBgUseGradient", "cardBgGradColor1", "cardBgGradColor2", "cardBgGradAngle", "cardShadowEnabled", "cardShadow", "cardRotate", "cardSkewX", "cardSkewY", "cardScaleX", "cardPerspective", "cardRotateX", "cardRotateY"],
     slider: ["sliderTrack", "sliderFill", "sliderThumb", "activeSliderPreset"],
@@ -1860,6 +1998,64 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     : previewMode === "button" ? { list: BUTTON_PRESETS, active: activeButtonPreset, apply: applyButtonPreset, clear: clearButtonPreset }
     : previewMode === "card" ? { list: CARD_PRESETS, active: activeCardPreset, apply: applyCardPreset, clear: clearCardPreset }
     : { list: SLIDER_PRESETS, active: activeSliderPreset, apply: applySliderPreset, clear: clearSliderPreset };
+
+  // ── 把各類 preset 轉成「按鈕內的效果預覽樣本」 ──
+  const designPv = (p: DesignPreset): React.CSSProperties => {
+    const s: React.CSSProperties = { fontWeight: 800, lineHeight: 1 };
+    if (p.gradient) {
+      const g = p.gradient;
+      s.backgroundImage = g.type === "radial"
+        ? `radial-gradient(circle, ${g.c1}, ${g.c2})`
+        : `linear-gradient(${g.angle}deg, ${g.c1}, ${g.c2})`;
+      (s as any).WebkitBackgroundClip = "text"; s.backgroundClip = "text" as any;
+      (s as any).WebkitTextFillColor = "transparent"; s.color = "transparent";
+      if (p.animate === "shimmer") { (s as any).backgroundSize = "220% auto"; s.animation = "pvShimmer 5s linear infinite"; }
+    } else if (p.highlight) {
+      s.color = p.color || "#1f2937";
+      s.backgroundImage = `linear-gradient(transparent 58%, ${p.highlight} 58%)`;
+      s.padding = "0 3px";
+    } else if (p.color) { s.color = p.color; }
+    if (p.fillTransparent) { (s as any).WebkitTextFillColor = "transparent"; s.color = "transparent"; }
+    if (p.stroke) (s as any).WebkitTextStroke = `${p.stroke.width}px ${p.stroke.color}`;
+    if (p.shadow) s.textShadow = p.shadow;
+    return s;
+  };
+  const effectPv = (p: TextEffectPreset): React.CSSProperties => {
+    const s: React.CSSProperties = { fontWeight: 800, lineHeight: 1, color: "#eef2f6" };
+    if (p.shadowEnabled) {
+      const r = hexToRgb(p.shadowColor);
+      s.textShadow = `${p.shadowX}px ${p.shadowY}px ${p.shadowBlur}px rgba(${r.r}, ${r.g}, ${r.b}, ${p.shadowOpacity})`;
+    }
+    if (p.strokeEnabled) (s as any).WebkitTextStroke = `${p.strokeWidth}px ${p.strokeColor}`;
+    return s;
+  };
+  const buttonPv = (p: ButtonPreset): React.CSSProperties => {
+    const s: React.CSSProperties = {
+      borderRadius: Math.min(p.radius, 14), color: p.textColor, fontWeight: 700,
+      padding: "5px 12px", fontSize: 13, lineHeight: 1.1, display: "inline-flex", alignItems: "center",
+      background: p.grad ? `linear-gradient(${p.grad.angle}deg, ${p.grad.c1}, ${p.grad.c2})` : (p.bg || "#3498db"),
+    };
+    if (p.border) s.border = `${p.border.width}px solid ${p.border.color}`;
+    if (p.boxShadow) s.boxShadow = p.boxShadow;
+    if (p.backdropBlur) { (s as any).backdropFilter = `blur(${p.backdropBlur}px)`; (s as any).WebkitBackdropFilter = `blur(${p.backdropBlur}px)`; }
+    return s;
+  };
+  const cardPv = (p: CardPreset): React.CSSProperties => ({
+    ...p.style, color: p.textColor, fontWeight: 700, fontSize: 12, padding: "8px 14px",
+    display: "inline-flex", alignItems: "center", lineHeight: 1.1,
+  });
+  const renderPresetSample = (p: any) => {
+    if (previewMode === "button") return <span style={buttonPv(p)}>Aa</span>;
+    if (previewMode === "card") return <span style={cardPv(p)}>Aa</span>;
+    if (previewMode === "slider") return (
+      <span className="mini-slider">
+        <span className="ms-track" style={p.track}><span className="ms-fill" style={{ ...p.fill, width: "55%" }} /></span>
+        <span className="ms-thumb" style={{ ...p.thumb, width: 14, height: 14 }} />
+      </span>
+    );
+    return <span style={designPv(p)}>Aa</span>;
+  };
+
   const modeCN = previewMode === "text" ? "純文字" : previewMode === "button" ? "按鈕" : previewMode === "card" ? "卡片" : "滑桿";
   const modeTag = previewMode === "text" ? "Text" : previewMode === "button" ? "Button" : previewMode === "card" ? "Card" : "Slider";
   const modeInputLabel = previewMode === "text" ? "預覽文字" : previewMode === "card" ? "卡片標題文字" : previewMode === "slider" ? "滑桿說明文字" : "按鈕文字";
@@ -2525,8 +2721,9 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
             <div className="panel-b">
               <div className="preset-grid">
                 {fxCfg.list.map((p) => (
-                  <button key={`fx-${p.name}`} className={`preset${fxCfg.active === p.name ? " active" : ""}`} onClick={() => fxCfg.apply(p)}>
-                    {p.label}
+                  <button key={`fx-${p.name}`} className={`preset has-pv${fxCfg.active === p.name ? " active" : ""}`} onClick={() => fxCfg.apply(p)}>
+                    <span className="preset-sample">{renderPresetSample(p)}</span>
+                    <span className="preset-name">{p.label}</span>
                     {fxCfg.active === p.name && <Check className="tick" />}
                   </button>
                 ))}
@@ -2545,8 +2742,9 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
             <div className="panel-b">
               <div className="preset-grid q3">
                 {EFFECT_PRESETS.map((preset) => (
-                  <button key={`quick-${preset.name}`} className={`preset${combinedPresets.includes(preset.name) ? " active" : ""}`} onClick={() => toggleCombinedPreset(preset.name)}>
-                    {preset.label}
+                  <button key={`quick-${preset.name}`} className={`preset has-pv${combinedPresets.includes(preset.name) ? " active" : ""}`} onClick={() => toggleCombinedPreset(preset.name)}>
+                    <span className="preset-sample"><span style={effectPv(preset)}>Aa</span></span>
+                    <span className="preset-name">{preset.label}</span>
                     {combinedPresets.includes(preset.name) && <Check className="tick" />}
                   </button>
                 ))}
@@ -2579,7 +2777,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
         <aside className="col">
           <section className="panel">
             <div className="mode-tabs">
-              {(["text", "button", "card", "slider"] as const).map((m) => (
+              {(["text", "button", "card"] as const).map((m) => (
                 <button key={m} className={`mode-tab${previewMode === m ? " active" : ""}`} onClick={() => setPreviewMode(m)}>
                   {m === "text" ? "純文字" : m === "button" ? "按鈕" : m === "card" ? "卡片" : "滑桿"}
                 </button>

@@ -123,6 +123,17 @@ input,select{ font-family:inherit; }
 .preset:hover{ transform:translateY(-1px); background:rgba(255,255,255,.12); box-shadow:0 1px 0 var(--glass-hi) inset, 0 8px 18px rgba(0,0,0,.28); }
 .preset.active{ color:#fff; border-color:transparent; background:linear-gradient(140deg, var(--accent-2), var(--accent-d)); box-shadow:0 1px 0 rgba(255,255,255,.35) inset, 0 8px 18px var(--accent-glow); }
 .preset .tick{ position:absolute; top:5px; right:5px; width:11px; height:11px; }
+/* 效果預覽按鈕：上面放套了效果的樣本，下面放名稱 */
+.preset.has-pv{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:7px; padding:11px 8px 9px; min-height:66px; }
+.preset.has-pv .preset-sample{ display:flex; align-items:center; justify-content:center; min-height:28px; max-width:100%; overflow:hidden; font-size:21px; }
+.preset.has-pv .preset-name{ font-size:11px; font-weight:650; opacity:.9; line-height:1; }
+.preset.has-pv.active .preset-name{ color:#fff; opacity:1; }
+.mini-slider{ position:relative; width:84px; height:22px; display:flex; align-items:center; }
+.mini-slider .ms-track{ position:relative; display:block; width:100%; }
+.mini-slider .ms-fill{ position:absolute; left:0; top:0; bottom:0; border-radius:inherit; }
+.mini-slider .ms-thumb{ position:absolute; left:52%; top:50%; transform:translate(-50%,-50%); border-radius:50%; }
+/* 流光漸層動畫（文字效果） */
+@keyframes pvShimmer{ to{ background-position:-220% center; } }
 .count-pill{ font:700 11px/1 var(--mono); color:#fff; background:linear-gradient(140deg,var(--accent-2),var(--accent-d)); padding:5px 9px; border-radius:8px; box-shadow:0 4px 10px var(--accent-glow); }
 
 /* ============ center preview ============ */
@@ -156,7 +167,7 @@ input,select{ font-family:inherit; }
 
 /* ============ unified inspector ============ */
 #inspectorScope{ }
-.ctl-cols{ padding:14px 16px 18px; column-count:3; column-gap:13px; position:relative; z-index:1; }
+.ctl-cols{ padding:14px 16px 18px; column-width:300px; column-gap:13px; position:relative; z-index:1; }
 .ctl-card{ break-inside:avoid; -webkit-column-break-inside:avoid; page-break-inside:avoid; display:block; margin:0 0 13px; border:1px solid var(--glass-line); border-radius:var(--r-md); background:var(--glass-2); box-shadow:var(--shadow-card); overflow:hidden; }
 .ctl-card.inactive{ opacity:.62; background:var(--glass-4); }
 .cc-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:11px 13px; }
