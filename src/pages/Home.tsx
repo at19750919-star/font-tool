@@ -401,6 +401,19 @@ function GalCard({
         {cn && <span className="g-cn">{cn}</span>}
       </div>
       <div className="g-sample" style={{ fontFamily: value }}>{sample}</div>
+      <span
+        className="g-copy"
+        role="button"
+        aria-label="複製字型名稱"
+        title="複製字型名稱"
+        onClick={(e) => {
+          e.stopPropagation();
+          navigator.clipboard.writeText(name);
+          toast.success(`已複製「${name}」`);
+        }}
+      >
+        <Copy size={14} />
+      </span>
       {onDelete && (
         <span
           className="g-del"
@@ -595,6 +608,15 @@ export default function Home() {
   // ── 卡片 tilt ──
   const [cardTiltEnabled, setCardTiltEnabled] = useState(false);
   const [cardTiltIntensity, setCardTiltIntensity] = useState(15);
+
+  // ── 卡片外框「靜態變形」(固定擺好角度，與滑鼠 Tilt 互動狀態無關) ──
+  const [cardRotate, setCardRotate] = useState(0);
+  const [cardSkewX, setCardSkewX] = useState(0);
+  const [cardSkewY, setCardSkewY] = useState(0);
+  const [cardScaleX, setCardScaleX] = useState(1);
+  const [cardPerspective, setCardPerspective] = useState(0);
+  const [cardRotateX, setCardRotateX] = useState(0);
+  const [cardRotateY, setCardRotateY] = useState(0);
 
   // 設計按鈕效果用的額外狀態
   const [btnBoxShadow, setBtnBoxShadow] = useState(""); // 整顆按鈕的 box-shadow（"" = 用發光邊框設定）
@@ -1129,6 +1151,17 @@ export default function Home() {
     return parts.length ? parts.join(" ") : "none";
   };
 
+  // ── 卡片外框靜態變形字串（與 buildTransform 同邏輯，作用在卡片外框上）──
+  const buildCardTransform = (): string => {
+    const parts: string[] = [];
+    if (cardPerspective > 0) return `perspective(${cardPerspective}px) rotateX(${cardRotateX}deg) rotateY(${cardRotateY}deg) rotate(${cardRotate}deg) skewX(${cardSkewX}deg) skewY(${cardSkewY}deg) scaleX(${cardScaleX})`;
+    if (cardRotate !== 0) parts.push(`rotate(${cardRotate}deg)`);
+    if (cardSkewX !== 0) parts.push(`skewX(${cardSkewX}deg)`);
+    if (cardSkewY !== 0) parts.push(`skewY(${cardSkewY}deg)`);
+    if (cardScaleX !== 1) parts.push(`scaleX(${cardScaleX})`);
+    return parts.length ? parts.join(" ") : "none";
+  };
+
   const cssCode = useMemo(() => {
     const effectiveFontWeight = fontVariationEnabled && fontAxisWeight != null ? fontAxisWeight : fontWeight;
     // 文字樣式片段（純文字模式直接用；按鈕模式包進 .button > span）
@@ -1628,6 +1661,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     textFillTransparent: setTextFillTransparent, textHighlightColor: setTextHighlightColor, effectShadow: setEffectShadow, activeDesignPreset: setActiveDesignPreset,
     combinedPresets: setCombinedPresets, combinedShadows: setCombinedShadows, activePreset: setActivePreset,
     cardStyle: setCardStyle, cardTextColor: setCardTextColor, activeCardPreset: setActiveCardPreset, cardOverride: setCardOverride, cardPadX: setCardPadX, cardPadY: setCardPadY, cardRadius: setCardRadius, cardWidth: setCardWidth, cardHeight: setCardHeight, cardBorderEnabled: setCardBorderEnabled, cardBorderMode: setCardBorderMode, cardBorderWidth: setCardBorderWidth, cardBorderTopWidth: setCardBorderTopWidth, cardBorderRightWidth: setCardBorderRightWidth, cardBorderBottomWidth: setCardBorderBottomWidth, cardBorderLeftWidth: setCardBorderLeftWidth, cardBorderColor: setCardBorderColor, cardBorderStyle: setCardBorderStyle, cardBorderGlowEnabled: setCardBorderGlowEnabled, cardBorderGlowColor: setCardBorderGlowColor, cardBorderGlowBlur: setCardBorderGlowBlur, cardBgEnabled: setCardBgEnabled, cardBgColor: setCardBgColor, cardBgUseGradient: setCardBgUseGradient, cardBgGradColor1: setCardBgGradColor1, cardBgGradColor2: setCardBgGradColor2, cardBgGradAngle: setCardBgGradAngle, cardShadowEnabled: setCardShadowEnabled, cardShadow: setCardShadow,
+    cardRotate: setCardRotate, cardSkewX: setCardSkewX, cardSkewY: setCardSkewY, cardScaleX: setCardScaleX, cardPerspective: setCardPerspective, cardRotateX: setCardRotateX, cardRotateY: setCardRotateY,
     sliderTrack: setSliderTrack, sliderFill: setSliderFill, sliderThumb: setSliderThumb, activeSliderPreset: setActiveSliderPreset,
   };
   const collectState = () => ({
@@ -1646,9 +1680,30 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     textFillTransparent, textHighlightColor, effectShadow, activeDesignPreset,
     combinedPresets, combinedShadows, activePreset,
     cardStyle, cardTextColor, activeCardPreset, cardOverride, cardPadX, cardPadY, cardRadius, cardWidth, cardHeight, cardBorderEnabled, cardBorderMode, cardBorderWidth, cardBorderTopWidth, cardBorderRightWidth, cardBorderBottomWidth, cardBorderLeftWidth, cardBorderColor, cardBorderStyle, cardBorderGlowEnabled, cardBorderGlowColor, cardBorderGlowBlur, cardBgEnabled, cardBgColor, cardBgUseGradient, cardBgGradColor1, cardBgGradColor2, cardBgGradAngle, cardShadowEnabled, cardShadow,
+    cardRotate, cardSkewX, cardSkewY, cardScaleX, cardPerspective, cardRotateX, cardRotateY,
     sliderTrack, sliderFill, sliderThumb, activeSliderPreset,
   });
   const applyState = (s: any) => { if (!s || typeof s !== "object") return; Object.keys(styleSetters).forEach((k) => { if (k in s) styleSetters[k](s[k]); }); };
+
+  // 第一次 render(在還原 localStorage 之前)就抓一份預設狀態快照，當作「清除 / 回預設」的基準
+  const defaultStateRef = useRef<any>(null);
+  if (defaultStateRef.current === null) defaultStateRef.current = collectState();
+  // 清除分頁時要還原的狀態鍵，依分頁分組。共用排版(typo)那組四個分頁都會還原；
+  // 不動：選取的字型、預覽文字、自訂範例字、目前所在分頁。
+  const RESET_KEYS = {
+    common: ["fontSize", "lineHeight", "letterSpacing", "wordSpacing", "fontWeight", "textOpacity", "textColor", "previewBgColor"],
+    text: ["textShadowEnabled", "textShadowX", "textShadowY", "textShadowBlur", "textShadowColor", "textShadowOpacity", "textStrokeEnabled", "textStrokeWidth", "textStrokeColor", "gradientEnabled", "gradientType", "gradientAngle", "gradientColor1", "gradientColor2", "textFillTransparent", "textHighlightColor", "effectShadow", "activeDesignPreset", "combinedPresets", "combinedShadows", "activePreset"],
+    button: ["btnPaddingX", "btnPaddingY", "btnBorderRadius", "btnWidth", "btnHeight", "btnBorderMode", "btnBorderWidth", "btnBorderTopWidth", "btnBorderRightWidth", "btnBorderBottomWidth", "btnBorderLeftWidth", "btnBorderColor", "btnBorderStyle", "btnBorderGlowEnabled", "btnBorderGlowColor", "btnBorderGlowBlur", "btnBorderGlowSpread", "btnBgColor", "bgUseGradient", "bgGradColor1", "bgGradColor2", "bgGradAngle", "btnHoverBgColor", "btnHoverScale", "btnHoverShadow", "btnHoverShadowEnabled", "btnTransitionDuration", "btnTransitionTiming", "btnFocusBgColor", "btnFocusBorderColor", "btnFocusBorderWidth", "btnFocusOutlineEnabled", "btnFocusOutlineColor", "btnFocusOutlineWidth", "btnFocusShadow", "btnFocusShadowEnabled", "btnDisabledOpacity", "btnDisabledCursor", "btnDisabledEnabled", "btnOpacity", "btnBoxShadow", "btnBackdropBlur", "activeButtonPreset"],
+    card: ["cardStyle", "cardTextColor", "activeCardPreset", "cardOverride", "cardPadX", "cardPadY", "cardRadius", "cardWidth", "cardHeight", "cardBorderEnabled", "cardBorderMode", "cardBorderWidth", "cardBorderTopWidth", "cardBorderRightWidth", "cardBorderBottomWidth", "cardBorderLeftWidth", "cardBorderColor", "cardBorderStyle", "cardBorderGlowEnabled", "cardBorderGlowColor", "cardBorderGlowBlur", "cardBgEnabled", "cardBgColor", "cardBgUseGradient", "cardBgGradColor1", "cardBgGradColor2", "cardBgGradAngle", "cardShadowEnabled", "cardShadow", "cardRotate", "cardSkewX", "cardSkewY", "cardScaleX", "cardPerspective", "cardRotateX", "cardRotateY"],
+    slider: ["sliderTrack", "sliderFill", "sliderThumb", "activeSliderPreset"],
+  } as const;
+  // 只清除目前所在分頁(加上共用排版)的設定，其他分頁不動
+  const resetToDefault = () => {
+    const d = defaultStateRef.current;
+    const keys = [...RESET_KEYS.common, ...RESET_KEYS[previewMode as keyof typeof RESET_KEYS]];
+    keys.forEach((k) => { if (k in styleSetters && k in d) styleSetters[k](d[k]); });
+    toast.success(`已清除「${modeCN}」分頁，回到預設`);
+  };
 
   const restoredRef = useRef(false);
   useEffect(() => {
@@ -2100,7 +2155,21 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
         {cardShadowEnabled && strRow(cardShadow, setCardShadow)}
       </>
     )));
-    cards.push(ctlCard("cbox-tilt", "外框", "傾斜 Tilt", togBtn(cardTiltEnabled, () => setCardTiltEnabled(!cardTiltEnabled), true), cardTiltEnabled ? (
+    // 外框靜態變形（固定擺好角度，與滑鼠互動無關）
+    cards.push(ctlCard("cbox-transform", "外框", "變形", null, (
+      <>
+        {sRow("旋轉", cardRotate, -180, 180, 1, (v) => setCardRotate(v), `${cardRotate}°`)}
+        {sRow("傾斜 X", cardSkewX, -30, 30, 1, (v) => setCardSkewX(v), `${cardSkewX}°`)}
+        {sRow("傾斜 Y", cardSkewY, -30, 30, 1, (v) => setCardSkewY(v), `${cardSkewY}°`)}
+        {sRow("橫向縮放", Math.round(cardScaleX * 100), 50, 200, 5, (v) => setCardScaleX(v / 100), `${Math.round(cardScaleX * 100)}%`)}
+        <div className="row-line"><span className="lbl sm" style={{fontSize:10,opacity:.7}}>── 3D 透視擠出 ──</span></div>
+        {sRow("透視距離", cardPerspective, 0, 1000, 50, (v) => setCardPerspective(v), cardPerspective === 0 ? "關" : `${cardPerspective}px`)}
+        {cardPerspective > 0 && sRow("旋轉 X 軸", cardRotateX, -60, 60, 1, (v) => setCardRotateX(v), `${cardRotateX}°`)}
+        {cardPerspective > 0 && sRow("旋轉 Y 軸", cardRotateY, -60, 60, 1, (v) => setCardRotateY(v), `${cardRotateY}°`)}
+      </>
+    )));
+    // 互動狀態：滑鼠移上去才出現的懸停效果
+    cards.push(ctlCard("cbox-tilt", "互動狀態", "傾斜 Tilt（懸停）", togBtn(cardTiltEnabled, () => setCardTiltEnabled(!cardTiltEnabled), true), cardTiltEnabled ? (
       sRow("強度", cardTiltIntensity, 1, 40, 1, (v) => setCardTiltIntensity(v), `${cardTiltIntensity}°`)
     ) : null));
   }
@@ -2213,6 +2282,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
   ) : null;
 
   // ============ 中央預覽內容（依模式） ============
+  const cardXform = buildCardTransform();
   const previewContent =
     previewMode === "text" ? (
       <div key={`pv-${fontStamp}`} style={previewStyle} className="preview-text">{previewText}</div>
@@ -2226,15 +2296,16 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
         )}
         <div
           key={`card-${fontStamp}`}
-          style={{ ...cardStyle, ...cardOverrideStyle, position: "relative", minHeight: 130, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, transition: "transform 0.1s ease", mixBlendMode: blendMode !== "normal" ? blendMode as any : undefined }}
+          style={{ ...cardStyle, ...cardOverrideStyle, position: "relative", minHeight: 130, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, transition: "transform 0.1s ease", transform: cardXform, mixBlendMode: blendMode !== "normal" ? blendMode as any : undefined }}
           onMouseMove={cardTiltEnabled ? (e) => {
             const el = e.currentTarget;
             const rect = el.getBoundingClientRect();
             const cx = (e.clientX - rect.left) / rect.width - 0.5;
             const cy = (e.clientY - rect.top) / rect.height - 0.5;
-            el.style.transform = `perspective(600px) rotateY(${cx * cardTiltIntensity}deg) rotateX(${-cy * cardTiltIntensity}deg) scale(1.02)`;
+            // Tilt 互動疊在靜態變形之上：先靜態，再加滑鼠跟隨
+            el.style.transform = `perspective(600px) rotateY(${cx * cardTiltIntensity}deg) rotateX(${-cy * cardTiltIntensity}deg) scale(1.02)${cardXform !== "none" ? " " + cardXform : ""}`;
           } : undefined}
-          onMouseLeave={cardTiltEnabled ? (e) => { e.currentTarget.style.transform = "none"; } : undefined}
+          onMouseLeave={cardTiltEnabled ? (e) => { e.currentTarget.style.transform = cardXform; } : undefined}
         >
           {activeCardPreset === "badges" ? (
             <div className="flex flex-wrap gap-2 justify-center">
@@ -2244,7 +2315,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
             </div>
           ) : (
             <>
-              <div style={{ fontFamily: selectedFont.value, fontWeight: fontWeight, letterSpacing: `${letterSpacing}px`, fontSize: `${Math.min(fontSize, 40)}px`, color: cardTextColor, textAlign: "center", lineHeight: 1.2 }}>{previewText}</div>
+              <div style={{ fontFamily: selectedFont.value, fontWeight: fontWeight, letterSpacing: `${letterSpacing}px`, fontSize: `${Math.min(fontSize, 40)}px`, color: cardTextColor, textAlign: "center", lineHeight: 1.2, whiteSpace: "pre-wrap" }}>{previewText}</div>
               <p style={{ color: cardTextColor, opacity: 0.6, fontSize: 13, margin: 0 }}>副標題文字 · Subtitle</p>
             </>
           )}
@@ -2492,7 +2563,11 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                 <label className="field-label">{modeInputLabel}</label>
                 {previewPos && <button className="dh-reset" onMouseDown={(e) => e.stopPropagation()} onClick={() => setPreviewPos(null)}>歸位</button>}
               </div>
-              <input className="text-input" value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="輸入要預覽的文字" spellCheck={false} />
+              {previewMode === "card" ? (
+                <textarea className="text-input" value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="輸入卡片標題（按 Enter 換行）" spellCheck={false} rows={2} style={{ resize: "vertical", minHeight: 48, lineHeight: 1.4, fontFamily: "inherit" }} />
+              ) : (
+                <input className="text-input" value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="輸入要預覽的文字" spellCheck={false} />
+              )}
             </div>
             <div className="stage" style={{ background: previewBgColor }}>
               {previewContent}
@@ -2515,7 +2590,13 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                 <h2>控制面板</h2>
                 <p className="desc">作用在目前選取的元件 · {modeCN}</p>
               </div>
-              <span className="tag">{modeTag}</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <button className="clear-link" onClick={resetToDefault} title="清除所有效果，回到預設">
+                  <X className="h-3 w-3" />
+                  清除
+                </button>
+                <span className="tag">{modeTag}</span>
+              </span>
             </div>
             <div className="ctl-cols">{cards}</div>
             {interactCard}

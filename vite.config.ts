@@ -150,6 +150,10 @@ function galleryApi() {
 
 export default defineConfig({
   base: "/font-tool/",
+  // preview 工具會用 PORT 環境變數指派埠號;沒有就用 Vite 預設
+  server: {
+    port: process.env.PORT ? Number(process.env.PORT) : undefined,
+  },
   plugins: [react(), tailwindcss(), serveUserFonts(), galleryApi()],
   resolve: {
     alias: {
