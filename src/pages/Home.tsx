@@ -216,7 +216,9 @@ interface DesignPreset {
   stroke?: { width: number; color: string };
   shadow?: string; // 多層 text-shadow 字串
   highlight?: string; // 螢光筆底色
-  animate?: "shimmer"; // 動態效果（流光掃過）
+  animate?: "shimmer" | "rainbow" | "pulse"; // 動態效果（流光 / 彩虹流動 / 霓虹呼吸）
+  accent?: string; // 可換色效果的預設重點色
+  recolor?: (c: string) => { color?: string; shadow?: string; stroke?: { width: number; color: string }; fillTransparent?: boolean }; // 用重點色重算效果
 }
 
 const DESIGN_PRESETS: DesignPreset[] = [
@@ -227,7 +229,7 @@ const DESIGN_PRESETS: DesignPreset[] = [
   // 鍍鉻銀：上白下灰 + 上下金屬邊 + 落地陰影
   { name: "chrome", label: "鍍鉻銀", gradient: { type: "linear", angle: 180, c1: "#ffffff", c2: "#6b7280" }, stroke: { width: 0.5, color: "#4b5563" }, shadow: "0 1px 0 #ffffff, 0 -1px 0 #cbd5e1, 0 3px 5px rgba(0,0,0,.4)" },
   // 霓虹發光：白色核心 + 多層粉光暈
-  { name: "neon", label: "霓虹發光", color: "#ff2db6", shadow: "0 0 2px #ffffff, 0 0 6px #ff2db6, 0 0 14px #ff2db6, 0 0 28px #ff2db6, 0 0 52px #ff2db6" },
+  { name: "neon", label: "霓虹發光", color: "#ff2db6", accent: "#ff2db6", recolor: (c) => ({ color: c, shadow: `0 0 2px #ffffff, 0 0 6px ${c}, 0 0 14px ${c}, 0 0 28px ${c}, 0 0 52px ${c}` }), shadow: "0 0 2px #ffffff, 0 0 6px #ff2db6, 0 0 14px #ff2db6, 0 0 28px #ff2db6, 0 0 52px #ff2db6" },
   // 立體 3D：米白面 + 左上亮邊 + 多層暗面擠出 + 落地陰影
   { name: "extrude3d", label: "立體 3D", color: "#ece3cf", shadow: "-1px -1px 0 #ffffff, 1px 1px 0 #c9bd99, 2px 2px 0 #c0b48f, 3px 3px 0 #b6aa85, 4px 4px 0 #ac9f7a, 5px 5px 0 #a29570, 6px 6px 0 #988b66, 7px 7px 0 #8d815b, 8px 8px 0 #837751, 11px 11px 17px rgba(0,0,0,.38)" },
   // 長陰影：亮面 + 22 層 45° 半透明長陰影
@@ -235,7 +237,7 @@ const DESIGN_PRESETS: DesignPreset[] = [
   // 中空描邊:粗外框 + 透明填色 + 淡位移陰影
   { name: "hollow", label: "中空描邊", fillTransparent: true, stroke: { width: 2.5, color: "#111827" }, shadow: "3px 3px 0 rgba(17,24,39,.12)" },
   // 霓虹中空:粉外框 + 透明填色 + 多層光暈
-  { name: "neonHollow", label: "霓虹中空", fillTransparent: true, stroke: { width: 1.6, color: "#ff2d95" }, shadow: "0 0 6px #ff2d95, 0 0 14px #ff2d95, 0 0 28px #ff2d95" },
+  { name: "neonHollow", label: "霓虹中空", fillTransparent: true, stroke: { width: 1.6, color: "#ff2d95" }, accent: "#ff2d95", recolor: (c) => ({ fillTransparent: true, stroke: { width: 1.6, color: c }, shadow: `0 0 6px ${c}, 0 0 14px ${c}, 0 0 28px ${c}` }), shadow: "0 0 6px #ff2d95, 0 0 14px #ff2d95, 0 0 28px #ff2d95" },
   // 套印錯位:青 / 洋紅雙色錯位
   { name: "misprint", label: "套印錯位", color: "#111827", shadow: "3px 3px 0 #00b4d8, -3px -3px 0 #ff006e" },
   // 故障 glitch:紅藍 RGB 分離
@@ -248,6 +250,10 @@ const DESIGN_PRESETS: DesignPreset[] = [
   { name: "neonGrad", label: "霓虹漸層", gradient: { type: "linear", angle: 100, c1: "#22d3ee", c2: "#c026d3" }, shadow: "0 0 10px rgba(192,38,211,.45)" },
   // 流光漸層:漸層 + 掃光動畫
   { name: "shimmer", label: "流光漸層", gradient: { type: "linear", angle: 100, c1: "#ffffff", c2: "#7c5cff" }, animate: "shimmer" },
+  // 彩虹流動:七彩漸層持續橫向流動
+  { name: "rainbow", label: "彩虹流動", gradient: { type: "linear", angle: 100, c1: "#ff5f6d", c2: "#7c5cff" }, animate: "rainbow" },
+  // 霓虹呼吸:霓虹光暈一明一暗
+  { name: "neonPulse", label: "霓虹呼吸", color: "#22d3ee", accent: "#22d3ee", recolor: (c) => ({ color: c, shadow: `0 0 4px #ffffff, 0 0 10px ${c}, 0 0 22px ${c}, 0 0 40px ${c}` }), shadow: "0 0 4px #ffffff, 0 0 10px #22d3ee, 0 0 22px #22d3ee, 0 0 40px #22d3ee", animate: "pulse" },
 ];
 
 // 設計按鈕效果：一鍵套用整顆按鈕的外觀
@@ -263,6 +269,8 @@ interface ButtonPreset {
   textColor: string;
   px?: number;
   py?: number;
+  accent?: string;
+  recolor?: (c: string) => { bg?: string; borderColor?: string; boxShadow?: string; textColor?: string };
 }
 
 const BUTTON_PRESETS: ButtonPreset[] = [
@@ -270,7 +278,7 @@ const BUTTON_PRESETS: ButtonPreset[] = [
   { name: "gradGlow", label: "漸層光暈", grad: { angle: 95, c1: "#a855f7", c2: "#ec4899" }, radius: 999, boxShadow: "0 10px 28px rgba(168,85,247,0.5)", textColor: "#ffffff", px: 30, py: 14 },
   { name: "neu", label: "新擬態", bg: "#e0e5ec", radius: 16, boxShadow: "8px 8px 16px #b8bcc4, -8px -8px 16px #ffffff", textColor: "#555f6d", px: 28, py: 14 },
   { name: "brutal", label: "neo-brutalism", bg: "#ffde59", radius: 4, border: { width: 2, color: "#111111" }, boxShadow: "5px 5px 0 #111111", textColor: "#111111", px: 26, py: 13 },
-  { name: "neonBorder", label: "霓虹邊框", bg: "#0b0f1a", radius: 10, border: { width: 2, color: "#22d3ee" }, boxShadow: "0 0 8px #22d3ee, 0 0 18px #22d3ee, inset 0 0 8px rgba(34,211,238,0.45)", textColor: "#22d3ee", px: 28, py: 13 },
+  { name: "neonBorder", label: "霓虹邊框", bg: "#0b0f1a", radius: 10, border: { width: 2, color: "#22d3ee" }, boxShadow: "0 0 8px #22d3ee, 0 0 18px #22d3ee, inset 0 0 8px rgba(34,211,238,0.45)", textColor: "#22d3ee", px: 28, py: 13, accent: "#22d3ee", recolor: (c) => ({ bg: "#0b0f1a", borderColor: c, boxShadow: `0 0 8px ${c}, 0 0 18px ${c}, inset 0 0 8px ${c}73`, textColor: c }) },
   { name: "press3d", label: "3D 按下", bg: "#ff7a18", radius: 12, boxShadow: "0 6px 0 #b3530f", textColor: "#ffffff", px: 28, py: 13 },
   { name: "ghost", label: "Ghost 描邊", bg: "transparent", radius: 8, border: { width: 2, color: "#3b82f6" }, textColor: "#3b82f6", px: 26, py: 12 },
   { name: "metal", label: "金屬質感", grad: { angle: 180, c1: "#f7f7f7", c2: "#9aa0a6" }, radius: 8, border: { width: 1, color: "#7c7c7c" }, boxShadow: "inset 0 1px 0 #ffffff, 0 2px 5px rgba(0,0,0,0.35)", textColor: "#2b2f33", px: 28, py: 13 },
@@ -298,11 +306,11 @@ const styleToCss = (style: React.CSSProperties): string =>
     .join(" ");
 
 // 設計卡片效果：一鍵套用整張卡片的外觀（外框 / 樣式）
-interface CardPreset { name: string; label: string; style: React.CSSProperties; textColor: string; badges?: boolean; }
+interface CardPreset { name: string; label: string; style: React.CSSProperties; textColor: string; badges?: boolean; accent?: string; recolor?: (c: string) => React.CSSProperties; }
 
 const CARD_PRESETS: CardPreset[] = [
   { name: "gradBorder", label: "漸層描邊", textColor: "#1f2937", style: { background: "linear-gradient(#fff,#fff) padding-box, linear-gradient(135deg,#a855f7,#ec4899) border-box", border: "3px solid transparent", borderRadius: 16 } },
-  { name: "neonBorder", label: "霓虹外框", textColor: "#22d3ee", style: { background: "#0b0f1a", border: "2px solid #22d3ee", borderRadius: 12, boxShadow: "0 0 10px #22d3ee, 0 0 24px rgba(34,211,238,.5), inset 0 0 12px rgba(34,211,238,.25)" } },
+  { name: "neonBorder", label: "霓虹外框", textColor: "#22d3ee", accent: "#22d3ee", recolor: (c) => ({ background: "#0b0f1a", border: `2px solid ${c}`, borderRadius: 12, boxShadow: `0 0 10px ${c}, 0 0 24px ${c}80, inset 0 0 12px ${c}40` }), style: { background: "#0b0f1a", border: "2px solid #22d3ee", borderRadius: 12, boxShadow: "0 0 10px #22d3ee, 0 0 24px rgba(34,211,238,.5), inset 0 0 12px rgba(34,211,238,.25)" } },
   { name: "doubleLine", label: "復古雙線", textColor: "#6b5b4a", style: { background: "#fdf6e3", border: "4px double #6b5b4a", borderRadius: 6 } },
   { name: "inset", label: "內凹卡片", textColor: "#555f6d", style: { background: "#e8eaed", borderRadius: 14, boxShadow: "inset 6px 6px 12px #c4c7cc, inset -6px -6px 12px #ffffff" } },
   { name: "ticket", label: "票券缺角", textColor: "#1f2937", style: { background: "#ffffff", borderRadius: 10, boxShadow: "0 2px 10px rgba(0,0,0,0.12)", maskImage: "radial-gradient(circle 13px at left center, transparent 12px, #000 13px), radial-gradient(circle 13px at right center, transparent 12px, #000 13px)", WebkitMaskImage: "radial-gradient(circle 13px at left center, transparent 12px, #000 13px), radial-gradient(circle 13px at right center, transparent 12px, #000 13px)", maskComposite: "intersect", WebkitMaskComposite: "source-in" } },
@@ -310,8 +318,12 @@ const CARD_PRESETS: CardPreset[] = [
   { name: "brutal", label: "手繪粗框", textColor: "#111111", style: { background: "#fffef5", border: "2.5px solid #111111", borderRadius: "255px 15px 225px 15px / 15px 225px 15px 255px", boxShadow: "3px 4px 0 rgba(17,17,17,0.85)" } },
   { name: "frosted", label: "毛玻璃", textColor: "#1f2937", style: { background: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.7)", borderRadius: 18, boxShadow: "0 8px 32px rgba(31,38,135,0.15)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" } },
   { name: "liquidGlass", label: "液態玻璃", textColor: "#1f2937", style: { background: "linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15))", border: "1px solid rgba(255,255,255,0.8)", borderRadius: 28, boxShadow: "0 12px 40px rgba(0,0,0,0.18), inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -10px 22px rgba(255,255,255,0.25)", backdropFilter: "blur(14px) saturate(160%)", WebkitBackdropFilter: "blur(14px) saturate(160%)" } },
-  { name: "glowEdge", label: "發光邊框", textColor: "#22d3ee", style: { background: "#0b0f1a", border: "1.5px solid #22d3ee", borderRadius: 14, boxShadow: "0 0 14px rgba(34,211,238,0.6), inset 0 0 14px rgba(34,211,238,0.22)" } },
+  { name: "glowEdge", label: "發光邊框", textColor: "#22d3ee", accent: "#22d3ee", recolor: (c) => ({ background: "#0b0f1a", border: `1.5px solid ${c}`, borderRadius: 14, boxShadow: `0 0 14px ${c}99, inset 0 0 14px ${c}38` }), style: { background: "#0b0f1a", border: "1.5px solid #22d3ee", borderRadius: 14, boxShadow: "0 0 14px rgba(34,211,238,0.6), inset 0 0 14px rgba(34,211,238,0.22)" } },
   { name: "holo", label: "全息漸層", textColor: "#1f2937", style: { background: "linear-gradient(135deg,#a8edea,#fed6e3 55%,#c2b9ff)", borderRadius: 18, boxShadow: "0 12px 30px rgba(124,92,255,0.18)" } },
+  { name: "blackLiquid", label: "黑色液態玻璃", textColor: "#f4f2fa", accent: "#8ab4ff",
+    recolor: (c) => ({ background: "linear-gradient(160deg, rgba(20,20,28,0.55), rgba(10,10,16,0.32))", borderRadius: 26, border: `1px solid ${c}55`, boxShadow: `inset 0 1.5px 1px rgba(255,255,255,0.55), inset 0 -10px 24px rgba(0,0,0,0.5), 0 0 32px -6px ${c}, 0 24px 60px -16px rgba(0,0,0,0.7)`, backdropFilter: "blur(3px) url(#liquidGlass)", WebkitBackdropFilter: "blur(10px)" }),
+    style: { background: "linear-gradient(160deg, rgba(20,20,28,0.55), rgba(10,10,16,0.32))", borderRadius: 26, border: "1px solid rgba(138,180,255,0.33)", boxShadow: "inset 0 1.5px 1px rgba(255,255,255,0.55), inset 0 -10px 24px rgba(0,0,0,0.5), 0 0 32px -6px #8ab4ff, 0 24px 60px -16px rgba(0,0,0,0.7)", backdropFilter: "blur(3px) url(#liquidGlass)", WebkitBackdropFilter: "blur(10px)" } },
+  { name: "none", label: "透明無框", textColor: "#1f2937", style: { background: "transparent", borderRadius: 16 } },
   { name: "neumorph", label: "新擬物", textColor: "#555f6d", style: { background: "#e0e5ec", borderRadius: 20, boxShadow: "9px 9px 18px #b8bcc4, -9px -9px 18px #ffffff" } },
   { name: "clay", label: "黏土擬態", textColor: "#4c1d95", style: { background: "#c9a7ff", borderRadius: 32, boxShadow: "30px 30px 60px rgba(0,0,0,0.22), inset -8px -8px 16px rgba(0,0,0,0.18), inset 8px 10px 22px rgba(255,255,255,0.65)" } },
   { name: "softui", label: "柔感 UI", textColor: "#4b5563", style: { background: "#eef1f6", borderRadius: 20, boxShadow: "6px 6px 14px #d1d6e0, -6px -6px 14px #ffffff" } },
@@ -455,6 +467,8 @@ export default function Home() {
   const [quickSnapshot, setQuickSnapshot] = useState<any>(null);
   const [sliderSnapshot, setSliderSnapshot] = useState<any>(null);
   const [effectAnimate, setEffectAnimate] = useState<string | null>(null); // 文字動態效果（流光）
+  const [designAccent, setDesignAccent] = useState<string>(""); // 文字可換色效果的重點色
+  const [btnAccent, setBtnAccent] = useState<string>(""); // 按鈕可換色效果的重點色
   const [previewBgColor, setPreviewBgColor] = useState("#f9fafb"); // 預覽區（按鈕後面那塊）底色
   const [gallerySample, setGallerySample] = useState("永 國 字體 Aa 123"); // 畫廊中文字型卡片的範例字（可自訂）
   const [copied, setCopied] = useState(false);
@@ -506,6 +520,7 @@ export default function Home() {
   const [btnBorderGlowSpread, setBtnBorderGlowSpread] = useState(0);
   // 背景
   const [btnBgColor, setBtnBgColor] = useState("#3498db");
+  const [btnBgEnabled, setBtnBgEnabled] = useState(true); // 按鈕背景：有 / 無（無 = 透明）
   const [bgUseGradient, setBgUseGradient] = useState(false);
   const [bgGradColor1, setBgGradColor1] = useState("#3498db");
   const [bgGradColor2, setBgGradColor2] = useState("#2980b9");
@@ -651,6 +666,7 @@ export default function Home() {
   // 設計卡片效果用的狀態
   const [cardStyle, setCardStyle] = useState<React.CSSProperties>(CARD_PRESETS[0].style);
   const [cardTextColor, setCardTextColor] = useState<string>(CARD_PRESETS[0].textColor);
+  const [cardAccent, setCardAccent] = useState<string>(""); // 可換色效果的重點色
   const [activeCardPreset, setActiveCardPreset] = useState<string | null>(null);
 
   // 卡片外框手動覆蓋層（疊在卡片預設之上；套預設時清空）
@@ -794,6 +810,7 @@ export default function Home() {
   };
   // 按鈕背景（套用「背景透明度」到背景色的 alpha；文字不受影響）
   const btnBgCss = () => {
+    if (!btnBgEnabled) return "transparent";
     const a = btnOpacity / 100;
     return bgUseGradient
       ? `linear-gradient(${bgGradAngle}deg, ${withAlpha(bgGradColor1, a)}, ${withAlpha(bgGradColor2, a)})`
@@ -880,7 +897,7 @@ export default function Home() {
         textColor, gradientEnabled, gradientType, gradientAngle,
         gradientColor1, gradientColor2, textFillTransparent,
         textStrokeEnabled, textStrokeWidth, textStrokeColor,
-        effectShadow, textHighlightColor, textShadowEnabled, effectAnimate,
+        effectShadow, textHighlightColor, textShadowEnabled, effectAnimate, designAccent,
       });
     }
     // 清掉舊的組合預設與單一陰影，避免互相干擾
@@ -913,6 +930,7 @@ export default function Home() {
     setEffectShadow(p.shadow || "");
     setTextHighlightColor(p.highlight || "");
     setEffectAnimate(p.animate || null);
+    setDesignAccent(p.accent || "");
     setActiveDesignPreset(p.name);
     toast.success(`已套用「${p.label}」`);
   };
@@ -936,6 +954,7 @@ export default function Home() {
       setTextHighlightColor(s.textHighlightColor);
       setTextShadowEnabled(s.textShadowEnabled);
       setEffectAnimate(s.effectAnimate ?? null);
+      setDesignAccent(s.designAccent ?? "");
       setDesignSnapshot(null);
     } else {
       setGradientEnabled(false);
@@ -944,6 +963,7 @@ export default function Home() {
       setEffectShadow("");
       setTextHighlightColor("");
       setEffectAnimate(null);
+      setDesignAccent("");
     }
     setActiveDesignPreset(null);
     toast.success("已清除效果，原本設定已還原");
@@ -955,9 +975,9 @@ export default function Home() {
     if (activeButtonPreset === null) {
       setBtnSnapshot({
         btnBoxShadow, btnBackdropBlur, bgUseGradient, bgGradColor1, bgGradColor2,
-        bgGradAngle, btnBgColor, btnOpacity, btnBorderMode, btnBorderWidth,
+        bgGradAngle, btnBgColor, btnBgEnabled, btnOpacity, btnBorderMode, btnBorderWidth,
         btnBorderColor, btnBorderStyle, btnBorderRadius, btnPaddingX, btnPaddingY,
-        btnWidth, btnHeight, btnBorderGlowEnabled, textColor,
+        btnWidth, btnHeight, btnBorderGlowEnabled, textColor, btnAccent,
       });
     }
     // 背景
@@ -987,6 +1007,8 @@ export default function Home() {
     // 陰影 / 毛玻璃
     setBtnBoxShadow(p.boxShadow || "");
     setBtnBackdropBlur(p.backdropBlur || 0);
+    setBtnBgEnabled(true); // 預設都有背景
+    setBtnAccent(p.accent || "");
     // 按鈕文字：乾淨純色（清掉文字設計效果）
     setGradientEnabled(false);
     setTextFillTransparent(false);
@@ -1012,6 +1034,7 @@ export default function Home() {
       setBgGradColor2(s.bgGradColor2);
       setBgGradAngle(s.bgGradAngle);
       setBtnBgColor(s.btnBgColor);
+      setBtnBgEnabled(s.btnBgEnabled ?? true);
       setBtnOpacity(s.btnOpacity);
       setBtnBorderMode(s.btnBorderMode);
       setBtnBorderWidth(s.btnBorderWidth);
@@ -1024,6 +1047,7 @@ export default function Home() {
       setBtnHeight(s.btnHeight);
       setBtnBorderGlowEnabled(s.btnBorderGlowEnabled);
       setTextColor(s.textColor);
+      setBtnAccent(s.btnAccent ?? "");
       setBtnSnapshot(null);
     } else {
       // 沒快照才回到出廠預設
@@ -1034,6 +1058,7 @@ export default function Home() {
       setBgGradColor2("#2980b9");
       setBgGradAngle(90);
       setBtnBgColor("#3498db");
+      setBtnBgEnabled(true);
       setBtnOpacity(100);
       setBtnBorderMode("unified");
       setBtnBorderWidth(0);
@@ -1046,6 +1071,7 @@ export default function Home() {
       setBtnHeight("auto");
       setBtnBorderGlowEnabled(false);
       setTextColor("#111827");
+      setBtnAccent("");
     }
     setActiveButtonPreset(null);
     toast.success("已清除按鈕效果，原本設定已還原");
@@ -1071,13 +1097,14 @@ export default function Home() {
     // ★ 第一次套用前先快照卡片原本外觀
     if (activeCardPreset === null) {
       setCardSnapshot({
-        cardStyle, cardTextColor, cardOverride, cardPadX, cardPadY, cardRadius,
+        cardStyle, cardTextColor, cardAccent, cardOverride, cardPadX, cardPadY, cardRadius,
         cardWidth, cardHeight, cardBorderEnabled, cardBorderMode,
         cardBorderGlowEnabled, cardBgEnabled, cardShadowEnabled,
       });
     }
     setCardStyle(p.style);
     setCardTextColor(p.textColor);
+    setCardAccent(p.accent || "");
     setActiveCardPreset(p.name);
     resetCardOverride();
     toast.success(`已套用「${p.label}」`);
@@ -1088,6 +1115,7 @@ export default function Home() {
       // ★ 還原使用者套效果前的卡片外觀
       setCardStyle(s.cardStyle);
       setCardTextColor(s.cardTextColor);
+      setCardAccent(s.cardAccent ?? "");
       setCardOverride(s.cardOverride);
       setCardPadX(s.cardPadX);
       setCardPadY(s.cardPadY);
@@ -1103,6 +1131,7 @@ export default function Home() {
     } else {
       setCardStyle(CARD_PRESETS[0].style);
       setCardTextColor(CARD_PRESETS[0].textColor);
+      setCardAccent("");
       resetCardOverride();
     }
     setActiveCardPreset(null);
@@ -1588,14 +1617,16 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
 
     // 顏色 / 漸層
     if (gradientEnabled) {
-      const g = gradientType === "linear"
+      const g = effectAnimate === "rainbow"
+        ? "linear-gradient(100deg,#ff5f6d,#ffc371,#47e0a0,#22d3ee,#7c5cff,#ff5f6d)"
+        : gradientType === "linear"
         ? `linear-gradient(${gradientAngle}deg, ${gradientColor1}, ${gradientColor2})`
         : `radial-gradient(circle, ${gradientColor1}, ${gradientColor2})`;
       style.background = g;
       (style as any).WebkitBackgroundClip = "text";
       (style as any).WebkitTextFillColor = "transparent";
       style.backgroundClip = "text" as any;
-      if (effectAnimate === "shimmer") {
+      if (effectAnimate === "shimmer" || effectAnimate === "rainbow") {
         (style as any).backgroundSize = "220% auto";
         style.animation = "pvShimmer 5s linear infinite";
       }
@@ -1618,6 +1649,9 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
       const rgb = hexToRgb(textShadowColor);
       style.textShadow = `${textShadowX}px ${textShadowY}px ${textShadowBlur}px rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${textShadowOpacity})`;
     }
+
+    // 動態：霓虹呼吸（純色 / 非漸層效果用）
+    if (effectAnimate === "pulse") style.animation = "pvPulse 1.6s ease-in-out infinite";
 
     // 描邊
     if (textStrokeEnabled) {
@@ -1787,18 +1821,18 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     previewText: setPreviewText, selectedFont: setSelectedFont, fontSize: setFontSize, lineHeight: setLineHeight, letterSpacing: setLetterSpacing, wordSpacing: setWordSpacing, fontWeight: setFontWeight, textOpacity: setTextOpacity, textColor: setTextColor, previewBgColor: setPreviewBgColor, gallerySample: setGallerySample, previewMode: setPreviewMode,
     btnPaddingX: setBtnPaddingX, btnPaddingY: setBtnPaddingY, btnBorderRadius: setBtnBorderRadius, btnWidth: setBtnWidth, btnHeight: setBtnHeight,
     btnBorderMode: setBtnBorderMode, btnBorderWidth: setBtnBorderWidth, btnBorderTopWidth: setBtnBorderTopWidth, btnBorderRightWidth: setBtnBorderRightWidth, btnBorderBottomWidth: setBtnBorderBottomWidth, btnBorderLeftWidth: setBtnBorderLeftWidth, btnBorderColor: setBtnBorderColor, btnBorderStyle: setBtnBorderStyle, btnBorderGlowEnabled: setBtnBorderGlowEnabled, btnBorderGlowColor: setBtnBorderGlowColor, btnBorderGlowBlur: setBtnBorderGlowBlur, btnBorderGlowSpread: setBtnBorderGlowSpread,
-    btnBgColor: setBtnBgColor, bgUseGradient: setBgUseGradient, bgGradColor1: setBgGradColor1, bgGradColor2: setBgGradColor2, bgGradAngle: setBgGradAngle,
+    btnBgColor: setBtnBgColor, btnBgEnabled: setBtnBgEnabled, bgUseGradient: setBgUseGradient, bgGradColor1: setBgGradColor1, bgGradColor2: setBgGradColor2, bgGradAngle: setBgGradAngle,
     btnHoverBgColor: setBtnHoverBgColor, btnHoverScale: setBtnHoverScale, btnHoverShadow: setBtnHoverShadow, btnHoverShadowEnabled: setBtnHoverShadowEnabled,
     btnTransitionDuration: setBtnTransitionDuration, btnTransitionTiming: setBtnTransitionTiming,
     btnFocusBgColor: setBtnFocusBgColor, btnFocusBorderColor: setBtnFocusBorderColor, btnFocusBorderWidth: setBtnFocusBorderWidth, btnFocusOutlineEnabled: setBtnFocusOutlineEnabled, btnFocusOutlineColor: setBtnFocusOutlineColor, btnFocusOutlineWidth: setBtnFocusOutlineWidth, btnFocusShadow: setBtnFocusShadow, btnFocusShadowEnabled: setBtnFocusShadowEnabled,
     btnDisabledOpacity: setBtnDisabledOpacity, btnDisabledCursor: setBtnDisabledCursor, btnDisabledEnabled: setBtnDisabledEnabled, btnOpacity: setBtnOpacity,
-    btnBoxShadow: setBtnBoxShadow, btnBackdropBlur: setBtnBackdropBlur, activeButtonPreset: setActiveButtonPreset,
+    btnBoxShadow: setBtnBoxShadow, btnBackdropBlur: setBtnBackdropBlur, btnAccent: setBtnAccent, activeButtonPreset: setActiveButtonPreset,
     textShadowEnabled: setTextShadowEnabled, textShadowX: setTextShadowX, textShadowY: setTextShadowY, textShadowBlur: setTextShadowBlur, textShadowColor: setTextShadowColor, textShadowOpacity: setTextShadowOpacity,
     textStrokeEnabled: setTextStrokeEnabled, textStrokeWidth: setTextStrokeWidth, textStrokeColor: setTextStrokeColor,
     gradientEnabled: setGradientEnabled, gradientType: setGradientType, gradientAngle: setGradientAngle, gradientColor1: setGradientColor1, gradientColor2: setGradientColor2,
-    textFillTransparent: setTextFillTransparent, textHighlightColor: setTextHighlightColor, effectShadow: setEffectShadow, effectAnimate: setEffectAnimate, activeDesignPreset: setActiveDesignPreset,
+    textFillTransparent: setTextFillTransparent, textHighlightColor: setTextHighlightColor, effectShadow: setEffectShadow, effectAnimate: setEffectAnimate, designAccent: setDesignAccent, activeDesignPreset: setActiveDesignPreset,
     combinedPresets: setCombinedPresets, combinedShadows: setCombinedShadows, activePreset: setActivePreset,
-    cardStyle: setCardStyle, cardTextColor: setCardTextColor, activeCardPreset: setActiveCardPreset, cardOverride: setCardOverride, cardPadX: setCardPadX, cardPadY: setCardPadY, cardRadius: setCardRadius, cardWidth: setCardWidth, cardHeight: setCardHeight, cardBorderEnabled: setCardBorderEnabled, cardBorderMode: setCardBorderMode, cardBorderWidth: setCardBorderWidth, cardBorderTopWidth: setCardBorderTopWidth, cardBorderRightWidth: setCardBorderRightWidth, cardBorderBottomWidth: setCardBorderBottomWidth, cardBorderLeftWidth: setCardBorderLeftWidth, cardBorderColor: setCardBorderColor, cardBorderStyle: setCardBorderStyle, cardBorderGlowEnabled: setCardBorderGlowEnabled, cardBorderGlowColor: setCardBorderGlowColor, cardBorderGlowBlur: setCardBorderGlowBlur, cardBgEnabled: setCardBgEnabled, cardBgColor: setCardBgColor, cardBgUseGradient: setCardBgUseGradient, cardBgGradColor1: setCardBgGradColor1, cardBgGradColor2: setCardBgGradColor2, cardBgGradAngle: setCardBgGradAngle, cardShadowEnabled: setCardShadowEnabled, cardShadow: setCardShadow,
+    cardStyle: setCardStyle, cardTextColor: setCardTextColor, cardAccent: setCardAccent, activeCardPreset: setActiveCardPreset, cardOverride: setCardOverride, cardPadX: setCardPadX, cardPadY: setCardPadY, cardRadius: setCardRadius, cardWidth: setCardWidth, cardHeight: setCardHeight, cardBorderEnabled: setCardBorderEnabled, cardBorderMode: setCardBorderMode, cardBorderWidth: setCardBorderWidth, cardBorderTopWidth: setCardBorderTopWidth, cardBorderRightWidth: setCardBorderRightWidth, cardBorderBottomWidth: setCardBorderBottomWidth, cardBorderLeftWidth: setCardBorderLeftWidth, cardBorderColor: setCardBorderColor, cardBorderStyle: setCardBorderStyle, cardBorderGlowEnabled: setCardBorderGlowEnabled, cardBorderGlowColor: setCardBorderGlowColor, cardBorderGlowBlur: setCardBorderGlowBlur, cardBgEnabled: setCardBgEnabled, cardBgColor: setCardBgColor, cardBgUseGradient: setCardBgUseGradient, cardBgGradColor1: setCardBgGradColor1, cardBgGradColor2: setCardBgGradColor2, cardBgGradAngle: setCardBgGradAngle, cardShadowEnabled: setCardShadowEnabled, cardShadow: setCardShadow,
     cardRotate: setCardRotate, cardSkewX: setCardSkewX, cardSkewY: setCardSkewY, cardScaleX: setCardScaleX, cardPerspective: setCardPerspective, cardRotateX: setCardRotateX, cardRotateY: setCardRotateY,
     sliderTrack: setSliderTrack, sliderFill: setSliderFill, sliderThumb: setSliderThumb, activeSliderPreset: setActiveSliderPreset,
   };
@@ -1806,18 +1840,18 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     previewText, selectedFont, fontSize, lineHeight, letterSpacing, wordSpacing, fontWeight, textOpacity, textColor, previewBgColor, gallerySample, previewMode,
     btnPaddingX, btnPaddingY, btnBorderRadius, btnWidth, btnHeight,
     btnBorderMode, btnBorderWidth, btnBorderTopWidth, btnBorderRightWidth, btnBorderBottomWidth, btnBorderLeftWidth, btnBorderColor, btnBorderStyle, btnBorderGlowEnabled, btnBorderGlowColor, btnBorderGlowBlur, btnBorderGlowSpread,
-    btnBgColor, bgUseGradient, bgGradColor1, bgGradColor2, bgGradAngle,
+    btnBgColor, btnBgEnabled, bgUseGradient, bgGradColor1, bgGradColor2, bgGradAngle,
     btnHoverBgColor, btnHoverScale, btnHoverShadow, btnHoverShadowEnabled,
     btnTransitionDuration, btnTransitionTiming,
     btnFocusBgColor, btnFocusBorderColor, btnFocusBorderWidth, btnFocusOutlineEnabled, btnFocusOutlineColor, btnFocusOutlineWidth, btnFocusShadow, btnFocusShadowEnabled,
     btnDisabledOpacity, btnDisabledCursor, btnDisabledEnabled, btnOpacity,
-    btnBoxShadow, btnBackdropBlur, activeButtonPreset,
+    btnBoxShadow, btnBackdropBlur, btnAccent, activeButtonPreset,
     textShadowEnabled, textShadowX, textShadowY, textShadowBlur, textShadowColor, textShadowOpacity,
     textStrokeEnabled, textStrokeWidth, textStrokeColor,
     gradientEnabled, gradientType, gradientAngle, gradientColor1, gradientColor2,
-    textFillTransparent, textHighlightColor, effectShadow, effectAnimate, activeDesignPreset,
+    textFillTransparent, textHighlightColor, effectShadow, effectAnimate, designAccent, activeDesignPreset,
     combinedPresets, combinedShadows, activePreset,
-    cardStyle, cardTextColor, activeCardPreset, cardOverride, cardPadX, cardPadY, cardRadius, cardWidth, cardHeight, cardBorderEnabled, cardBorderMode, cardBorderWidth, cardBorderTopWidth, cardBorderRightWidth, cardBorderBottomWidth, cardBorderLeftWidth, cardBorderColor, cardBorderStyle, cardBorderGlowEnabled, cardBorderGlowColor, cardBorderGlowBlur, cardBgEnabled, cardBgColor, cardBgUseGradient, cardBgGradColor1, cardBgGradColor2, cardBgGradAngle, cardShadowEnabled, cardShadow,
+    cardStyle, cardTextColor, cardAccent, activeCardPreset, cardOverride, cardPadX, cardPadY, cardRadius, cardWidth, cardHeight, cardBorderEnabled, cardBorderMode, cardBorderWidth, cardBorderTopWidth, cardBorderRightWidth, cardBorderBottomWidth, cardBorderLeftWidth, cardBorderColor, cardBorderStyle, cardBorderGlowEnabled, cardBorderGlowColor, cardBorderGlowBlur, cardBgEnabled, cardBgColor, cardBgUseGradient, cardBgGradColor1, cardBgGradColor2, cardBgGradAngle, cardShadowEnabled, cardShadow,
     cardRotate, cardSkewX, cardSkewY, cardScaleX, cardPerspective, cardRotateX, cardRotateY,
     sliderTrack, sliderFill, sliderThumb, activeSliderPreset,
   });
@@ -1830,9 +1864,9 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
   // 不動：選取的字型、預覽文字、自訂範例字、目前所在分頁。
   const RESET_KEYS = {
     common: ["fontSize", "lineHeight", "letterSpacing", "wordSpacing", "fontWeight", "textOpacity", "textColor", "previewBgColor"],
-    text: ["textShadowEnabled", "textShadowX", "textShadowY", "textShadowBlur", "textShadowColor", "textShadowOpacity", "textStrokeEnabled", "textStrokeWidth", "textStrokeColor", "gradientEnabled", "gradientType", "gradientAngle", "gradientColor1", "gradientColor2", "textFillTransparent", "textHighlightColor", "effectShadow", "effectAnimate", "activeDesignPreset", "combinedPresets", "combinedShadows", "activePreset"],
-    button: ["btnPaddingX", "btnPaddingY", "btnBorderRadius", "btnWidth", "btnHeight", "btnBorderMode", "btnBorderWidth", "btnBorderTopWidth", "btnBorderRightWidth", "btnBorderBottomWidth", "btnBorderLeftWidth", "btnBorderColor", "btnBorderStyle", "btnBorderGlowEnabled", "btnBorderGlowColor", "btnBorderGlowBlur", "btnBorderGlowSpread", "btnBgColor", "bgUseGradient", "bgGradColor1", "bgGradColor2", "bgGradAngle", "btnHoverBgColor", "btnHoverScale", "btnHoverShadow", "btnHoverShadowEnabled", "btnTransitionDuration", "btnTransitionTiming", "btnFocusBgColor", "btnFocusBorderColor", "btnFocusBorderWidth", "btnFocusOutlineEnabled", "btnFocusOutlineColor", "btnFocusOutlineWidth", "btnFocusShadow", "btnFocusShadowEnabled", "btnDisabledOpacity", "btnDisabledCursor", "btnDisabledEnabled", "btnOpacity", "btnBoxShadow", "btnBackdropBlur", "activeButtonPreset"],
-    card: ["cardStyle", "cardTextColor", "activeCardPreset", "cardOverride", "cardPadX", "cardPadY", "cardRadius", "cardWidth", "cardHeight", "cardBorderEnabled", "cardBorderMode", "cardBorderWidth", "cardBorderTopWidth", "cardBorderRightWidth", "cardBorderBottomWidth", "cardBorderLeftWidth", "cardBorderColor", "cardBorderStyle", "cardBorderGlowEnabled", "cardBorderGlowColor", "cardBorderGlowBlur", "cardBgEnabled", "cardBgColor", "cardBgUseGradient", "cardBgGradColor1", "cardBgGradColor2", "cardBgGradAngle", "cardShadowEnabled", "cardShadow", "cardRotate", "cardSkewX", "cardSkewY", "cardScaleX", "cardPerspective", "cardRotateX", "cardRotateY"],
+    text: ["textShadowEnabled", "textShadowX", "textShadowY", "textShadowBlur", "textShadowColor", "textShadowOpacity", "textStrokeEnabled", "textStrokeWidth", "textStrokeColor", "gradientEnabled", "gradientType", "gradientAngle", "gradientColor1", "gradientColor2", "textFillTransparent", "textHighlightColor", "effectShadow", "effectAnimate", "designAccent", "activeDesignPreset", "combinedPresets", "combinedShadows", "activePreset"],
+    button: ["btnPaddingX", "btnPaddingY", "btnBorderRadius", "btnWidth", "btnHeight", "btnBorderMode", "btnBorderWidth", "btnBorderTopWidth", "btnBorderRightWidth", "btnBorderBottomWidth", "btnBorderLeftWidth", "btnBorderColor", "btnBorderStyle", "btnBorderGlowEnabled", "btnBorderGlowColor", "btnBorderGlowBlur", "btnBorderGlowSpread", "btnBgColor", "btnBgEnabled", "bgUseGradient", "bgGradColor1", "bgGradColor2", "bgGradAngle", "btnHoverBgColor", "btnHoverScale", "btnHoverShadow", "btnHoverShadowEnabled", "btnTransitionDuration", "btnTransitionTiming", "btnFocusBgColor", "btnFocusBorderColor", "btnFocusBorderWidth", "btnFocusOutlineEnabled", "btnFocusOutlineColor", "btnFocusOutlineWidth", "btnFocusShadow", "btnFocusShadowEnabled", "btnDisabledOpacity", "btnDisabledCursor", "btnDisabledEnabled", "btnOpacity", "btnBoxShadow", "btnBackdropBlur", "btnAccent", "activeButtonPreset"],
+    card: ["cardStyle", "cardTextColor", "cardAccent", "activeCardPreset", "cardOverride", "cardPadX", "cardPadY", "cardRadius", "cardWidth", "cardHeight", "cardBorderEnabled", "cardBorderMode", "cardBorderWidth", "cardBorderTopWidth", "cardBorderRightWidth", "cardBorderBottomWidth", "cardBorderLeftWidth", "cardBorderColor", "cardBorderStyle", "cardBorderGlowEnabled", "cardBorderGlowColor", "cardBorderGlowBlur", "cardBgEnabled", "cardBgColor", "cardBgUseGradient", "cardBgGradColor1", "cardBgGradColor2", "cardBgGradAngle", "cardShadowEnabled", "cardShadow", "cardRotate", "cardSkewX", "cardSkewY", "cardScaleX", "cardPerspective", "cardRotateX", "cardRotateY"],
     slider: ["sliderTrack", "sliderFill", "sliderThumb", "activeSliderPreset"],
   } as const;
   // 只清除目前所在分頁(加上共用排版)的設定，其他分頁不動
@@ -2004,12 +2038,14 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     const s: React.CSSProperties = { fontWeight: 800, lineHeight: 1 };
     if (p.gradient) {
       const g = p.gradient;
-      s.backgroundImage = g.type === "radial"
+      s.backgroundImage = p.animate === "rainbow"
+        ? "linear-gradient(100deg,#ff5f6d,#ffc371,#47e0a0,#22d3ee,#7c5cff,#ff5f6d)"
+        : g.type === "radial"
         ? `radial-gradient(circle, ${g.c1}, ${g.c2})`
         : `linear-gradient(${g.angle}deg, ${g.c1}, ${g.c2})`;
       (s as any).WebkitBackgroundClip = "text"; s.backgroundClip = "text" as any;
       (s as any).WebkitTextFillColor = "transparent"; s.color = "transparent";
-      if (p.animate === "shimmer") { (s as any).backgroundSize = "220% auto"; s.animation = "pvShimmer 5s linear infinite"; }
+      if (p.animate === "shimmer" || p.animate === "rainbow") { (s as any).backgroundSize = "220% auto"; s.animation = "pvShimmer 5s linear infinite"; }
     } else if (p.highlight) {
       s.color = p.color || "#1f2937";
       s.backgroundImage = `linear-gradient(transparent 58%, ${p.highlight} 58%)`;
@@ -2018,6 +2054,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     if (p.fillTransparent) { (s as any).WebkitTextFillColor = "transparent"; s.color = "transparent"; }
     if (p.stroke) (s as any).WebkitTextStroke = `${p.stroke.width}px ${p.stroke.color}`;
     if (p.shadow) s.textShadow = p.shadow;
+    if (p.animate === "pulse") s.animation = "pvPulse 1.6s ease-in-out infinite";
     return s;
   };
   const effectPv = (p: TextEffectPreset): React.CSSProperties => {
@@ -2085,6 +2122,21 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
 
   // 文字漸層（純文字模式）
   if (previewMode === "text") {
+    const activeTextObj = DESIGN_PRESETS.find((p) => p.name === activeDesignPreset);
+    if (activeTextObj?.recolor) {
+      cards.push(ctlCard("text-accent", "效果", "重點色", <span className="mtag">可換色</span>, (
+        <>
+          {cRow("效果主色", designAccent || activeTextObj.accent || "#ff2db6", (v: string) => {
+            setDesignAccent(v);
+            const r = activeTextObj.recolor!(v);
+            if (r.color !== undefined) { setGradientEnabled(false); setTextColor(r.color); }
+            if (r.fillTransparent !== undefined) setTextFillTransparent(r.fillTransparent);
+            if (r.stroke) { setTextStrokeEnabled(true); setTextStrokeWidth(r.stroke.width); setTextStrokeColor(r.stroke.color); }
+            if (r.shadow !== undefined) setEffectShadow(r.shadow);
+          })}
+        </>
+      )));
+    }
     cards.push(ctlCard("fx-grad", "文字效果", "文字漸層", togBtn(gradientEnabled, () => setGradientEnabled(!gradientEnabled), true), gradientEnabled ? (
       <>
         {segRow("漸層類型", gradientType, [["linear", "線性"], ["radial", "徑向"]], (v) => setGradientType(v as any))}
@@ -2228,6 +2280,21 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
 
   // 外框（按鈕 / 卡片）
   if (previewMode === "button") {
+    const activeBtnObj = BUTTON_PRESETS.find((p) => p.name === activeButtonPreset);
+    if (activeBtnObj?.recolor) {
+      cards.push(ctlCard("btn-accent", "效果", "重點色", <span className="mtag">可換色</span>, (
+        <>
+          {cRow("效果主色", btnAccent || activeBtnObj.accent || "#22d3ee", (v: string) => {
+            setBtnAccent(v);
+            const r = activeBtnObj.recolor!(v);
+            if (r.bg !== undefined) { setBgUseGradient(false); setBtnBgColor(r.bg); setBtnBgEnabled(true); }
+            if (r.borderColor !== undefined) { setBtnBorderMode("unified"); setBtnBorderWidth(2); setBtnBorderColor(r.borderColor); }
+            if (r.boxShadow !== undefined) setBtnBoxShadow(r.boxShadow);
+            if (r.textColor !== undefined) setTextColor(r.textColor);
+          })}
+        </>
+      )));
+    }
     cards.push(ctlCard("box-model", "外框", "盒模型", <span className="mtag">按鈕</span>, (
       <>
         {sRow("水平內距", btnPaddingX, 0, 64, 1, (v) => setBtnPaddingX(v), `${btnPaddingX}px`)}
@@ -2265,14 +2332,19 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     )));
     cards.push(ctlCard("box-bg", "外框", "背景", null, (
       <>
-        {togRow("漸層", bgUseGradient, () => setBgUseGradient(!bgUseGradient))}
-        {bgUseGradient ? (
+        {togRow("背景", btnBgEnabled, () => setBtnBgEnabled(!btnBgEnabled))}
+        {btnBgEnabled && (
           <>
-            {sRow("角度", bgGradAngle, 0, 360, 1, (v) => setBgGradAngle(v), `${bgGradAngle}°`)}
-            {cRow("起始色", bgGradColor1, setBgGradColor1)}
-            {cRow("結束色", bgGradColor2, setBgGradColor2)}
+            {togRow("漸層", bgUseGradient, () => setBgUseGradient(!bgUseGradient))}
+            {bgUseGradient ? (
+              <>
+                {sRow("角度", bgGradAngle, 0, 360, 1, (v) => setBgGradAngle(v), `${bgGradAngle}°`)}
+                {cRow("起始色", bgGradColor1, setBgGradColor1)}
+                {cRow("結束色", bgGradColor2, setBgGradColor2)}
+              </>
+            ) : cRow("背景顏色", btnBgColor, setBtnBgColor)}
           </>
-        ) : cRow("背景顏色", btnBgColor, setBtnBgColor)}
+        )}
       </>
     )));
     // 按鈕陰影（外陰影 / 內陰影 / 內外光暈）
@@ -2290,6 +2362,14 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     ) : null));
     // 互動狀態：合併成一張卡，移到最後（在「預覽底色」之後 push）
   } else if (previewMode === "card") {
+    const activeCardObj = CARD_PRESETS.find((p) => p.name === activeCardPreset);
+    if (activeCardObj?.recolor) {
+      cards.push(ctlCard("card-accent", "效果", "重點色", <span className="mtag">可換色</span>, (
+        <>
+          {cRow("效果主色", cardAccent || activeCardObj.accent || "#22d3ee", (v: string) => { setCardAccent(v); setCardStyle(activeCardObj.recolor!(v)); })}
+        </>
+      )));
+    }
     cards.push(ctlCard("cbox-model", "外框", "盒模型", <span className="mtag">卡片</span>, (
       <>
         {sRow("水平內距", cardPadX, 0, 64, 1, (v) => setCardPadX(v), `${cardPadX}px`)}
@@ -2510,10 +2590,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
               ))}
             </div>
           ) : (
-            <>
-              <div style={{ fontFamily: selectedFont.value, fontWeight: fontWeight, letterSpacing: `${letterSpacing}px`, fontSize: `${Math.min(fontSize, 40)}px`, color: cardTextColor, textAlign: "center", lineHeight: 1.2, whiteSpace: "pre-wrap" }}>{previewText}</div>
-              <p style={{ color: cardTextColor, opacity: 0.6, fontSize: 13, margin: 0 }}>副標題文字 · Subtitle</p>
-            </>
+            <div style={{ fontFamily: selectedFont.value, fontWeight: fontWeight, letterSpacing: `${letterSpacing}px`, fontSize: `${Math.min(fontSize, 40)}px`, color: cardTextColor, textAlign: "center", lineHeight: 1.2, whiteSpace: "pre-wrap" }}>{previewText}</div>
           )}
         </div>
       </div>
@@ -2680,6 +2757,14 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
   ) : (
     /* ============ 編輯模式 · Frosted Studio ============ */
     <div className="wrap">
+      {/* 黑色液態玻璃用的折射濾鏡 */}
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
+        <filter id="liquidGlass">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves={2} seed={8} result="n" />
+          <feGaussianBlur in="n" stdDeviation="1.4" result="nb" />
+          <feDisplacementMap in="SourceGraphic" in2="nb" scale={40} xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
       <header className="masthead">
         <div>
           <p className="eyebrow">2560 × 1080 Desktop Workspace · 介面重設計</p>
@@ -2721,7 +2806,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
             <div className="panel-b">
               <div className="preset-grid">
                 {fxCfg.list.map((p) => (
-                  <button key={`fx-${p.name}`} className={`preset has-pv${fxCfg.active === p.name ? " active" : ""}`} onClick={() => fxCfg.apply(p)}>
+                  <button key={`fx-${p.name}`} className={`preset has-pv${fxCfg.active === p.name ? " active" : ""}`} onClick={() => fxCfg.active === p.name ? fxCfg.clear() : fxCfg.apply(p)}>
                     <span className="preset-sample">{renderPresetSample(p)}</span>
                     <span className="preset-name">{p.label}</span>
                     {fxCfg.active === p.name && <Check className="tick" />}

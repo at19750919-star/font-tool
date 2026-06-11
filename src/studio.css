@@ -134,6 +134,8 @@ input,select{ font-family:inherit; }
 .mini-slider .ms-thumb{ position:absolute; left:52%; top:50%; transform:translate(-50%,-50%); border-radius:50%; }
 /* 流光漸層動畫（文字效果） */
 @keyframes pvShimmer{ to{ background-position:-220% center; } }
+/* 霓虹呼吸動畫 */
+@keyframes pvPulse{ 0%,100%{ opacity:1; } 50%{ opacity:.45; } }
 .count-pill{ font:700 11px/1 var(--mono); color:#fff; background:linear-gradient(140deg,var(--accent-2),var(--accent-d)); padding:5px 9px; border-radius:8px; box-shadow:0 4px 10px var(--accent-glow); }
 
 /* ============ center preview ============ */
