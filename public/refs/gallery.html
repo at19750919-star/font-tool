@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>效果參考菜單</title>
+<title>UI 效果參考菜單</title>
 <style>
   :root { color-scheme: light; }
   body { margin:0; font-family: system-ui, "Microsoft JhengHei", sans-serif; background:#f4f1ea; color:#1f2430; }
@@ -44,19 +44,21 @@
   .cat-h .n { font-size:12px; color:#9ca3af; font-weight:500; }
   figcaption .catsel { margin-top:6px; }
   figcaption .catsel select { font:inherit; font-size:12px; padding:3px 6px; border:1px solid #d8d5cc; border-radius:6px; background:#faf9f6; color:#4b5563; cursor:pointer; }
+  figcaption .catsel span { font-size:12px; color:#6b7280; margin-left:4px; }
   /* 只有開發模式（dev server 在跑）才顯示上傳 / 刪除 */
   body:not(.dev) .dev-only { display:none !important; }
 </style>
 </head>
 <body class="drop">
 <header>
-  <h1>效果參考菜單</h1>
-  <p>挑好哪一張,跟我說它的檔名(或描述),我用真 CSS 寫進工具。點圖可放大;切換上方分類過濾。<span class="dev-only">（開發模式：可編輯說明 / 拖曳上傳 / 刪除）</span></p>
+  <h1>UI 效果參考菜單</h1>
+  <p>以設計過的參考圖為主；挑好哪一張，直接用檔名或描述指定。點圖可放大，切換上方分類過濾。<span class="dev-only">（開發模式：可編輯說明 / 拖曳上傳 / 刪除）</span></p>
   <div class="bar">
     <button class="btn primary dev-only" id="uploadBtn">＋ 上傳圖片</button>
     <input type="file" id="fileInput" accept="image/*" multiple hidden>
     <button class="btn" id="refreshBtn">↻ 重新整理</button>
-    <a class="btn" href="components.html">🧩 組件樣式參考(即時 CSS)</a>
+    <a class="btn" href="components.html">組件款式參考菜單</a>
+    <a class="btn" href="styles-120.html" target="_blank">120 種風格</a>
     <span class="count" id="count"></span>
     <span class="mode-tag" id="modeTag"></span>
   </div>
@@ -77,7 +79,6 @@ let visibleOrder = [];
 let currentFilter = '全部';
 let devMode = false;
 let CATS = ['文字效果','按鈕','卡片・外框','質感・材質','視覺風格','版面・布局','UI組件','AI・其他'];
-let catMap = {}; try { catMap = JSON.parse(localStorage.getItem('refCats')||'{}'); } catch {}
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
@@ -96,9 +97,23 @@ function autoCat(name, caption){
   if (h(/組件|元件|彈窗|表格|通知|載入|進度|輸入|搜尋|導覽|導航|側邊欄|底部|開關|滑桿|核取|tab|頭像|分頁|標籤|徽章|時間/i)) return 'UI組件';
   return 'UI組件';
 }
-// 優先序：個人 localStorage 覆蓋 > manifest 分類（repo）> 自動推斷
-function catOf(name){ return catMap[name] || manifestCat[name] || autoCat(name, captions[name]); }
-function setCat(name, c){ catMap[name] = c; try { localStorage.setItem('refCats', JSON.stringify(catMap)); } catch {} render(); }
+// 優先序：manifest 分類（repo）> 自動推斷
+function catOf(name){ return manifestCat[name] || autoCat(name, captions[name]); }
+async function setCat(name, c){
+  if (!devMode) return;
+  const prev = manifestCat[name];
+  manifestCat[name] = c;
+  render();
+  try {
+    const res = await fetch('/refs-category',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name,cat:c})});
+    if (!res.ok) throw new Error('save failed');
+  } catch (e) {
+    if (prev) manifestCat[name] = prev;
+    else delete manifestCat[name];
+    alert('分類沒有存成功，請確認 dev server 還在執行。');
+    render();
+  }
+}
 
 async function load() {
   // 先嘗試 dev 端點（開發時即時列出 / 可上傳）；失敗則讀靜態 manifest.json（線上版）
@@ -108,6 +123,9 @@ async function load() {
     if (!lr.ok) throw 0;
     allNames = await lr.json();
     captions = await fetch('/refs-captions', { cache:'no-store' }).then(r=>r.json()).catch(()=>({}));
+    const m = await fetch('/refs-manifest', { cache:'no-store' }).then(r=>r.json()).catch(()=>({}));
+    CATS = m.categories || CATS;
+    (m.items || []).forEach(i=>{ manifestCat[i.file] = i.cat; if (i.caption) captions[i.file] = i.caption; });
     devMode = true;
   } catch {
     try {
@@ -143,20 +161,24 @@ function figFor(name){
   const url = './' + encodeURIComponent(name);
   const desc = captions[name] || '';
   const cur = catOf(name);
+  const catControl = devMode
+    ? '<select>'+CATS.map(c=>'<option '+(c===cur?'selected':'')+'>'+esc(c)+'</option>').join('')+'</select>'
+    : '<span>'+esc(cur)+'</span>';
   fig.innerHTML =
     '<img loading="lazy" src="'+url+'" alt="'+esc(name)+'">' +
     '<button class="del dev-only" title="刪除">✕</button>' +
     '<figcaption>' +
       '<div class="fn">'+esc(name)+'</div>' +
       '<div class="desc'+(desc?'':' empty')+'" title="'+(devMode?'點此編輯說明':'')+'">'+(desc?esc(desc):(devMode?'＋ 點此加說明':'（無說明）'))+'</div>' +
-      '<div class="catsel">分類:<select>'+CATS.map(c=>'<option '+(c===cur?'selected':'')+'>'+esc(c)+'</option>').join('')+'</select></div>' +
+      '<div class="catsel">分類:'+catControl+'</div>' +
     '</figcaption>';
   fig.querySelector('img').addEventListener('click', ()=>zoom(name));
   if (devMode) {
     fig.querySelector('.del').addEventListener('click', ()=>del(name));
     fig.querySelector('.desc').addEventListener('click', function(){ editDesc(this, name); });
   }
-  fig.querySelector('.catsel select').addEventListener('change', function(){ setCat(name, this.value); });
+  const select = fig.querySelector('.catsel select');
+  if (select) select.addEventListener('change', function(){ setCat(name, this.value); });
   return fig;
 }
 
@@ -236,7 +258,7 @@ function zoom(name){
 }
 
 async function del(name){
-  if(!confirm('刪除「'+name+'」?（記得之後重跑 npm run refs:manifest）')) return;
+  if(!confirm('刪除「'+name+'」?')) return;
   await fetch('/refs-delete',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name})});
   load();
 }

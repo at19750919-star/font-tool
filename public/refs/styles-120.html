@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網頁設計風格 120 種</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Microsoft JhengHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+
+        /* Tabs 樣式 */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 表格樣式 */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .code-name {
+            font-family: Consolas, Monaco, monospace;
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #b91c1c;
+            font-size: 0.9rem;
+        }
+
+        .style-name {
+            font-weight: bold;
+            color: #0f172a;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 15px; }
+            th, td { padding: 10px 8px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>網頁設計風格 120 種</h1>
+    <div class="subtitle">來源: AnxForever/stylekit-skill ｜ 欄位：英文代號 ｜ 中文名 ｜ 說明</div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('expressive')">表達主義 Expressive (48)</button>
+        <button class="tab-btn" onclick="switchTab('minimal')">極簡主義 Minimal (17)</button>
+        <button class="tab-btn" onclick="switchTab('modern')">現代主義 Modern (31)</button>
+        <button class="tab-btn" onclick="switchTab('retro')">復古懷舊 Retro (24)</button>
+    </div>
+
+    <div id="expressive" class="tab-content active">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%">英文代號</th>
+                        <th style="width: 20%">中文名</th>
+                        <th style="width: 60%">說明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><span class="code-name">neo-brutalist</span></td><td class="style-name">新野獸派</td><td>Neo-Brutalist（新野獸派）設計風格源於建築領域的野獸派運動，強調原始、未經修飾的功能美學。在 Web 設計中，這種風格通過大膽的…</td></tr>
+                    <tr><td><span class="code-name">modern-gradient</span></td><td class="style-name">現代漸層風</td><td>Modern Gradient 風格通過豐富的漸層色彩和光影效果創造視覺衝擊力和活力感。 核心理念： - 視覺活力：漸層色彩帶來動感和能量 …</td></tr>
+                    <tr><td><span class="code-name">geometric-bold</span></td><td class="style-name">幾何大膽風</td><td>Geometric Bold 風格受包浩斯和構成主義藝術的影響，通過簡單但強烈的幾何形狀創造視覺衝擊。 核心理念： - 形狀優先：幾何形狀是…</td></tr>
+                    <tr><td><span class="code-name">full-page-scroll</span></td><td class="style-name">全螢幕捲動版面</td><td>Full Page Scroll（全螢幕捲動版面）是一種將每個內容區塊擴展到整個視口的排版方式，創造電影般的敘事體驗。 核心理念： - 沉浸體…</td></tr>
+                    <tr><td><span class="code-name">card-stack</span></td><td class="style-name">卡片堆疊版面</td><td>Card Stack（卡片堆疊版面）是一種利用 Z 軸創造深度感的排版方式，多張卡片前後重疊，形成視覺層次。 核心理念： - 深度感知：通過…</td></tr>
+                    <tr><td><span class="code-name">hero-fullscreen</span></td><td class="style-name">全螢幕主視覺版面</td><td>Fullscreen Hero（全螢幕主視覺版面）是一種以視覺衝擊力為核心的排版方式，用全螢幕圖片或影片創造沉浸式第一印象。 核心理念： - 第…</td></tr>
+                    <tr><td><span class="code-name">ghibli-style</span></td><td class="style-name">吉卜力風格</td><td>Ghibli Style（吉卜力風格）受日本吉卜力工作室動畫影響，以溫暖、療癒、富有詩意的視覺語言著稱。 核心理念： - 手繪質感：保留手工…</td></tr>
+                    <tr><td><span class="code-name">comic-style</span></td><td class="style-name">漫畫風格</td><td>Comic Style 是一種源自漫畫書和日式漫畫的設計風格，通過濃重的墨線邊框、半調網點、對話氣泡和動態線條，將介面變成生動的漫畫面構。 …</td></tr>
+                    <tr><td><span class="code-name">sketch-style</span></td><td class="style-name">鉛筆手繪風</td><td>Sketch Style 是一種模擬手繪鉛筆素描的設計風格，通過不規則的線條、紙張紋理和手寫感元素，為數位介面注入溫暖的手工質感。 核心理念…</td></tr>
+                    <tr><td><span class="code-name">watercolor-style</span></td><td class="style-name">水彩畫風</td><td>Watercolor Style 是一種模擬水彩畫效果的設計風格，通過柔和的顏色漸層、模糊的邊緣和流動的色彩擴散，為介面注入藝術氣息和詩意感…</td></tr>
+                    <tr><td><span class="code-name">cyberpunk-neon</span></td><td class="style-name">賽博朋克霓虹</td><td>Cyberpunk Neon 風格來源於賽博朋克科幻美學，通過霓虹發光、深色背景和高對比度創造未來感。 核心理念： - 霓虹發光：核心元素使…</td></tr>
+                    <tr><td><span class="code-name">neo-brutalist-soft</span></td><td class="style-name">柔和野獸派</td><td>Neo-Brutalist Soft（柔和野獸派）是原版 Neo-Brutalist 的溫和變體。它保留了核心的結構特徵——無圓角、硬邊緣陰…</td></tr>
+                    <tr><td><span class="code-name">neo-brutalist-playful</span></td><td class="style-name">俏皮野獸派</td><td>Neo-Brutalist Playful（俏皮野獸派）是原版 Neo-Brutalist 的活潑變體。在保持硬邊緣、無圓角的結構基礎上，通…</td></tr>
+                    <tr><td><span class="code-name">surrealism</span></td><td class="style-name">超現實主義風</td><td>Surrealism（超現實主義）是20世紀初的藝術運動，致力於釋放潛意識的創造力，打破理性與非理性的界限。 核心理念： - 夢境邏輯：超越…</td></tr>
+                    <tr><td><span class="code-name">risograph</span></td><td class="style-name">Risograph 印刷風</td><td>Risograph 是一種源於日本的快速印刷技術，因其獨特的視覺效果而被藝術家和設計師廣泛採用。 核心理念： - 有限色彩：通常只使用2-3…</td></tr>
+                    <tr><td><span class="code-name">mecha</span></td><td class="style-name">機甲風</td><td>Mecha（機甲風）是源自日本機甲動畫（鋼彈、EVA等）的設計美學，融合軍事工業風和科幻面板介面。 核心理念： - 裝甲面板：模擬機甲外殼的…</td></tr>
+                    <tr><td><span class="code-name">gothic-lolita</span></td><td class="style-name">哥特蘿莉風</td><td>Gothic Lolita（哥特蘿莉）是一種融合維多利亞時代與哥特美學的視覺風格，起源於日本街頭時尚。 核心理念： - 暗黑優雅：黑色為主調…</td></tr>
+                    <tr><td><span class="code-name">cyber-chinese</span></td><td class="style-name">賽博中華風</td><td>Cyber Chinese（賽博中華）是傳統中國美學與賽博朋克科幻風格的融合，在暗色基底上用霓虹光效重新演繹東方經典元素。 核心理念： - …</td></tr>
+                    <tr><td><span class="code-name">acid-graphics</span></td><td class="style-name">酸性平面設計</td><td>Acid Graphics 源於90年代銳舞文化和地下俱樂部場景，融合了賽博朋克、迷幻藝術和實驗排版。 核心理念： - 螢光色彩：使用高飽和…</td></tr>
+                    <tr><td><span class="code-name">hand-drawn-doodle</span></td><td class="style-name">手繪塗鴉風</td><td>Hand-Drawn Doodle 風格模擬手工繪製的質感，營造溫暖、親切、創意十足的視覺體驗。 核心理念： - 筆記本紙張：奶白色背景模擬…</td></tr>
+                    <tr><td><span class="code-name">watercolor-art</span></td><td class="style-name">水彩藝術風</td><td>水彩藝術風格追求真實水彩畫的自然有機美學，強調顏料在濕紙上的流動、滲透和池化效果。 核心理念： - 有機邊緣：使用 SVG feTurbul…</td></tr>
+                    <tr><td><span class="code-name">impressionist-oil</span></td><td class="style-name">油畫印象派風</td><td>油畫印象派風格汲取19世紀法國印象派繪畫的精髓，強調光影變化和色彩的即興表達。 核心理念： - 斑駁光影：使用 multiple radia…</td></tr>
+                    <tr><td><span class="code-name">collage-art</span></td><td class="style-name">拼貼藝術風</td><td>拼貼藝術風格源於達達主義和波普藝術的混合媒材傳統，強調不同材料、字體和圖像的碰撞與融合。 核心理念： - 隨機旋轉：每個元素都有細微的 ro…</td></tr>
+                    <tr><td><span class="code-name">glitch-art</span></td><td class="style-name">故障藝術風</td><td>Glitch Art 是一種擁抱數位錯誤與技術故障的藝術形式，將系統崩潰和數據損壞轉化為視覺表達。完美是數位世界的幻覺——我們在斷裂的程式碼、…</td></tr>
+                    <tr><td><span class="code-name">shoujo-manga</span></td><td class="style-name">少女漫畫風</td><td>Shoujo Manga 風格源於日本少女漫畫的經典視覺語言，以浪漫、夢幻、柔美為核心。 核心理念： - 網點紋理：screentone d…</td></tr>
+                    <tr><td><span class="code-name">cyber-anime</span></td><td class="style-name">賽博動漫風</td><td>Cyber Anime 融合了賽博朋克 HUD 介面與動漫展現力… (Cyber anime fuses cyberpunk HUD interfaces with anime's expressive pow…)</td></tr>
+                    <tr><td><span class="code-name">neon-samurai</span></td><td class="style-name">霓虹武士風</td><td>Neon Samurai 融合了日本武士道美學與賽博朋克霓虹發光… (Neon samurai fuses Japanese bushido aesthetics with cyberpunk neon lum…)</td></tr>
+                    <tr><td><span class="code-name">magic-circle</span></td><td class="style-name">魔法陣風</td><td>Magic Circle 汲取自幾何召喚陣的神秘傳統… (Magic Circle draws from the arcane tradition of geometric summoning ci…)</td></tr>
+                    <tr><td><span class="code-name">cyber-wafuu</span></td><td class="style-name">賽博和風</td><td>Cyber Wafuu 透過數位科技重新詮釋日本傳統視覺文化… (Cyber wafuu reimagines traditional Japanese visual culture through dig…)</td></tr>
+                    <tr><td><span class="code-name">steampunk</span></td><td class="style-name">蒸汽朋克</td><td>Steampunk 風格源自維多利亞時代工業革命的美學想像，通過黃銅/銅質金屬質感、齒輪機關元素和精密的機械細節創造復古未來感。 核心理念：…</td></tr>
+                    <tr><td><span class="code-name">pop-art</span></td><td class="style-name">波普藝術</td><td>Pop Art 風格來源於 20 世紀 60 年代的波普藝術運動，以 Andy Warhol 和 Roy Lichtenstein 為代表，…</td></tr>
+                    <tr><td><span class="code-name">solarpunk</span></td><td class="style-name">太陽朋克</td><td>Solarpunk 風格源自對未來的樂觀想像，描繪人與自然和諧共存的世界。通過有機曲線、植物元素和溫暖色調傳遞希望與生機。 核心理念： - …</td></tr>
+                    <tr><td><span class="code-name">jrpg</span></td><td class="style-name">日式RPG</td><td>JRPG 風格源自經典日式角色扮演遊戲的選單與 UI 設計，通過斜面邊框、漸層背景和精緻框架重現復古遊戲體驗。 核心理念： - 斜面邊框：使…</td></tr>
+                    <tr><td><span class="code-name">neon-gradient</span></td><td class="style-name">霓虹漸層</td><td>Neon Gradient（霓虹漸層）是一種大膽、現代的設計風格，在深色背景上使用鮮豔的漸層色卡片和粗彩色邊框，營造出未來感和科技感。 核心…</td></tr>
+                    <tr><td><span class="code-name">cel-shading</span></td><td class="style-name">賽璐璐動畫風</td><td>賽璐璐動畫風（Cel Shading / Toon Shading）模擬傳統手繪動畫的視覺效果。 核心理念： - 粗黑輪廓：所有元素都有明確…</td></tr>
+                    <tr><td><span class="code-name">anti-design</span></td><td class="style-name">反設計</td><td>Anti-Design 故意打破所有 UI 常規。在傳統設計講究之處反其道而行… (Anti-Design deliberately breaks every UI convention. Where traditional…)</td></tr>
+                    <tr><td><span class="code-name">holographic</span></td><td class="style-name">全息漸層</td><td>Holographic（全息漸層）模擬全息箔片的稜鏡之美——彩虹光譜漸層隨視角變化而流轉，營造超凡脫俗的虹彩體驗。 核心理念： - 稜鏡折射…</td></tr>
+                    <tr><td><span class="code-name">generative-art</span></td><td class="style-name">生成藝術</td><td>Generative Art 風格源自創意編碼與演算法美學，每一個視覺元素都由數學函數和程序化規則生成。 核心理念： - 演算法驅動：顏色、形狀…</td></tr>
+                    <tr><td><span class="code-name">op-art</span></td><td class="style-name">歐普藝術</td><td>Op Art（光學藝術）興起於1960年代，以Bridget Riley和Victor Vasarely為代表。它利用精密的幾何圖案在二維平…</td></tr>
+                    <tr><td><span class="code-name">islamic-geometric</span></td><td class="style-name">伊斯蘭幾何</td><td>伊斯蘭幾何藝術是人類文明中最精密的裝飾體系之一，跨越千年仍令人嘆服。它基於嚴格的數學原理——正多邊形的鑲嵌（tessellation）、星形…</td></tr>
+                    <tr><td><span class="code-name">indian-festive</span></td><td class="style-name">印度節慶</td><td>Indian Festive（印度節慶）汲取排燈節（Diwali）和色彩節（Holi）的絢爛視覺語言，將南亞次大陸數千年的色彩傳統轉化為現代…</td></tr>
+                    <tr><td><span class="code-name">african-textile</span></td><td class="style-name">非洲紡織</td><td>African Textile（非洲紡織）以西非的Kente編織布和Adire靛藍扎染為靈感泉源，將數百年的紡織工藝傳統轉化為充滿生命力的數…</td></tr>
+                    <tr><td><span class="code-name">pastel-goth</span></td><td class="style-name">粉彩哥特</td><td>Pastel Goth（粉彩哥特）是2010年代從Tumblr亞文化中誕生的獨特美學流派，將傳統哥特的暗黑元素與甜美的糖果色彩進行了顛覆性的…</td></tr>
+                    <tr><td><span class="code-name">maximalism</span></td><td class="style-name">極繁主義</td><td>極繁主義（Maximalism）是對極簡主義的直接反叛。它相信"更多就是更多"，拒絕留白的克制，擁抱層疊、裝飾和視覺豐富性。從巴洛克宮殿到波…</td></tr>
+                    <tr><td><span class="code-name">graffiti-street</span></td><td class="style-name">塗鴉街頭</td><td>塗鴉街頭（Graffiti Street）風格源自20世紀60年代紐約地鐵和費城街頭的塗鴉文化，是嘻哈文化四大元素之一。從早期的簡單"tag…</td></tr>
+                    <tr><td><span class="code-name">cubism</span></td><td class="style-name">立體主義</td><td>Cubism（立體主義）是20世紀最具革命性的藝術運動之一，由畢卡索和布拉克於1907年前後開創。它徹底打破了文藝復興以來的單點透視傳統，用…</td></tr>
+                    <tr><td><span class="code-name">witchcore</span></td><td class="style-name">巫術核心</td><td>Witchcore（巫術核心）設計靈感源自神秘學、塔羅牌與自然魔法傳統，通過深邃的暗紫色調與閃爍的金色符文，構建一個充滿儀式感與神秘力量的視…</td></tr>
+                    <tr><td><span class="code-name">paper-craft</span></td><td class="style-name">紙藝手作</td><td>Paper Craft（紙藝手作）的設計靈感來自剪紙藝術、折紙和手工拼貼。通過層疊的紙張效果、柔和的投影和不規則的手作邊緣，創造出溫暖、有觸…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="minimal" class="tab-content">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%">英文代號</th>
+                        <th style="width: 20%">中文名</th>
+                        <th style="width: 60%">說明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><span class="code-name">editorial</span></td><td class="style-name">編輯雜誌風</td><td>Editorial（編輯雜誌風）設計風格源於傳統印刷媒體的排版美學，特別是高端時尚雜誌和報紙的設計語言。這種風格強調內容的層次結構、精緻的字…</td></tr>
+                    <tr><td><span class="code-name">corporate-clean</span></td><td class="style-name">企業簡潔風</td><td>Corporate Clean 設計風格源於現代企業軟體的設計語言，強調專業性、可信度和高效的信息傳達。 核心理念： - 专业可信：通过一致…</td></tr>
+                    <tr><td><span class="code-name">minimalist-flat</span></td><td class="style-name">極簡扁平風</td><td>Minimalist Flat 風格追求設計的本質，去除一切不必要的裝飾，讓內容成為主角。 核心理念： - 少即是多：每個元素都必須有存在的…</td></tr>
+                    <tr><td><span class="code-name">natural-organic</span></td><td class="style-name">自然有機風</td><td>Natural Organic 風格從自然界汲取靈感，通過大地色系、有機形狀和自然紋理創造溫慢親切的體驗。 核心理念： - 自然和諧：色彩和…</td></tr>
+                    <tr><td><span class="code-name">timeline-vertical</span></td><td class="style-name">垂直時間線版面</td><td>Vertical Timeline（垂直時間線版面）是一種用於展示時間序列或流程步驟的排版方式，通過視覺連接線引導閱讀。 核心理念： - 線…</td></tr>
+                    <tr><td><span class="code-name">notion-style</span></td><td class="style-name">Notion 風格</td><td>Notion Style 是一種源於 Notion 應用的極簡設計風格，強調內容的可讀性和功能的直觀性。通過微妙的視覺元素和清晰的層級結構，…</td></tr>
+                    <tr><td><span class="code-name">apple-style</span></td><td class="style-name">Apple 風格</td><td>Apple Style 是一種源於 Apple 設計語言的極致簡約風格，通過大量留白、精緻的細節和克制的配色，傳達高端科技產品的品質感和信任…</td></tr>
+                    <tr><td><span class="code-name">japanese-fresh</span></td><td class="style-name">日系清新風</td><td>Japanese Fresh 體現了「間（留白）」與「侘寂（殘缺之美）」… (Japanese fresh embodies Ma (space between) and wabi-sabi (beauty in im…)</td></tr>
+                    <tr><td><span class="code-name">scandinavian</span></td><td class="style-name">北歐極簡風</td><td>北歐極簡風（Scandinavian Minimalism）源自丹麥、瑞典、挪威、芬蘭等北歐國家的設計傳統。 核心理念： - 少即是多：每個…</td></tr>
+                    <tr><td><span class="code-name">wabi-sabi</span></td><td class="style-name">侘寂風</td><td>侘寂（Wabi-Sabi）是日本傳統美學中最深層的哲學概念。 核心理念： - 不完美之美：裂紋、磨損、不規則都是歲月賦予的美 - 間（Ma）…</td></tr>
+                    <tr><td><span class="code-name">zen-garden</span></td><td class="style-name">枯山水</td><td>枯山水（Karesansui）是日本禪宗庭園的最高表現形式。 核心理念： - 以砂代水：白砂上的紋路象徵水面的漣漪與波紋，無水卻見水 - 石…</td></tr>
+                    <tr><td><span class="code-name">kawaii-minimal</span></td><td class="style-name">可愛極簡</td><td>Kawaii Minimal 風格融合日本可愛文化的溫暖感與北歐極簡主義的克制感。 核心理念： - 柔和粉彩：使用低飽和度的粉、紫、藍、黃色…</td></tr>
+                    <tr><td><span class="code-name">terracotta</span></td><td class="style-name">赤陶暖調</td><td>赤陶暖調（Terracotta）源自地中海沿岸數千年的陶藝傳統，將燒製泥土的溫暖色澤融入數位設計。 核心理念： - 大地之溫：以赤陶色（#b…</td></tr>
+                    <tr><td><span class="code-name">monochrome</span></td><td class="style-name">單色極簡</td><td>單色極簡（Monochrome）是對色彩的徹底放棄，僅憑黑、白、灰三者的精確調度構建完整的視覺層次。 核心理念： - 零色相依賴：不使用任何…</td></tr>
+                    <tr><td><span class="code-name">ink-wash</span></td><td class="style-name">水墨畫風</td><td>水墨畫風（Ink Wash）源自中國傳統繪畫的千年美學體系，以"墨分五色"詮釋萬象。 核心理念： - 氣韻生動：謝赫六法之首，追求畫面的生命…</td></tr>
+                    <tr><td><span class="code-name">korean-minimal</span></td><td class="style-name">韓式極簡</td><td>Korean Minimal（韓式極簡）源自韓國當代設計美學中對"留白"與"克制"的深度追求，融合了K-beauty的柔和質感和韓國現代建築…</td></tr>
+                    <tr><td><span class="code-name">blueprint</span></td><td class="style-name">工程藍圖</td><td>Blueprint（工程藍圖）的設計靈感來自傳統的氰版藍圖印刷工藝和現代工程製圖。藍色底色上的白色線條是其最具標誌性的視覺特徵，網格系統、標…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="modern" class="tab-content">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%">英文代號</th>
+                        <th style="width: 20%">中文名</th>
+                        <th style="width: 60%">說明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><span class="code-name">neumorphism</span></td><td class="style-name">新擬物派</td><td>Neumorphism（新擬物派）是一種介於扁平設計和擬物設計之間的風格，通過柔和的陰影創造出元素從背景中"擠壓"或"凹陷"的視覺效果。 核…</td></tr>
+                    <tr><td><span class="code-name">glassmorphism</span></td><td class="style-name">玻璃擬態</td><td>Glassmorphism（玻璃擬態）是一種源於 iOS 和 macOS 設計語言的現代 UI 風格，通過半透明背景和背景模糊效果創造出類似…</td></tr>
+                    <tr><td><span class="code-name">bento-grid</span></td><td class="style-name">便當盒版面</td><td>Bento Grid（便當盒版面）是一種源於日式便當盒分隔設計的現代排版風格。通過不同尺寸的卡片在網格中的組合排列，創造出既有秩序又富有變化…</td></tr>
+                    <tr><td><span class="code-name">soft-ui</span></td><td class="style-name">柔和介面風</td><td>Soft UI 設計風格強調友好、親和、舒適的視覺體驗，讓用戶感到放鬆和愉悅。 核心理念： - 溫和友好：通過柔和的陰影和圓角傳達親和力 -…</td></tr>
+                    <tr><td><span class="code-name">dark-mode</span></td><td class="style-name">暗黑模式</td><td>Dark Mode 設計強調在深色背景上創造舒適的閱讀體驗和清晰的信息層次。 核心理念： - 護眼舒適：降低螢幕亮度，減少視覺疲勞 - 層次…</td></tr>
+                    <tr><td><span class="code-name">masonry-flow</span></td><td class="style-name">瀑布流版面</td><td>Masonry Flow（瀑布流版面）是一種模仿磚牆砌築方式的排版，卡片按列排列，高度不一，形成自然流動的視覺效果。 核心理念： - 自然流…</td></tr>
+                    <tr><td><span class="code-name">split-screen</span></td><td class="style-name">分屏版面</td><td>Split Screen（分屏版面）是一種將視口分為兩個或多個區域的排版方式，通過對比創造視覺張力和敘事效果。 核心理念： - 對比強調：通…</td></tr>
+                    <tr><td><span class="code-name">sidebar-fixed</span></td><td class="style-name">固定側邊欄版面</td><td>Fixed Sidebar（固定側邊欄版面）是應用型介面的經典排版，提供持久可見的導覽同時最大化內容展示空間。 核心理念： - 導覽常駐：重…</td></tr>
+                    <tr><td><span class="code-name">magazine-grid</span></td><td class="style-name">雜誌網格版面</td><td>Magazine Grid（雜誌網格版面）借鑑傳統印刷雜誌的排版智慧，通過多欄和混合尺寸內容塊創造專業的編輯效果。 核心理念： - 視覺層級…</td></tr>
+                    <tr><td><span class="code-name">claymorphism</span></td><td class="style-name">粘土擬態</td><td>Claymorphism（粘土擬態）是一種模擬粘土或橡皮泥質感的 UI 設計風格，通過超大圓角、內外陰影組合和柔和的漸層色彩，創造出柔軟、可…</td></tr>
+                    <tr><td><span class="code-name">stripe-style</span></td><td class="style-name">Stripe 風格</td><td>Stripe Style 是一種源於 Stripe 的精緻設計風格，以其標誌性的紫色和專業的視覺語言著稱。通過漸層網格背景、精緻的卡片陰影和…</td></tr>
+                    <tr><td><span class="code-name">bauhaus</span></td><td class="style-name">包浩斯風格</td><td>Bauhaus（包浩斯）是1919年在德國創立的設計學派，其核心理念"形式追隨功能"深刻影響了現代設計。 核心理念： - 功能主義：設計服務…</td></tr>
+                    <tr><td><span class="code-name">swiss-style</span></td><td class="style-name">瑞士國際風格</td><td>Swiss International Style（瑞士國際風格）是20世紀50年代在瑞士發展起來的設計運動，強調清晰、客觀、理性的視覺傳達…</td></tr>
+                    <tr><td><span class="code-name">material-design</span></td><td class="style-name">材料設計</td><td>Material Design（材料設計）是 Google 在 2014 年推出的設計語言，將數位介面比作有物理屬性的紙張和墨水。 核心理念…</td></tr>
+                    <tr><td><span class="code-name">fluent-design</span></td><td class="style-name">流暢設計系統</td><td>Fluent Design System（流暢設計系統）是微軟於 2017 年推出的設計語言，旨在創造跨設備的一致體驗。 核心五元素： - …</td></tr>
+                    <tr><td><span class="code-name">f-pattern-layout</span></td><td class="style-name">F型版面</td><td>F-Pattern Layout 基於尼爾森·諾曼集團的眼動追蹤研究，用戶瀏覽網頁時視線呈 F 形移動：先水平掃描頂部內容，再向下移動後進行…</td></tr>
+                    <tr><td><span class="code-name">z-pattern-layout</span></td><td class="style-name">Z型版面</td><td>Z-Pattern Layout 基於用戶在視覺簡潔頁面上的自然掃描路徑。視線從左上角（logo/品牌）移到右上角（CTA），然後斜穿到左下…</td></tr>
+                    <tr><td><span class="code-name">holy-grail-layout</span></td><td class="style-name">聖杯版面</td><td>Holy Grail Layout 是Web設計中追求已久的經典版面方案，包含固定的頁首頁尾和三列中間內容區。這個名字來源於CSS版面早期實…</td></tr>
+                    <tr><td><span class="code-name">dashboard-layout</span></td><td class="style-name">儀表板版面</td><td>Dashboard Layout 是一種以數據展示為核心的版面方案，通過側邊導覽、多模組數據面板和靈活的網格系統，讓用戶高效地監控和分析多維…</td></tr>
+                    <tr><td><span class="code-name">swiss-poster</span></td><td class="style-name">瑞士海報風</td><td>Swiss Poster 風格源於瑞士國際主義設計運動的海報傳統，追求極致的排版表現力。 核心理念： - 超大排版：使用極端大小的字體創造視…</td></tr>
+                    <tr><td><span class="code-name">visual-novel</span></td><td class="style-name">視覺小說風</td><td>Visual Novel 風格源於日本ADV（Adventure）視覺小說遊戲的UI設計，強調敘事沉浸感和角色互動。 核心理念： - ADV…</td></tr>
+                    <tr><td><span class="code-name">asymmetric-grid</span></td><td class="style-name">非對稱網格</td><td>Asymmetric Grid 打破傳統網格的均勻分布，通過不等寬列、元素重疊和留白對比創造視覺張力。 核心理念： - 打破對稱：故意使用不…</td></tr>
+                    <tr><td><span class="code-name">parallax-sections</span></td><td class="style-name">視差捲動</td><td>Parallax Sections 通過背景與前景的差速捲動創造深度感，讓用戶在捲動中體驗層次分明的視覺旅程。 核心理念： - 深度層次：背…</td></tr>
+                    <tr><td><span class="code-name">warm-dashboard</span></td><td class="style-name">暖色儀表板</td><td>Warm Dashboard（暖色儀表板）是一種溫暖、專業的介面設計風格，通過暖色調背景和柔和的卡片設計，讓數據展示更加親和友好。 核心理念…</td></tr>
+                    <tr><td><span class="code-name">liquid-glass</span></td><td class="style-name">Apple 流動玻璃</td><td>Liquid Glass（流動玻璃）是 Apple WWDC 2025 發布的革命性設計語言，超越傳統毛玻璃效果，通過光線折射、彩虹邊緣和流…</td></tr>
+                    <tr><td><span class="code-name">sci-fi-hud</span></td><td class="style-name">科幻HUD</td><td>Sci-Fi HUD 風格源自電影、遊戲中的未來科技介面，核心在於"信息即介面"。 設計原則： - 深空背景：極深的藍灰色背景模擬太空指揮室…</td></tr>
+                    <tr><td><span class="code-name">particle</span></td><td class="style-name">粒子系統</td><td>由浮動粒子與連接線組成的動態網絡… (A living network of floating particles and connection lines creates a …)</td></tr>
+                    <tr><td><span class="code-name">marble-luxury</span></td><td class="style-name">大理石奢華</td><td>大理石奢華（Marble Luxury）設計風格源自高端建築和室內設計的材質美學。大理石自古羅馬時代起便是權力、財富和永恆之美的象徵，其天然…</td></tr>
+                    <tr><td><span class="code-name">tropical-paradise</span></td><td class="style-name">熱帶天堂</td><td>Tropical Paradise（熱帶天堂）風格汲取熱帶島嶼的自然色彩與度假氛圍，將陽光、海洋、棕櫚葉和熱帶花卉的鮮活能量注入數位介面。 …</td></tr>
+                    <tr><td><span class="code-name">github-style</span></td><td class="style-name">GitHub 風格</td><td>GitHub Style 是一種源於 GitHub 平台的設計語言，為全球數以千萬計的開發者提供清晰、高效、無干擾的工作介面。它的設計哲學是…</td></tr>
+                    <tr><td><span class="code-name">neon-tokyo</span></td><td class="style-name">霓虹東京</td><td>Neon Tokyo（霓虹東京）靈感源自東京歌舞伎町、新宿和澀谷的霓虹夜景。不同於 Cyberpunk Neon 的科幻未來感，這個風格更貼…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="retro" class="tab-content">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%">英文代號</th>
+                        <th style="width: 20%">中文名</th>
+                        <th style="width: 60%">說明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><span class="code-name">retro-vintage</span></td><td class="style-name">復古懷舊風</td><td>Retro Vintage 風格從20世紀中期的設計美學中汲取靈感，通過復古排版、做舊紋理和懷舊色調創造溫暖的時光感。 核心理念： - 時光…</td></tr>
+                    <tr><td><span class="code-name">pixel-art</span></td><td class="style-name">像素藝術風</td><td>Pixel Art 是一種源於早期電子遊戲的復古設計風格，通過像素化的視覺元素、硬邊陰影和鮮明的 8-bit 配色，喚起對經典遊戲的懷舊情感…</td></tr>
+                    <tr><td><span class="code-name">vaporwave</span></td><td class="style-name">霓虹復古 (蒸汽波)</td><td>Vaporwave（蒸汽波）是一種源於2010年代初的網路亞文化美學，融合了80-90年代的消費主義符號、日本文化元素和早期網際網路美學。 核…</td></tr>
+                    <tr><td><span class="code-name">y2k</span></td><td class="style-name">千禧風格</td><td>Y2K（千禧風格）是1990年代末至2000年代初的設計美學，反映了人們對新千年和數位未來的樂觀想像。 核心理念： - 未來感：對數位時代的…</td></tr>
+                    <tr><td><span class="code-name">memphis</span></td><td class="style-name">孟菲斯風格</td><td>Memphis（孟菲斯）是1980年代由義大利設計師 Ettore Sottsass 創立的設計運動，以打破傳統、擁抱混亂和趣味性著稱。 核…</td></tr>
+                    <tr><td><span class="code-name">art-deco</span></td><td class="style-name">裝飾藝術風格</td><td>Art Deco（裝飾藝術）是1920-30年代流行的設計風格，融合了現代主義的幾何形式與傳統工藝的奢華感。 核心理念： - 幾何對稱：放射…</td></tr>
+                    <tr><td><span class="code-name">skeuomorphism</span></td><td class="style-name">擬物設計</td><td>Skeuomorphism（擬物設計）是一種模擬真實世界物體外觀和行為的設計方法，曾在早期 iOS 和數位產品中廣泛使用。 核心理念： - …</td></tr>
+                    <tr><td><span class="code-name">synthwave</span></td><td class="style-name">合成波</td><td>Synthwave（合成波）是一種源於2000年代中期的電子音樂流派和視覺美學，致敬80年代的科幻電影、電子遊戲和合成器音樂。 核心理念： …</td></tr>
+                    <tr><td><span class="code-name">art-nouveau</span></td><td class="style-name">新藝術運動風</td><td>Art Nouveau（新藝術運動）是19世紀末至20世紀初的國際性藝術運動，以自然界的有機形態為靈感，將裝飾藝術推向極致。 核心理念： -…</td></tr>
+                    <tr><td><span class="code-name">ukiyo-e-digital</span></td><td class="style-name">浮世繪數位風</td><td>Ukiyo-e Digital（浮世繪數位風）將江戶時代的木版畫藝術轉化為現代數位設計語言，保留其獨特的扁平透視和色彩分區技法。 核心理念：…</td></tr>
+                    <tr><td><span class="code-name">gothic</span></td><td class="style-name">哥特式風</td><td>Gothic（哥特式）設計靈感源自中世紀晚期的大教堂建築和手抄本裝飾藝術，強調垂直線條、尖拱結構和精緻的裝飾紋樣。 核心理念： - 大教堂美…</td></tr>
+                    <tr><td><span class="code-name">outrun</span></td><td class="style-name">Outrun 復古未來</td><td>Outrun 是一種根植於80年代流行文化的視覺美學，命名自同名電子遊戲。它將夕陽、跑車、棕櫚樹和霓虹燈光融為一體，創造出一種永恆的復古未來…</td></tr>
+                    <tr><td><span class="code-name">dark-academia</span></td><td class="style-name">暗黑學院風</td><td>Dark Academia（暗黑學院風）是一種以古典教育、文學和建築為核心的美學流派，融合了古希臘羅馬文化、哥特式建築和維多利亞時代學術氛圍…</td></tr>
+                    <tr><td><span class="code-name">cottagecore</span></td><td class="style-name">田園核風</td><td>Cottagecore（田園核）是一種浪漫化田園鄉村生活的美學運動，起源於2010年代末的網際網路文化。 核心理念： - 田園詩意：對簡單鄉村…</td></tr>
+                    <tr><td><span class="code-name">pixel-anime</span></td><td class="style-name">像素動漫風</td><td>Pixel Anime 結合了經典 JRPG 遊戲 UI 與像素畫動漫美學… (Pixel anime merges classic JRPG game UI with pixel-art anime aesthetic…)</td></tr>
+                    <tr><td><span class="code-name">film-noir</span></td><td class="style-name">黑色電影</td><td>Film Noir 風格取自 1940-50 年代好萊塢黑色電影的視覺語言。 核心理念： - 極致對比：深黑與亮白之間幾乎沒有中間地帶，製造…</td></tr>
+                    <tr><td><span class="code-name">arcade-crt</span></td><td class="style-name">街機CRT</td><td>Arcade CRT 風格再現了80-90年代街機CRT顯示器的懷舊輝光。 核心理念： - 掃描線疊加：所有內容區域使用 repeating…</td></tr>
+                    <tr><td><span class="code-name">frutiger-aero</span></td><td class="style-name">Frutiger Aero</td><td>Frutiger Aero 靈感源自 Windows Vista/7 Aero 的玻璃美學… (Frutiger Aero draws inspiration from the Windows Vista/7 Aero glass ae…)</td></tr>
+                    <tr><td><span class="code-name">brutalist-web</span></td><td class="style-name">網頁粗野主義</td><td>Brutalist Web 擁抱 1990 年代早期網際網路的原始粗糙美學… (Brutalist Web embraces the raw aesthetics of the early 1990s internet.)</td></tr>
+                    <tr><td><span class="code-name">vhs-aesthetic</span></td><td class="style-name">VHS美學</td><td>VHS Aesthetic 再現了80-90年代VHS磁帶的模擬溫暖感與美麗缺陷。 核心理念： - 掃描線疊加：所有內容區域使用 repea…</td></tr>
+                    <tr><td><span class="code-name">mid-century-modern</span></td><td class="style-name">中世紀現代</td><td>Mid-Century Modern（中世紀現代主義）是20世紀40-60年代盛行的設計運動，誕生於戰後樂觀主義與太空時代的交匯點。它追求形…</td></tr>
+                    <tr><td><span class="code-name">constructivism</span></td><td class="style-name">構成主義</td><td>構成主義（Constructivism）起源於1910年代的俄國先鋒派藝術運動，在1920-30年代的蘇聯達到高峰。它主張"藝術為社會服務"…</td></tr>
+                    <tr><td><span class="code-name">medieval-manuscript</span></td><td class="style-name">中世紀手抄本</td><td>中世紀泥金手抄本（Illuminated Manuscript）是西方書籍藝術的巔峰形態，誕生於修道院的繕寫室中。每一頁都是信仰與美學的結合…</td></tr>
+                    <tr><td><span class="code-name">victorian-botanical</span></td><td class="style-name">維多利亞植物</td><td>Victorian Botanical（維多利亞植物學）風格源於19世紀英國維多利亞時代的自然歷史研究熱潮。當時的植物學家和插畫師用精細的線…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function switchTab(tabId) {
+        // 隱藏所有 tab 內容
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+
+        // 取消所有按鈕的 active 狀態
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(button => button.classList.remove('active'));
+
+        // 顯示被點選的 tab 內容與 active 按鈕
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
