@@ -12,6 +12,7 @@ dist/
 !public/refs/*.jpg
 !public/refs/*.jpeg
 !public/refs/*.webp
+!public/refs/_components/*.webp
 參考圖/
 _cleanup_screenshots_*/
 verify-*.png
