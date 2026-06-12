@@ -361,18 +361,48 @@ const CARD_PRESETS: CardPreset[] = [
   { name: "badges", label: "彩色標籤", textColor: "#1f2937", badges: true, style: { background: "transparent" } },
 ];
 
-// 設計滑桿效果：一鍵套用滑軌 / 已填段 / 把手樣式
-interface SliderPreset { name: string; label: string; track: React.CSSProperties; fill: React.CSSProperties; thumb: React.CSSProperties; }
+// 設計圖片效果：一鍵套用相框 / 濾鏡 / 光暈（套在使用者上傳的圖片上）
+interface ImageVals {
+  radius: number; padding: number; frameColor: string;
+  borderW: number; borderColor: string; borderStyle: string;
+  shadowEnabled: boolean; shadowType: "box" | "drop"; shadowX: number; shadowY: number; shadowBlur: number; shadowSpread: number; shadowColor: string; shadowOpacity: number; square: boolean;
+  brightness: number; contrast: number; saturate: number; hue: number;
+  grayscale: number; sepia: number; blur: number; invert: number;
+}
+interface ImagePreset { name: string; label: string; v: Partial<ImageVals>; }
 
-const SLIDER_PRESETS: SliderPreset[] = [
-  { name: "neon", label: "霓虹內外光", track: { height: 8, background: "#0b0f1a", borderRadius: 999, boxShadow: "inset 0 0 6px rgba(34,211,238,0.4)" }, fill: { background: "#22d3ee", boxShadow: "0 0 8px #22d3ee, 0 0 16px #22d3ee" }, thumb: { width: 22, height: 22, background: "#0b0f1a", border: "2px solid #22d3ee", boxShadow: "0 0 10px #22d3ee, inset 0 0 6px #22d3ee" } },
-  { name: "insetTrack", label: "內凹軌道", track: { height: 10, background: "#e0e5ec", borderRadius: 999, boxShadow: "inset 3px 3px 6px #b8bcc4, inset -3px -3px 6px #ffffff" }, fill: { background: "#94a3b8" }, thumb: { width: 22, height: 22, background: "#f0f3f7", boxShadow: "3px 3px 6px #b8bcc4, -3px -3px 6px #ffffff" } },
-  { name: "neumorph", label: "新擬態凸起", track: { height: 10, background: "#e0e5ec", borderRadius: 999, boxShadow: "3px 3px 6px #b8bcc4, -3px -3px 6px #ffffff" }, fill: { background: "#a3aab8" }, thumb: { width: 22, height: 22, background: "#e0e5ec", boxShadow: "3px 3px 6px #b8bcc4, -3px -3px 6px #ffffff" } },
-  { name: "gradient", label: "漸層軌道", track: { height: 8, background: "#e5e7eb", borderRadius: 999 }, fill: { background: "linear-gradient(90deg,#a855f7,#ec4899)" }, thumb: { width: 22, height: 22, background: "#ffffff", boxShadow: "0 2px 6px rgba(0,0,0,0.3)" } },
-  { name: "glass", label: "玻璃", track: { height: 10, background: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.7)", borderRadius: 999 }, fill: { background: "rgba(168,85,247,0.55)" }, thumb: { width: 22, height: 22, background: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.85)", boxShadow: "0 4px 10px rgba(0,0,0,0.2)" } },
-  { name: "solid3d", label: "立體把手", track: { height: 8, background: "#e5e7eb", borderRadius: 999 }, fill: { background: "#3b82f6" }, thumb: { width: 24, height: 24, background: "#3b82f6", boxShadow: "0 4px 0 #1e40af" } },
-  { name: "thick", label: "粗描邊", track: { height: 12, background: "#ffffff", border: "2px solid #111111", borderRadius: 999 }, fill: { background: "#ffde59" }, thumb: { width: 24, height: 24, background: "#ffffff", border: "2px solid #111111", boxShadow: "3px 3px 0 #111111" } },
-  { name: "minimal", label: "極簡", track: { height: 4, background: "#e5e7eb", borderRadius: 999 }, fill: { background: "#111111" }, thumb: { width: 14, height: 14, background: "#111111" } },
+const IMG_DEFAULTS: ImageVals = {
+  radius: 12, padding: 0, frameColor: "#ffffff",
+  borderW: 0, borderColor: "#111111", borderStyle: "solid",
+  shadowEnabled: false, shadowType: "drop", shadowX: 0, shadowY: 12, shadowBlur: 30, shadowSpread: 0, shadowColor: "#000000", shadowOpacity: 0.25, square: false,
+  brightness: 100, contrast: 100, saturate: 100, hue: 0,
+  grayscale: 0, sepia: 0, blur: 0, invert: 0,
+};
+
+// 沿去背形狀的描邊：8 個方向各打一個 0 模糊 drop-shadow，疊成貼合輪廓的描邊
+function buildOutlineFilter(w: number, c: string): string {
+  const dirs: [number, number][] = [[w, 0], [-w, 0], [0, w], [0, -w], [w, w], [-w, -w], [w, -w], [-w, w]];
+  return dirs.map(([x, y]) => `drop-shadow(${x}px ${y}px 0 ${c})`).join(" ");
+}
+
+const IMAGE_PRESETS: ImagePreset[] = [
+  // ── 透明去背圖適用：只作用在圖案本身，貼合形狀（光影 / 濾鏡）──
+  { name: "neonGlow", label: "霓虹光暈", v: { radius: 14, shadowEnabled: true, shadowX: 0, shadowY: 0, shadowBlur: 20, shadowColor: "#22d3ee", shadowOpacity: 0.9 } },
+  { name: "softShadow", label: "圓角柔影", v: { radius: 24, shadowEnabled: true, shadowY: 16, shadowBlur: 40, shadowColor: "#000000", shadowOpacity: 0.2 } },
+  { name: "glitch", label: "故障藝術", v: { radius: 4, shadowEnabled: true, shadowX: 4, shadowY: 0, shadowBlur: 0, shadowColor: "#ff006e", shadowOpacity: 1 } },
+  { name: "mono", label: "黑白", v: { grayscale: 100, contrast: 110 } },
+  { name: "noir", label: "黑白高反差", v: { grayscale: 100, contrast: 145, brightness: 92 } },
+  { name: "vintage", label: "復古", v: { sepia: 60, contrast: 92, brightness: 104, saturate: 88 } },
+  { name: "vivid", label: "鮮豔", v: { saturate: 165, contrast: 115 } },
+  { name: "warm", label: "暖色調", v: { hue: 18, saturate: 120, brightness: 105 } },
+  { name: "cool", label: "冷色調", v: { hue: 200, saturate: 120 } },
+  { name: "softFocus", label: "柔焦", v: { blur: 2.2, brightness: 108, saturate: 110 } },
+  { name: "invert", label: "反相", v: { invert: 100 } },
+  // ── 相框類：會在透明區外圍畫矩形框 / 裁切，適合方形照片 ──
+  { name: "polaroid", label: "拍立得", v: { padding: 14, frameColor: "#ffffff", radius: 4, shadowEnabled: true, shadowY: 10, shadowBlur: 30, shadowColor: "#000000", shadowOpacity: 0.28 } },
+  { name: "circle", label: "圓形頭像", v: { square: true, radius: 999, borderW: 4, borderColor: "#ffffff", shadowEnabled: true, shadowY: 6, shadowBlur: 18, shadowColor: "#000000", shadowOpacity: 0.3 } },
+  { name: "glassCard", label: "玻璃卡", v: { radius: 20, borderW: 1, borderColor: "rgba(255,255,255,0.6)", shadowEnabled: true, shadowY: 12, shadowBlur: 40, shadowColor: "#000000", shadowOpacity: 0.18 } },
+  { name: "brutal", label: "粗黑框", v: { radius: 0, borderW: 3, borderColor: "#111111", shadowEnabled: true, shadowX: 8, shadowY: 8, shadowBlur: 0, shadowColor: "#111111", shadowOpacity: 1 } },
 ];
 
 interface ComparisonFont {
@@ -465,7 +495,7 @@ export default function Home() {
   const [btnSnapshot, setBtnSnapshot] = useState<any>(null);
   const [cardSnapshot, setCardSnapshot] = useState<any>(null);
   const [quickSnapshot, setQuickSnapshot] = useState<any>(null);
-  const [sliderSnapshot, setSliderSnapshot] = useState<any>(null);
+  const [imageSnapshot, setImageSnapshot] = useState<any>(null);
   const [effectAnimate, setEffectAnimate] = useState<string | null>(null); // 文字動態效果（流光）
   const [designAccent, setDesignAccent] = useState<string>(""); // 文字可換色效果的重點色
   const [btnAccent, setBtnAccent] = useState<string>(""); // 按鈕可換色效果的重點色
@@ -495,8 +525,29 @@ export default function Home() {
     e.preventDefault();
   };
 
+  const [modeTabsPos, setModeTabsPos] = useState<{ x: number; y: number } | null>(null);
+  const modeTabsDragRef = useRef<{ dx: number; dy: number } | null>(null);
+  const startModeTabsDrag = (e: React.MouseEvent) => {
+    const shell = (e.currentTarget as HTMLElement).closest(".mast-mode-shell") as HTMLElement | null;
+    if (!shell) return;
+    const rect = shell.getBoundingClientRect();
+    modeTabsDragRef.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
+    const move = (ev: MouseEvent) => {
+      if (!modeTabsDragRef.current) return;
+      setModeTabsPos({ x: ev.clientX - modeTabsDragRef.current.dx, y: ev.clientY - modeTabsDragRef.current.dy });
+    };
+    const up = () => {
+      modeTabsDragRef.current = null;
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", up);
+    };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+    e.preventDefault();
+  };
+
   // 預覽模式：純文字 / 按鈕
-  const [previewMode, setPreviewMode] = useState<"text" | "button" | "card" | "slider">("text");
+  const [previewMode, setPreviewMode] = useState<"text" | "button" | "card" | "image">("text");
 
   // ── 按鈕外框狀態（btn* / bg* 前綴，避開文字漸層 gradient*）──
   // 盒模型
@@ -520,7 +571,7 @@ export default function Home() {
   const [btnBorderGlowSpread, setBtnBorderGlowSpread] = useState(0);
   // 背景
   const [btnBgColor, setBtnBgColor] = useState("#3498db");
-  const [btnBgEnabled, setBtnBgEnabled] = useState(true); // 按鈕背景：有 / 無（無 = 透明）
+  const [btnBgEnabled, setBtnBgEnabled] = useState(false); // 按鈕背景：有 / 無（無 = 透明）；預設無色
   const [bgUseGradient, setBgUseGradient] = useState(false);
   const [bgGradColor1, setBgGradColor1] = useState("#3498db");
   const [bgGradColor2, setBgGradColor2] = useState("#2980b9");
@@ -700,11 +751,42 @@ export default function Home() {
   const [cardShadowEnabled, setCardShadowEnabled] = useState(false);
   const [cardShadow, setCardShadow] = useState("0 8px 24px rgba(0,0,0,0.12)");
 
-  // 設計滑桿效果用的狀態
-  const [sliderTrack, setSliderTrack] = useState<React.CSSProperties>(SLIDER_PRESETS[0].track);
-  const [sliderFill, setSliderFill] = useState<React.CSSProperties>(SLIDER_PRESETS[0].fill);
-  const [sliderThumb, setSliderThumb] = useState<React.CSSProperties>(SLIDER_PRESETS[0].thumb);
-  const [activeSliderPreset, setActiveSliderPreset] = useState<string | null>(null);
+  // 設計圖片效果用的狀態
+  const [imageSrc, setImageSrc] = useState<string>("");            // 使用者上傳的圖片（data URL）
+  const [imgWidth, setImgWidth] = useState(320);                   // 顯示寬度
+  const [imgOpacity, setImgOpacity] = useState(100);
+  const [imgSquare, setImgSquare] = useState(IMG_DEFAULTS.square);  // 是否正方形裁切（圓形頭像用）
+  const [imgRadius, setImgRadius] = useState(IMG_DEFAULTS.radius);
+  const [imgPadding, setImgPadding] = useState(IMG_DEFAULTS.padding);     // 相框留白
+  const [imgFrameColor, setImgFrameColor] = useState(IMG_DEFAULTS.frameColor);
+  const [imgBorderW, setImgBorderW] = useState(IMG_DEFAULTS.borderW);
+  const [imgBorderColor, setImgBorderColor] = useState(IMG_DEFAULTS.borderColor);
+  const [imgBorderStyle, setImgBorderStyle] = useState(IMG_DEFAULTS.borderStyle);
+  const [imgShadowEnabled, setImgShadowEnabled] = useState(IMG_DEFAULTS.shadowEnabled);
+  const [imgShadowType, setImgShadowType] = useState<"box" | "drop">(IMG_DEFAULTS.shadowType);
+  const [imgShadowX, setImgShadowX] = useState(IMG_DEFAULTS.shadowX);
+  const [imgShadowY, setImgShadowY] = useState(IMG_DEFAULTS.shadowY);
+  const [imgShadowBlur, setImgShadowBlur] = useState(IMG_DEFAULTS.shadowBlur);
+  const [imgShadowSpread, setImgShadowSpread] = useState(IMG_DEFAULTS.shadowSpread);
+  const [imgShadowColor, setImgShadowColor] = useState(IMG_DEFAULTS.shadowColor);
+  const [imgShadowOpacity, setImgShadowOpacity] = useState(IMG_DEFAULTS.shadowOpacity);
+  // 輪廓描邊（沿去背形狀，不需陰影）—— 用多向 drop-shadow 0 模糊堆出貼合輪廓
+  const [imgOutlineEnabled, setImgOutlineEnabled] = useState(false);
+  const [imgOutlineWidth, setImgOutlineWidth] = useState(3);
+  const [imgOutlineColor, setImgOutlineColor] = useState("#ffffff");
+  const [imgBrightness, setImgBrightness] = useState(100);
+  const [imgContrast, setImgContrast] = useState(100);
+  const [imgSaturate, setImgSaturate] = useState(100);
+  const [imgHue, setImgHue] = useState(0);
+  const [imgGrayscale, setImgGrayscale] = useState(0);
+  const [imgSepia, setImgSepia] = useState(0);
+  const [imgBlur, setImgBlur] = useState(0);
+  const [imgInvert, setImgInvert] = useState(0);
+  const [imgRotate, setImgRotate] = useState(0);
+  const [imgSkewX, setImgSkewX] = useState(0);
+  const [imgSkewY, setImgSkewY] = useState(0);
+  const [imgScaleX, setImgScaleX] = useState(100);
+  const [activeImagePreset, setActiveImagePreset] = useState<string | null>(null);
 
   // 字型載入完成後 bump 一次，用來強制預覽重掛 → 讓 background-clip:text 的漸層
   // 在粗體網路字型 swap 進來後重新裁切(否則漸層會變成一塊底色跑到字後面)
@@ -1058,7 +1140,7 @@ export default function Home() {
       setBgGradColor2("#2980b9");
       setBgGradAngle(90);
       setBtnBgColor("#3498db");
-      setBtnBgEnabled(true);
+      setBtnBgEnabled(false);
       setBtnOpacity(100);
       setBtnBorderMode("unified");
       setBtnBorderWidth(0);
@@ -1138,24 +1220,44 @@ export default function Home() {
     toast.success("已清除卡片效果，原本設定已還原");
   };
 
-  // 套用 / 清除設計滑桿效果
-  const applySliderPreset = (p: SliderPreset) => {
-    if (activeSliderPreset === null) {
-      setSliderSnapshot({ sliderTrack, sliderFill, sliderThumb });
-    }
-    setSliderTrack(p.track); setSliderFill(p.fill); setSliderThumb(p.thumb); setActiveSliderPreset(p.name);
+  // 套用 / 清除設計圖片效果（非破壞性：套用前快照，清除時還原）
+  const snapImg = (): ImageVals => ({
+    radius: imgRadius, padding: imgPadding, frameColor: imgFrameColor,
+    borderW: imgBorderW, borderColor: imgBorderColor, borderStyle: imgBorderStyle,
+    shadowEnabled: imgShadowEnabled, shadowType: imgShadowType, shadowX: imgShadowX, shadowY: imgShadowY, shadowBlur: imgShadowBlur, shadowSpread: imgShadowSpread, shadowColor: imgShadowColor, shadowOpacity: imgShadowOpacity, square: imgSquare,
+    brightness: imgBrightness, contrast: imgContrast, saturate: imgSaturate, hue: imgHue,
+    grayscale: imgGrayscale, sepia: imgSepia, blur: imgBlur, invert: imgInvert,
+  });
+  const setImgVals = (vv: Partial<ImageVals>) => {
+    const m = { ...IMG_DEFAULTS, ...vv };
+    setImgRadius(m.radius); setImgPadding(m.padding); setImgFrameColor(m.frameColor);
+    setImgBorderW(m.borderW); setImgBorderColor(m.borderColor); setImgBorderStyle(m.borderStyle);
+    setImgShadowEnabled(m.shadowEnabled); setImgShadowType(m.shadowType); setImgShadowX(m.shadowX); setImgShadowY(m.shadowY); setImgShadowBlur(m.shadowBlur); setImgShadowSpread(m.shadowSpread); setImgShadowColor(m.shadowColor); setImgShadowOpacity(m.shadowOpacity); setImgSquare(m.square);
+    setImgBrightness(m.brightness); setImgContrast(m.contrast); setImgSaturate(m.saturate); setImgHue(m.hue);
+    setImgGrayscale(m.grayscale); setImgSepia(m.sepia); setImgBlur(m.blur); setImgInvert(m.invert);
+  };
+  const applyImagePreset = (p: ImagePreset) => {
+    if (activeImagePreset === null) setImageSnapshot(snapImg());
+    // 陰影類型是全域設定：套預設時保留使用者目前選的「方框 / 貼合圖形」，不被預設覆蓋
+    setImgVals({ ...p.v, shadowType: imgShadowType });
+    setActiveImagePreset(p.name);
     toast.success(`已套用「${p.label}」`);
   };
-  const clearSliderPreset = () => {
-    const s = sliderSnapshot;
-    if (s) {
-      setSliderTrack(s.sliderTrack); setSliderFill(s.sliderFill); setSliderThumb(s.sliderThumb);
-      setSliderSnapshot(null);
-    } else {
-      setSliderTrack(SLIDER_PRESETS[0].track); setSliderFill(SLIDER_PRESETS[0].fill); setSliderThumb(SLIDER_PRESETS[0].thumb);
-    }
-    setActiveSliderPreset(null);
-    toast.success("已清除滑桿效果，原本設定已還原");
+  const clearImagePreset = () => {
+    const s = imageSnapshot;
+    // 清除時同樣保留全域陰影類型
+    if (s) { setImgVals({ ...s, shadowType: imgShadowType }); setImageSnapshot(null); }
+    else setImgVals({ ...IMG_DEFAULTS, shadowType: imgShadowType });
+    setActiveImagePreset(null);
+    toast.success("已清除圖片效果，原本設定已還原");
+  };
+  // 讀取使用者選的圖片成 data URL
+  const onPickImage = (file: File | undefined) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("請選擇圖片檔"); return; }
+    const reader = new FileReader();
+    reader.onload = () => setImageSrc(String(reader.result));
+    reader.readAsDataURL(file);
   };
 
   // 新增對比字型
@@ -1400,10 +1502,40 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
       return `.card {\n${styleToCss(merged).split(";").filter(Boolean).map((s) => "  " + s.trim() + ";").join("\n")}\n  color: ${cardTextColor};\n}`;
     }
 
-    // 滑桿模式：.slider-track / .slider-fill / .slider-thumb 樣式
-    if (previewMode === "slider") {
-      const blk = (sel: string, obj: React.CSSProperties) => `${sel} {\n${styleToCss(obj).split(";").filter(Boolean).map((s) => "  " + s.trim() + ";").join("\n")}\n}`;
-      return [blk(".slider-track", sliderTrack), blk(".slider-fill", sliderFill), blk(".slider-thumb", sliderThumb)].join("\n\n");
+    // 圖片模式：.image 樣式（相框 / 濾鏡 / 變形）
+    if (previewMode === "image") {
+      const filterParts: string[] = [];
+      if (imgBrightness !== 100) filterParts.push(`brightness(${imgBrightness}%)`);
+      if (imgContrast !== 100) filterParts.push(`contrast(${imgContrast}%)`);
+      if (imgSaturate !== 100) filterParts.push(`saturate(${imgSaturate}%)`);
+      if (imgHue !== 0) filterParts.push(`hue-rotate(${imgHue}deg)`);
+      if (imgGrayscale !== 0) filterParts.push(`grayscale(${imgGrayscale}%)`);
+      if (imgSepia !== 0) filterParts.push(`sepia(${imgSepia}%)`);
+      if (imgBlur !== 0) filterParts.push(`blur(${imgBlur}px)`);
+      if (imgInvert !== 0) filterParts.push(`invert(${imgInvert}%)`);
+      if (imgOutlineEnabled && imgOutlineWidth > 0) filterParts.push(buildOutlineFilter(imgOutlineWidth, imgOutlineColor));
+      const sr = hexToRgb(imgShadowColor);
+      const shadowRgba = `rgba(${sr.r}, ${sr.g}, ${sr.b}, ${imgShadowOpacity})`;
+      if (imgShadowEnabled && imgShadowType === "drop") filterParts.push(`drop-shadow(${imgShadowX}px ${imgShadowY}px ${imgShadowBlur}px ${shadowRgba})`);
+      const xf: string[] = [];
+      if (imgRotate !== 0) xf.push(`rotate(${imgRotate}deg)`);
+      if (imgSkewX !== 0) xf.push(`skewX(${imgSkewX}deg)`);
+      if (imgSkewY !== 0) xf.push(`skewY(${imgSkewY}deg)`);
+      if (imgScaleX !== 100) xf.push(`scaleX(${imgScaleX / 100})`);
+      const lines = [
+        `  width: ${imgWidth}px;`,
+        imgSquare ? `  height: ${imgWidth}px;\n  object-fit: cover;` : `  height: auto;`,
+        `  box-sizing: border-box;`,
+        `  border-radius: ${imgRadius}px;`,
+        imgPadding > 0 ? `  padding: ${imgPadding}px;\n  background: ${imgFrameColor};` : "",
+        imgBorderW > 0 ? `  border: ${imgBorderW}px ${imgBorderStyle} ${imgBorderColor};` : "",
+        imgShadowEnabled && imgShadowType === "box" ? `  box-shadow: ${imgShadowX}px ${imgShadowY}px ${imgShadowBlur}px ${imgShadowSpread}px ${shadowRgba};` : "",
+        imgOpacity !== 100 ? `  opacity: ${(imgOpacity / 100).toFixed(2)};` : "",
+        filterParts.length ? `  filter: ${filterParts.join(" ")};` : "",
+        xf.length ? `  transform: ${xf.join(" ")};` : "",
+        blendMode !== "normal" ? `  mix-blend-mode: ${blendMode};` : "",
+      ].filter(Boolean);
+      return `.image {\n${lines.join("\n")}\n}`;
     }
 
     // 按鈕模式：.button 外框 + .button > span 文字
@@ -1461,9 +1593,9 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     cardStyle,
     cardOverrideStyle,
     cardTextColor,
-    sliderTrack,
-    sliderFill,
-    sliderThumb,
+    imgWidth, imgSquare, imgRadius, imgPadding, imgFrameColor, imgBorderW, imgBorderColor, imgBorderStyle,
+    imgShadowEnabled, imgShadowType, imgShadowX, imgShadowY, imgShadowBlur, imgShadowSpread, imgShadowColor, imgShadowOpacity, imgOutlineEnabled, imgOutlineWidth, imgOutlineColor, imgOpacity, imgBrightness, imgContrast, imgSaturate, imgHue,
+    imgGrayscale, imgSepia, imgBlur, imgInvert, imgRotate, imgSkewX, imgSkewY, imgScaleX,
     selectedFont,
     fontSize,
     lineHeight,
@@ -1834,7 +1966,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     combinedPresets: setCombinedPresets, combinedShadows: setCombinedShadows, activePreset: setActivePreset,
     cardStyle: setCardStyle, cardTextColor: setCardTextColor, cardAccent: setCardAccent, activeCardPreset: setActiveCardPreset, cardOverride: setCardOverride, cardPadX: setCardPadX, cardPadY: setCardPadY, cardRadius: setCardRadius, cardWidth: setCardWidth, cardHeight: setCardHeight, cardBorderEnabled: setCardBorderEnabled, cardBorderMode: setCardBorderMode, cardBorderWidth: setCardBorderWidth, cardBorderTopWidth: setCardBorderTopWidth, cardBorderRightWidth: setCardBorderRightWidth, cardBorderBottomWidth: setCardBorderBottomWidth, cardBorderLeftWidth: setCardBorderLeftWidth, cardBorderColor: setCardBorderColor, cardBorderStyle: setCardBorderStyle, cardBorderGlowEnabled: setCardBorderGlowEnabled, cardBorderGlowColor: setCardBorderGlowColor, cardBorderGlowBlur: setCardBorderGlowBlur, cardBgEnabled: setCardBgEnabled, cardBgColor: setCardBgColor, cardBgUseGradient: setCardBgUseGradient, cardBgGradColor1: setCardBgGradColor1, cardBgGradColor2: setCardBgGradColor2, cardBgGradAngle: setCardBgGradAngle, cardShadowEnabled: setCardShadowEnabled, cardShadow: setCardShadow,
     cardRotate: setCardRotate, cardSkewX: setCardSkewX, cardSkewY: setCardSkewY, cardScaleX: setCardScaleX, cardPerspective: setCardPerspective, cardRotateX: setCardRotateX, cardRotateY: setCardRotateY,
-    sliderTrack: setSliderTrack, sliderFill: setSliderFill, sliderThumb: setSliderThumb, activeSliderPreset: setActiveSliderPreset,
+    imgWidth: setImgWidth, imgOpacity: setImgOpacity, imgSquare: setImgSquare, imgRadius: setImgRadius, imgPadding: setImgPadding, imgFrameColor: setImgFrameColor, imgBorderW: setImgBorderW, imgBorderColor: setImgBorderColor, imgBorderStyle: setImgBorderStyle, imgShadowEnabled: setImgShadowEnabled, imgShadowType: setImgShadowType, imgShadowX: setImgShadowX, imgShadowY: setImgShadowY, imgShadowBlur: setImgShadowBlur, imgShadowSpread: setImgShadowSpread, imgShadowColor: setImgShadowColor, imgShadowOpacity: setImgShadowOpacity, imgOutlineEnabled: setImgOutlineEnabled, imgOutlineWidth: setImgOutlineWidth, imgOutlineColor: setImgOutlineColor, imgBrightness: setImgBrightness, imgContrast: setImgContrast, imgSaturate: setImgSaturate, imgHue: setImgHue, imgGrayscale: setImgGrayscale, imgSepia: setImgSepia, imgBlur: setImgBlur, imgInvert: setImgInvert, imgRotate: setImgRotate, imgSkewX: setImgSkewX, imgSkewY: setImgSkewY, imgScaleX: setImgScaleX, activeImagePreset: setActiveImagePreset,
   };
   const collectState = () => ({
     previewText, selectedFont, fontSize, lineHeight, letterSpacing, wordSpacing, fontWeight, textOpacity, textColor, previewBgColor, gallerySample, previewMode,
@@ -1853,7 +1985,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     combinedPresets, combinedShadows, activePreset,
     cardStyle, cardTextColor, cardAccent, activeCardPreset, cardOverride, cardPadX, cardPadY, cardRadius, cardWidth, cardHeight, cardBorderEnabled, cardBorderMode, cardBorderWidth, cardBorderTopWidth, cardBorderRightWidth, cardBorderBottomWidth, cardBorderLeftWidth, cardBorderColor, cardBorderStyle, cardBorderGlowEnabled, cardBorderGlowColor, cardBorderGlowBlur, cardBgEnabled, cardBgColor, cardBgUseGradient, cardBgGradColor1, cardBgGradColor2, cardBgGradAngle, cardShadowEnabled, cardShadow,
     cardRotate, cardSkewX, cardSkewY, cardScaleX, cardPerspective, cardRotateX, cardRotateY,
-    sliderTrack, sliderFill, sliderThumb, activeSliderPreset,
+    imgWidth, imgOpacity, imgSquare, imgRadius, imgPadding, imgFrameColor, imgBorderW, imgBorderColor, imgBorderStyle, imgShadowEnabled, imgShadowType, imgShadowX, imgShadowY, imgShadowBlur, imgShadowSpread, imgShadowColor, imgShadowOpacity, imgOutlineEnabled, imgOutlineWidth, imgOutlineColor, imgBrightness, imgContrast, imgSaturate, imgHue, imgGrayscale, imgSepia, imgBlur, imgInvert, imgRotate, imgSkewX, imgSkewY, imgScaleX, activeImagePreset,
   });
   const applyState = (s: any) => { if (!s || typeof s !== "object") return; Object.keys(styleSetters).forEach((k) => { if (k in s) styleSetters[k](s[k]); }); };
 
@@ -1867,7 +1999,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     text: ["textShadowEnabled", "textShadowX", "textShadowY", "textShadowBlur", "textShadowColor", "textShadowOpacity", "textStrokeEnabled", "textStrokeWidth", "textStrokeColor", "gradientEnabled", "gradientType", "gradientAngle", "gradientColor1", "gradientColor2", "textFillTransparent", "textHighlightColor", "effectShadow", "effectAnimate", "designAccent", "activeDesignPreset", "combinedPresets", "combinedShadows", "activePreset"],
     button: ["btnPaddingX", "btnPaddingY", "btnBorderRadius", "btnWidth", "btnHeight", "btnBorderMode", "btnBorderWidth", "btnBorderTopWidth", "btnBorderRightWidth", "btnBorderBottomWidth", "btnBorderLeftWidth", "btnBorderColor", "btnBorderStyle", "btnBorderGlowEnabled", "btnBorderGlowColor", "btnBorderGlowBlur", "btnBorderGlowSpread", "btnBgColor", "btnBgEnabled", "bgUseGradient", "bgGradColor1", "bgGradColor2", "bgGradAngle", "btnHoverBgColor", "btnHoverScale", "btnHoverShadow", "btnHoverShadowEnabled", "btnTransitionDuration", "btnTransitionTiming", "btnFocusBgColor", "btnFocusBorderColor", "btnFocusBorderWidth", "btnFocusOutlineEnabled", "btnFocusOutlineColor", "btnFocusOutlineWidth", "btnFocusShadow", "btnFocusShadowEnabled", "btnDisabledOpacity", "btnDisabledCursor", "btnDisabledEnabled", "btnOpacity", "btnBoxShadow", "btnBackdropBlur", "btnAccent", "activeButtonPreset"],
     card: ["cardStyle", "cardTextColor", "cardAccent", "activeCardPreset", "cardOverride", "cardPadX", "cardPadY", "cardRadius", "cardWidth", "cardHeight", "cardBorderEnabled", "cardBorderMode", "cardBorderWidth", "cardBorderTopWidth", "cardBorderRightWidth", "cardBorderBottomWidth", "cardBorderLeftWidth", "cardBorderColor", "cardBorderStyle", "cardBorderGlowEnabled", "cardBorderGlowColor", "cardBorderGlowBlur", "cardBgEnabled", "cardBgColor", "cardBgUseGradient", "cardBgGradColor1", "cardBgGradColor2", "cardBgGradAngle", "cardShadowEnabled", "cardShadow", "cardRotate", "cardSkewX", "cardSkewY", "cardScaleX", "cardPerspective", "cardRotateX", "cardRotateY"],
-    slider: ["sliderTrack", "sliderFill", "sliderThumb", "activeSliderPreset"],
+    image: ["imgWidth", "imgOpacity", "imgSquare", "imgRadius", "imgPadding", "imgFrameColor", "imgBorderW", "imgBorderColor", "imgBorderStyle", "imgShadowEnabled", "imgShadowType", "imgShadowX", "imgShadowY", "imgShadowBlur", "imgShadowSpread", "imgShadowColor", "imgShadowOpacity", "imgOutlineEnabled", "imgOutlineWidth", "imgOutlineColor", "imgBrightness", "imgContrast", "imgSaturate", "imgHue", "imgGrayscale", "imgSepia", "imgBlur", "imgInvert", "imgRotate", "imgSkewX", "imgSkewY", "imgScaleX", "activeImagePreset"],
   } as const;
   // 只清除目前所在分頁(加上共用排版)的設定，其他分頁不動
   const resetToDefault = () => {
@@ -2026,12 +2158,12 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     previewMode === "text" ? "文字效果：漸層 / 中空 / 多層陰影 / 螢光筆"
     : previewMode === "button" ? "按鈕效果：玻璃 / 漸層光暈 / 新擬態 / 立體 / 霓虹…（套完可用右側微調）"
     : previewMode === "card" ? "卡片效果：外框 / 質感 / 玻璃 / 霓虹 / 黏土…"
-    : "滑桿效果：滑軌與把手樣式（含內外光暈）";
+    : "圖片效果：相框 / 濾鏡 / 光暈（上傳圖片後可再用右側微調）";
   const fxCfg: { list: any[]; active: string | null; apply: (p: any) => void; clear: () => void } =
     previewMode === "text" ? { list: DESIGN_PRESETS, active: activeDesignPreset, apply: applyDesignPreset, clear: clearDesignPreset }
     : previewMode === "button" ? { list: BUTTON_PRESETS, active: activeButtonPreset, apply: applyButtonPreset, clear: clearButtonPreset }
     : previewMode === "card" ? { list: CARD_PRESETS, active: activeCardPreset, apply: applyCardPreset, clear: clearCardPreset }
-    : { list: SLIDER_PRESETS, active: activeSliderPreset, apply: applySliderPreset, clear: clearSliderPreset };
+    : { list: IMAGE_PRESETS, active: activeImagePreset, apply: applyImagePreset, clear: clearImagePreset };
 
   // ── 把各類 preset 轉成「按鈕內的效果預覽樣本」 ──
   const designPv = (p: DesignPreset): React.CSSProperties => {
@@ -2081,27 +2213,44 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     ...p.style, color: p.textColor, fontWeight: 700, fontSize: 12, padding: "8px 14px",
     display: "inline-flex", alignItems: "center", lineHeight: 1.1,
   });
+  // 圖片預設的小樣本：用漸層方塊代替圖片，套上該預設的相框 / 濾鏡
+  const imgPv = (p: ImagePreset): React.CSSProperties => {
+    const v = { ...IMG_DEFAULTS, ...p.v };
+    const f: string[] = [];
+    if (v.brightness !== 100) f.push(`brightness(${v.brightness}%)`);
+    if (v.contrast !== 100) f.push(`contrast(${v.contrast}%)`);
+    if (v.saturate !== 100) f.push(`saturate(${v.saturate}%)`);
+    if (v.hue !== 0) f.push(`hue-rotate(${v.hue}deg)`);
+    if (v.grayscale !== 0) f.push(`grayscale(${v.grayscale}%)`);
+    if (v.sepia !== 0) f.push(`sepia(${v.sepia}%)`);
+    if (v.blur !== 0) f.push(`blur(${Math.min(v.blur, 1.2)}px)`);
+    if (v.invert !== 0) f.push(`invert(${v.invert}%)`);
+    return {
+      width: 30, height: 30, boxSizing: "border-box",
+      background: "linear-gradient(135deg,#60a5fa,#f472b6 55%,#fbbf24)",
+      borderRadius: v.square ? "50%" : Math.min(v.radius, 12),
+      border: v.borderW > 0 ? `${Math.min(v.borderW, 3)}px ${v.borderStyle} ${v.borderColor}` : undefined,
+      padding: v.padding > 0 ? Math.min(v.padding, 4) : undefined,
+      boxShadow: v.shadowEnabled ? (() => { const r = hexToRgb(v.shadowColor); return `${Math.max(-4, Math.min(v.shadowX, 4))}px ${Math.max(-4, Math.min(v.shadowY, 4))}px ${Math.min(v.shadowBlur, 8)}px rgba(${r.r}, ${r.g}, ${r.b}, ${v.shadowOpacity})`; })() : undefined,
+      filter: f.length ? f.join(" ") : undefined,
+    };
+  };
   const renderPresetSample = (p: any) => {
     if (previewMode === "button") return <span style={buttonPv(p)}>Aa</span>;
     if (previewMode === "card") return <span style={cardPv(p)}>Aa</span>;
-    if (previewMode === "slider") return (
-      <span className="mini-slider">
-        <span className="ms-track" style={p.track}><span className="ms-fill" style={{ ...p.fill, width: "55%" }} /></span>
-        <span className="ms-thumb" style={{ ...p.thumb, width: 14, height: 14 }} />
-      </span>
-    );
+    if (previewMode === "image") return <span style={imgPv(p)} />;
     return <span style={designPv(p)}>Aa</span>;
   };
 
-  const modeCN = previewMode === "text" ? "純文字" : previewMode === "button" ? "按鈕" : previewMode === "card" ? "卡片" : "滑桿";
-  const modeTag = previewMode === "text" ? "Text" : previewMode === "button" ? "Button" : previewMode === "card" ? "Card" : "Slider";
-  const modeInputLabel = previewMode === "text" ? "預覽文字" : previewMode === "card" ? "卡片標題文字" : previewMode === "slider" ? "滑桿說明文字" : "按鈕文字";
+  const modeCN = previewMode === "text" ? "純文字" : previewMode === "button" ? "按鈕" : previewMode === "card" ? "卡片" : "圖片";
+  const modeTag = previewMode === "text" ? "Text" : previewMode === "button" ? "Button" : previewMode === "card" ? "Card" : "Image";
+  const modeInputLabel = previewMode === "text" ? "預覽文字" : previewMode === "card" ? "卡片標題文字" : previewMode === "image" ? "圖片來源" : "按鈕文字";
 
   // ============ 組裝控制面板卡片（依模式） ============
   const cards: React.ReactNode[] = [];
 
-  // 排版（所有模式都有：作用在預覽文字 / 標題 / 說明）
-  cards.push(ctlCard("typo", "", "排版", <span className="mtag">{modeCN}</span>, (
+  // 排版（文字 / 按鈕 / 卡片：作用在預覽文字 / 標題 / 說明；圖片模式不需要）
+  if (previewMode !== "image") cards.push(ctlCard("typo", "", "排版", <span className="mtag">{modeCN}</span>, (
     <>
       {sRow("字型大小", fontSize, 12, 120, 1, (v) => setFontSize(v), `${fontSize}px`)}
       {sRow("行高", lineHeight, 1, 3, 0.1, (v) => setLineHeight(v), lineHeight.toFixed(1))}
@@ -2270,10 +2419,10 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     ) : null));
   }
 
-  // 混合模式（純文字 / 按鈕 / 卡片皆可）
-  if (previewMode !== "slider") {
+  // 混合模式（純文字 / 按鈕 / 卡片 / 圖片皆可）
+  {
     const BLEND_OPTS: [string, string][] = [["normal","正常"],["multiply","正片疊底"],["screen","濾色"],["overlay","覆疊"],["darken","變暗"],["lighten","變亮"],["color-dodge","加亮"],["color-burn","加深"],["hard-light","實光"],["soft-light","柔光"],["difference","差異"],["exclusion","排除"],["hue","色相"],["saturation","飽和"],["color","顏色"],["luminosity","亮度"]];
-    cards.push(ctlCard("fx-blend", "效果", "混合模式", null, (
+    cards.push(ctlCard("fx-blend", previewMode === "image" ? "" : "效果", "混合模式", null, (
       selRow("mix-blend-mode", blendMode, BLEND_OPTS, setBlendMode)
     )));
   }
@@ -2448,6 +2597,73 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     cards.push(ctlCard("cbox-tilt", "互動狀態", "傾斜 Tilt（懸停）", togBtn(cardTiltEnabled, () => setCardTiltEnabled(!cardTiltEnabled), true), cardTiltEnabled ? (
       sRow("強度", cardTiltIntensity, 1, 40, 1, (v) => setCardTiltIntensity(v), `${cardTiltIntensity}°`)
     ) : null));
+  } else if (previewMode === "image") {
+    // 圖片來源：上傳 / 更換 / 移除
+    cards.push(ctlCard("img-src", "", "圖片來源", <span className="mtag">Image</span>, (
+      <>
+        <label className="img-pick">
+          {imageSrc ? "更換圖片" : "選擇圖片…"}
+          <input type="file" accept="image/*" hidden onChange={(e) => { onPickImage(e.target.files?.[0]); e.target.value = ""; }} />
+        </label>
+        {imageSrc && <button className="clear-link" style={{ marginTop: 8, fontSize: 11 }} onClick={() => { setImageSrc(""); setActiveImagePreset(null); }}>移除圖片</button>}
+      </>
+    )));
+    cards.push(ctlCard("ibox-model", "", "尺寸 / 圓角", <span className="mtag">圖片</span>, (
+      <>
+        {sRow("顯示寬度", imgWidth, 120, 560, 1, (v) => setImgWidth(v), `${imgWidth}px`)}
+        {segRow("比例", imgSquare ? "square" : "auto", [["auto", "原比例"], ["square", "正方形裁切"]], (v) => setImgSquare(v === "square"))}
+        {sRow("圓角", imgRadius, 0, 300, 1, (v) => setImgRadius(v), imgRadius >= 300 ? "全圓" : `${imgRadius}px`)}
+        {sRow("相框留白", imgPadding, 0, 40, 1, (v) => setImgPadding(v), `${imgPadding}px`)}
+        {imgPadding > 0 && cRow("相框顏色", imgFrameColor, setImgFrameColor)}
+        {sRow("透明度", imgOpacity, 0, 100, 1, (v) => setImgOpacity(v), `${imgOpacity}%`)}
+      </>
+    )));
+    cards.push(ctlCard("ibox-filter", "", "濾鏡", null, (
+      <>
+        {sRow("亮度", imgBrightness, 0, 200, 1, (v) => setImgBrightness(v), `${imgBrightness}%`)}
+        {sRow("對比", imgContrast, 0, 200, 1, (v) => setImgContrast(v), `${imgContrast}%`)}
+        {sRow("飽和度", imgSaturate, 0, 300, 1, (v) => setImgSaturate(v), `${imgSaturate}%`)}
+        {sRow("色相旋轉", imgHue, 0, 360, 1, (v) => setImgHue(v), `${imgHue}°`)}
+        {sRow("黑白", imgGrayscale, 0, 100, 1, (v) => setImgGrayscale(v), `${imgGrayscale}%`)}
+        {sRow("復古", imgSepia, 0, 100, 1, (v) => setImgSepia(v), `${imgSepia}%`)}
+        {sRow("模糊", imgBlur, 0, 20, 0.2, (v) => setImgBlur(v), `${imgBlur}px`)}
+        {sRow("反相", imgInvert, 0, 100, 1, (v) => setImgInvert(v), `${imgInvert}%`)}
+      </>
+    )));
+    cards.push(ctlCard("ibox-border", "", "邊框", null, (
+      <>
+        {sRow("邊框寬度", imgBorderW, 0, 20, 1, (v) => setImgBorderW(v), `${imgBorderW}px`)}
+        {imgBorderW > 0 && cRow("邊框顏色", imgBorderColor, setImgBorderColor)}
+        {imgBorderW > 0 && selRow("邊框樣式", imgBorderStyle, STYLE_OPTS, setImgBorderStyle)}
+      </>
+    )));
+    cards.push(ctlCard("ibox-outline", "去背圖", "輪廓描邊", togBtn(imgOutlineEnabled, () => setImgOutlineEnabled(!imgOutlineEnabled), true), imgOutlineEnabled ? (
+      <>
+        {sRow("粗細", imgOutlineWidth, 1, 12, 1, (v) => setImgOutlineWidth(v), `${imgOutlineWidth}px`)}
+        {cRow("顏色", imgOutlineColor, setImgOutlineColor)}
+        <div className="row-line"><span className="lbl sm" style={{ fontSize: 10, opacity: .6 }}>沿去背圖案輪廓描一圈（像貼紙白邊），不需開陰影</span></div>
+      </>
+    ) : null));
+    cards.push(ctlCard("ibox-shadow", "", "陰影 / 光暈", togBtn(imgShadowEnabled, () => setImgShadowEnabled(!imgShadowEnabled), true), imgShadowEnabled ? (
+      <>
+        {segRow("陰影類型", imgShadowType, [["box", "方框陰影"], ["drop", "貼合圖形"]], (v) => setImgShadowType(v as any))}
+        {sRow("X 位移", imgShadowX, -40, 40, 1, (v) => setImgShadowX(v), `${imgShadowX}px`)}
+        {sRow("Y 位移", imgShadowY, -40, 40, 1, (v) => setImgShadowY(v), `${imgShadowY}px`)}
+        {sRow("模糊", imgShadowBlur, 0, 80, 1, (v) => setImgShadowBlur(v), `${imgShadowBlur}px`)}
+        {imgShadowType === "box" && sRow("擴散", imgShadowSpread, -20, 40, 1, (v) => setImgShadowSpread(v), `${imgShadowSpread}px`)}
+        {cRow("顏色", imgShadowColor, setImgShadowColor)}
+        {sRow("透明度", Math.round(imgShadowOpacity * 100), 0, 100, 5, (v) => setImgShadowOpacity(v / 100), `${Math.round(imgShadowOpacity * 100)}%`)}
+        <div className="row-line"><span className="lbl sm" style={{ fontSize: 10, opacity: .6 }}>X/Y 設 0 → 純光暈；透明去背圖選「貼合圖形」陰影才會貼著圖案</span></div>
+      </>
+    ) : null));
+    cards.push(ctlCard("ibox-transform", "", "變形", null, (
+      <>
+        {sRow("旋轉", imgRotate, -180, 180, 1, (v) => setImgRotate(v), `${imgRotate}°`)}
+        {sRow("傾斜 X", imgSkewX, -30, 30, 1, (v) => setImgSkewX(v), `${imgSkewX}°`)}
+        {sRow("傾斜 Y", imgSkewY, -30, 30, 1, (v) => setImgSkewY(v), `${imgSkewY}°`)}
+        {sRow("橫向縮放", imgScaleX, 50, 200, 5, (v) => setImgScaleX(v), `${imgScaleX}%`)}
+      </>
+    )));
   }
 
   // 預覽底色
@@ -2559,6 +2775,50 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
 
   // ============ 中央預覽內容（依模式） ============
   const cardXform = buildCardTransform();
+  // 圖片預覽：把所有圖片調整組成 style
+  const imgFilterStr = (() => {
+    const f: string[] = [];
+    if (imgBrightness !== 100) f.push(`brightness(${imgBrightness}%)`);
+    if (imgContrast !== 100) f.push(`contrast(${imgContrast}%)`);
+    if (imgSaturate !== 100) f.push(`saturate(${imgSaturate}%)`);
+    if (imgHue !== 0) f.push(`hue-rotate(${imgHue}deg)`);
+    if (imgGrayscale !== 0) f.push(`grayscale(${imgGrayscale}%)`);
+    if (imgSepia !== 0) f.push(`sepia(${imgSepia}%)`);
+    if (imgBlur !== 0) f.push(`blur(${imgBlur}px)`);
+    if (imgInvert !== 0) f.push(`invert(${imgInvert}%)`);
+    return f.join(" ");
+  })();
+  const imgXformStr = (() => {
+    const t: string[] = [];
+    if (imgRotate !== 0) t.push(`rotate(${imgRotate}deg)`);
+    if (imgSkewX !== 0) t.push(`skewX(${imgSkewX}deg)`);
+    if (imgSkewY !== 0) t.push(`skewY(${imgSkewY}deg)`);
+    if (imgScaleX !== 100) t.push(`scaleX(${imgScaleX / 100})`);
+    return t.join(" ");
+  })();
+  // 陰影：方框(box-shadow，繞矩形外框) vs 貼合圖形(drop-shadow，順著去背形狀)
+  const imgShadowRgba = (() => { const r = hexToRgb(imgShadowColor); return `rgba(${r.r}, ${r.g}, ${r.b}, ${imgShadowOpacity})`; })();
+  const imgBoxShadow = imgShadowEnabled && imgShadowType === "box"
+    ? `${imgShadowX}px ${imgShadowY}px ${imgShadowBlur}px ${imgShadowSpread}px ${imgShadowRgba}`
+    : undefined;
+  const imgDropShadow = imgShadowEnabled && imgShadowType === "drop"
+    ? `drop-shadow(${imgShadowX}px ${imgShadowY}px ${imgShadowBlur}px ${imgShadowRgba})`
+    : "";
+  // 輪廓描邊：多向 0 模糊 drop-shadow 疊出沿去背形狀的描邊
+  const imgOutlineFilter = imgOutlineEnabled && imgOutlineWidth > 0 ? buildOutlineFilter(imgOutlineWidth, imgOutlineColor) : "";
+  const imgFilterFull = [imgFilterStr, imgOutlineFilter, imgDropShadow].filter(Boolean).join(" ");
+  const imgPreviewStyle: React.CSSProperties = {
+    width: imgWidth, height: imgSquare ? imgWidth : "auto", maxWidth: "100%",
+    objectFit: imgSquare ? "cover" : undefined, display: "block", boxSizing: "border-box",
+    borderRadius: imgRadius, padding: imgPadding > 0 ? imgPadding : undefined,
+    background: imgPadding > 0 ? imgFrameColor : undefined,
+    border: imgBorderW > 0 ? `${imgBorderW}px ${imgBorderStyle} ${imgBorderColor}` : undefined,
+    boxShadow: imgBoxShadow,
+    opacity: imgOpacity / 100,
+    filter: imgFilterFull || undefined,
+    transform: imgXformStr || undefined,
+    mixBlendMode: blendMode !== "normal" ? (blendMode as any) : undefined,
+  };
   const previewContent =
     previewMode === "text" ? (
       <div key={`pv-${fontStamp}`} style={previewStyle} className="preview-text">{previewText}</div>
@@ -2594,16 +2854,22 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
           )}
         </div>
       </div>
-    ) : previewMode === "slider" ? (
-      <div style={{ width: 320, padding: "20px 0" }}>
-        <div style={{ marginBottom: 14, textAlign: "center" }}>
-          <span style={{ ...previewStyle, display: "inline-block" }}>{previewText}</span>
-        </div>
-        <div style={{ position: "relative", ...sliderTrack, width: "100%" }}>
-          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "62%", borderRadius: 999, ...sliderFill }} />
-          <div style={{ position: "absolute", left: "62%", top: "50%", transform: "translate(-50%,-50%)", borderRadius: "50%", ...sliderThumb }} />
-        </div>
-      </div>
+    ) : previewMode === "image" ? (
+      imageSrc ? (
+        <img src={imageSrc} alt="預覽圖片" style={imgPreviewStyle} />
+      ) : (
+        <label className="img-dropzone">
+          <span className="img-dropzone-icon">＋</span>
+          <span>點此上傳圖片</span>
+          <span className="img-dropzone-hint">或把圖片拖進來</span>
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => { onPickImage(e.target.files?.[0]); e.target.value = ""; }}
+          />
+        </label>
+      )
     ) : (
       <button
         style={getButtonBoxStyle()}
@@ -2816,6 +3082,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
             </div>
           </section>
 
+          {previewMode !== "image" && (
           <section className="panel">
             <div className="panel-h">
               <div>
@@ -2836,6 +3103,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
               </div>
             </div>
           </section>
+          )}
         </aside>
 
         {/* 中：預覽 */}
@@ -2844,9 +3112,21 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
             <div className="field-wrap">
               <div className="field-head" onMouseDown={startPreviewDrag} title="按住拖曳預覽框">
                 <label className="field-label">{modeInputLabel}</label>
+                <div className="mode-tabs field-mode-tabs" aria-label="預覽模式" onMouseDown={(e) => e.stopPropagation()}>
+                  {(["text", "button", "card", "image"] as const).map((m) => (
+                    <button key={m} className={`mode-tab${previewMode === m ? " active" : ""}`} onClick={() => setPreviewMode(m)}>
+                      {m === "text" ? "純文字" : m === "button" ? "按鈕" : m === "card" ? "卡片" : "圖片"}
+                    </button>
+                  ))}
+                </div>
                 {previewPos && <button className="dh-reset" onMouseDown={(e) => e.stopPropagation()} onClick={() => setPreviewPos(null)}>歸位</button>}
               </div>
-              {previewMode === "card" ? (
+              {previewMode === "image" ? (
+                <label className="img-pick">
+                  {imageSrc ? "更換圖片" : "選擇圖片…"}
+                  <input type="file" accept="image/*" hidden onChange={(e) => { onPickImage(e.target.files?.[0]); e.target.value = ""; }} />
+                </label>
+              ) : previewMode === "card" ? (
                 <textarea className="text-input" value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="輸入卡片標題（按 Enter 換行）" spellCheck={false} rows={2} style={{ resize: "vertical", minHeight: 48, lineHeight: 1.4, fontFamily: "inherit" }} />
               ) : (
                 <input className="text-input" value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="輸入要預覽的文字" spellCheck={false} />
@@ -2861,13 +3141,6 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
         {/* 右：控制面板 + CSS 輸出 */}
         <aside className="col">
           <section className="panel">
-            <div className="mode-tabs">
-              {(["text", "button", "card"] as const).map((m) => (
-                <button key={m} className={`mode-tab${previewMode === m ? " active" : ""}`} onClick={() => setPreviewMode(m)}>
-                  {m === "text" ? "純文字" : m === "button" ? "按鈕" : m === "card" ? "卡片" : "滑桿"}
-                </button>
-              ))}
-            </div>
             <div className="panel-h">
               <div>
                 <h2>控制面板</h2>

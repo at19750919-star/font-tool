@@ -4,6 +4,12 @@ import tailwindcss from "@tailwindcss/vite";
 import { fileURLToPath, URL } from "node:url";
 import fs from "node:fs";
 import path from "node:path";
+import {
+  buildRefsManifest,
+  removeRefFromManifest,
+  saveRefCategory,
+  syncRefsManifest,
+} from "./scripts/refs-manifest-utils.mjs";
 
 // 開發伺服器路由：讓「一鍵匯入本機字型」按鈕能讀取你已安裝的字型。
 // 只在 dev 生效，直接從使用者字型資料夾讀檔（不複製檔案）。
@@ -52,7 +58,8 @@ function serveUserFonts() {
 }
 
 // 畫廊 API：讓 public/refs 的參考圖能在瀏覽器裡列出 / 上傳 / 刪除（只在 dev 生效）。
-const REFS_DIR = fileURLToPath(new URL("./public/refs", import.meta.url));
+const REFS_URL = new URL("./public/refs/", import.meta.url);
+const REFS_DIR = fileURLToPath(REFS_URL);
 const IMG_EXT = /\.(png|jpe?g|webp|gif)$/i;
 const safeName = (n: string) => path.basename(n || "");
 
@@ -85,6 +92,7 @@ function galleryApi() {
           try {
             fs.mkdirSync(REFS_DIR, { recursive: true });
             fs.writeFileSync(path.join(REFS_DIR, name), Buffer.concat(chunks));
+            syncRefsManifest(REFS_URL);
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify({ ok: true, name }));
           } catch (e) {
@@ -99,6 +107,16 @@ function galleryApi() {
           const data = fs.existsSync(fp) ? fs.readFileSync(fp, "utf-8") : "{}";
           res.setHeader("Content-Type", "application/json");
           res.end(data || "{}");
+        } catch {
+          res.statusCode = 500;
+          res.end("{}");
+        }
+      });
+      // 讀取目前 manifest：GET /refs-manifest
+      server.middlewares.use("/refs-manifest", (_req: any, res: any) => {
+        try {
+          res.setHeader("Content-Type", "application/json");
+          res.end(JSON.stringify(buildRefsManifest(REFS_URL)));
         } catch {
           res.statusCode = 500;
           res.end("{}");
@@ -119,8 +137,26 @@ function galleryApi() {
             if (text && String(text).trim()) all[name] = String(text);
             else delete all[name];
             fs.writeFileSync(fp, JSON.stringify(all, null, 2));
+            syncRefsManifest(REFS_URL);
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify({ ok: true }));
+          } catch {
+            res.statusCode = 500; res.end("save failed");
+          }
+        });
+      });
+      // 儲存單張分類：POST /refs-category，body 為 JSON {name, cat}
+      server.middlewares.use("/refs-category", (req: any, res: any) => {
+        if (req.method !== "POST") { res.statusCode = 405; res.end("method"); return; }
+        let body = "";
+        req.on("data", (c: Buffer) => (body += c));
+        req.on("end", () => {
+          try {
+            const { name: rawName, cat } = JSON.parse(body || "{}");
+            const name = safeName(rawName);
+            const item = saveRefCategory(REFS_URL, name, String(cat || ""));
+            res.setHeader("Content-Type", "application/json");
+            res.end(JSON.stringify({ ok: true, item }));
           } catch {
             res.statusCode = 500; res.end("save failed");
           }
@@ -137,6 +173,7 @@ function galleryApi() {
             if (!name || !IMG_EXT.test(name)) { res.statusCode = 400; res.end("bad name"); return; }
             const fp = path.join(REFS_DIR, name);
             if (fs.existsSync(fp)) fs.unlinkSync(fp);
+            removeRefFromManifest(REFS_URL, name);
             res.setHeader("Content-Type", "application/json");
             res.end(JSON.stringify({ ok: true }));
           } catch {

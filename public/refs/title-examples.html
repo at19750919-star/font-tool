@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>標題排版範例</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin:0; font-family: system-ui, "Microsoft JhengHei", sans-serif; background:#f4f1ea; color:#1f2430; }
+  header { padding:24px 32px 16px; position:sticky; top:0; background:#f4f1eaee; backdrop-filter:blur(6px); border-bottom:1px solid #e5e3dc; z-index:5; }
+  header h1 { margin:0; font-size:22px; }
+  header p { margin:6px 0 0; color:#6b7280; font-size:13px; }
+  .bar { margin-top:12px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:8px; border:1px solid #d1cfc7; background:#fff; font-size:14px; cursor:pointer; text-decoration:none; color:inherit; }
+  .count { color:#9ca3af; font-size:13px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; padding:18px 32px 80px; }
+  figure { margin:0; background:#fff; border:1px solid #e5e3dc; border-radius:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  figure img { display:block; width:100%; height:auto; cursor:zoom-in; background:#faf9f6; }
+  figcaption { padding:9px 12px; font-size:13px; color:#6b7280; }
+</style>
+</head>
+<body>
+<header>
+  <h1>標題排版範例</h1>
+  <p>做網頁標題時的靈感參考。挑中哪一款，直接跟我說是第幾張、第幾排第幾個，我照著做成可用的 HTML/CSS。點圖可放大。</p>
+  <div class="bar">
+    <a class="btn" href="gallery.html">← 回 UI 效果參考菜單</a>
+    <span class="count" id="count"></span>
+  </div>
+</header>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const items = [
+  { f:'title-examples/overview.jpg', c:'標題範例總覽' },
+  { f:'title-examples/title-01.jpg', c:'50+ 常用標題排版設計 1' },
+  { f:'title-examples/title-02.jpg', c:'50+ 常用標題排版設計 2' },
+  { f:'title-examples/title-03.jpg', c:'50+ 常用標題排版設計 3' },
+  { f:'title-examples/title-04.jpg', c:'50+ 常用標題排版設計 4' },
+  { f:'title-examples/title-05.jpg', c:'50+ 常用標題排版設計 5' },
+];
+const grid = document.getElementById('grid');
+document.getElementById('count').textContent = items.length + ' 張';
+items.forEach((it, idx) => {
+  const fig = document.createElement('figure');
+  fig.innerHTML = '<img loading="lazy" src="./'+it.f+'" alt="'+it.c+'"><figcaption>'+(idx+1)+'. '+it.c+'</figcaption>';
+  fig.querySelector('img').addEventListener('click', ()=>zoom(idx));
+  grid.appendChild(fig);
+});
+
+function zoom(start){
+  let i = start, zoomed = false;
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:99;padding:20px;overflow:auto';
+  const big = document.createElement('img'); big.style.cssText = 'border-radius:6px;box-shadow:0 12px 44px rgba(0,0,0,.55);cursor:zoom-in';
+  const cap = document.createElement('div'); cap.style.cssText = 'color:#fff;font-size:13px;opacity:.85;text-align:center;max-width:90vw;flex:none';
+  const navCss = 'position:fixed;top:50%;transform:translateY(-50%);width:54px;height:54px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:30px;cursor:pointer;z-index:100';
+  const prev = document.createElement('button'); prev.textContent='‹'; prev.style.cssText = navCss+';left:18px';
+  const next = document.createElement('button'); next.textContent='›'; next.style.cssText = navCss+';right:18px';
+  const close = document.createElement('button'); close.textContent='✕';
+  close.style.cssText = 'position:fixed;top:16px;right:18px;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.16);color:#fff;font-size:18px;cursor:pointer;z-index:100';
+  function applyZoom(){
+    if(zoomed){ big.style.maxWidth='none'; big.style.maxHeight='none'; big.style.cursor='zoom-out'; o.style.alignItems='flex-start'; o.style.justifyContent='flex-start'; }
+    else { big.style.maxWidth='92vw'; big.style.maxHeight='82vh'; big.style.cursor='zoom-in'; o.style.alignItems='center'; o.style.justifyContent='center'; o.scrollTo(0,0); }
+  }
+  function show(){ zoomed=false; big.src='./'+items[i].f; cap.textContent=(i+1)+' / '+items.length+'  ·  '+items[i].c+'  （點圖放大）'; applyZoom(); }
+  function go(d){ i=(i+d+items.length)%items.length; show(); }
+  prev.onclick=e=>{e.stopPropagation();go(-1);};
+  next.onclick=e=>{e.stopPropagation();go(1);};
+  big.onclick=e=>{e.stopPropagation(); zoomed=!zoomed; applyZoom();};
+  function cleanup(){ document.removeEventListener('keydown',onKey); o.remove(); }
+  close.onclick=cleanup;
+  o.addEventListener('click',cleanup);
+  function onKey(e){ if(e.key==='ArrowLeft')go(-1); else if(e.key==='ArrowRight')go(1); else if(e.key==='Escape')cleanup(); }
+  document.addEventListener('keydown',onKey);
+  o.appendChild(big); o.appendChild(cap); o.appendChild(prev); o.appendChild(next); o.appendChild(close);
+  document.body.appendChild(o); show();
+}
+</script>
+</body>
+</html>
