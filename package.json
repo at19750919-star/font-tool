@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test:refs-manifest": "node scripts/refs-manifest-utils.test.mjs",
+    "test:saved-styles": "node scripts/saved-style-backup.test.mjs",
     "refs:manifest": "node scripts/gen-refs-manifest.mjs",
     "refs:compress": "node scripts/compress-refs.mjs"
   },

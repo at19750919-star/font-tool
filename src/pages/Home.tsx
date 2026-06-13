@@ -1,9 +1,19 @@
-import { useState, useMemo, useEffect, useRef } from "react";
+import { isValidElement, useState, useMemo, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
-import { Copy, Check, X, LayoutGrid, Eye, ChevronDown, Trash2 } from "lucide-react";
+import { Copy, Check, X, LayoutGrid, Eye, ChevronDown, Trash2, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useLocalFonts } from "@/hooks/useLocalFonts";
 import { FontUploader } from "@/components/FontUploader";
+import {
+  createSavedStylesBackup,
+  filterSavedStyles,
+  getSavedStyleMode,
+  getSavedStyleModeLabel,
+  parseSavedStylesBackup,
+  summarizeSavedStyleImport,
+  type SavedStyleEntry,
+  type SavedStyleMode,
+} from "@/lib/savedStyleBackup";
 import "@/studio.css";
 
 // 與 dashboard 一致的網路字型（Google Fonts + CDN，已在 index.html 載入）
@@ -370,6 +380,26 @@ interface ImageVals {
   grayscale: number; sepia: number; blur: number; invert: number;
 }
 interface ImagePreset { name: string; label: string; v: Partial<ImageVals>; }
+type ShapeEffectPresetName = "custom" | "metal" | "neon" | "flow" | "hollow" | "extrude";
+interface ShapeEffectPreset {
+  name: ShapeEffectPresetName;
+  label: string;
+  v: {
+    c1: string;
+    c2: string;
+    angle: number;
+    glow: boolean;
+    glowColor: string;
+    glowBlur: number;
+    outline: boolean;
+    outlineWidth: number;
+    outlineColor: string;
+    extrude: boolean;
+    extrudeDepth: number;
+    extrudeColor: string;
+    animate: boolean;
+  };
+}
 
 const IMG_DEFAULTS: ImageVals = {
   radius: 12, padding: 0, frameColor: "#ffffff",
@@ -403,6 +433,14 @@ const IMAGE_PRESETS: ImagePreset[] = [
   { name: "circle", label: "圓形頭像", v: { square: true, radius: 999, borderW: 4, borderColor: "#ffffff", shadowEnabled: true, shadowY: 6, shadowBlur: 18, shadowColor: "#000000", shadowOpacity: 0.3 } },
   { name: "glassCard", label: "玻璃卡", v: { radius: 20, borderW: 1, borderColor: "rgba(255,255,255,0.6)", shadowEnabled: true, shadowY: 12, shadowBlur: 40, shadowColor: "#000000", shadowOpacity: 0.18 } },
   { name: "brutal", label: "粗黑框", v: { radius: 0, borderW: 3, borderColor: "#111111", shadowEnabled: true, shadowX: 8, shadowY: 8, shadowBlur: 0, shadowColor: "#111111", shadowOpacity: 1 } },
+];
+
+const SHAPE_EFFECT_PRESETS: ShapeEffectPreset[] = [
+  { name: "metal", label: "金屬", v: { c1: "#ffffff", c2: "#737373", angle: 180, glow: false, glowColor: "#ffffff", glowBlur: 0, outline: true, outlineWidth: 1, outlineColor: "#404040", extrude: false, extrudeDepth: 0, extrudeColor: "#525252", animate: false } },
+  { name: "neon", label: "霓虹", v: { c1: "#ffffff", c2: "#22d3ee", angle: 110, glow: true, glowColor: "#22d3ee", glowBlur: 28, outline: true, outlineWidth: 1, outlineColor: "#a5f3fc", extrude: false, extrudeDepth: 0, extrudeColor: "#0891b2", animate: false } },
+  { name: "flow", label: "流光", v: { c1: "#7c3aed", c2: "#fb7185", angle: 95, glow: true, glowColor: "#fb7185", glowBlur: 18, outline: false, outlineWidth: 0, outlineColor: "#ffffff", extrude: false, extrudeDepth: 0, extrudeColor: "#7c3aed", animate: true } },
+  { name: "hollow", label: "中空描邊", v: { c1: "transparent", c2: "transparent", angle: 90, glow: false, glowColor: "#ffffff", glowBlur: 0, outline: true, outlineWidth: 4, outlineColor: "#ffffff", extrude: false, extrudeDepth: 0, extrudeColor: "#111827", animate: false } },
+  { name: "extrude", label: "立體", v: { c1: "#f8fafc", c2: "#cbd5e1", angle: 150, glow: false, glowColor: "#ffffff", glowBlur: 0, outline: true, outlineWidth: 1, outlineColor: "#94a3b8", extrude: true, extrudeDepth: 10, extrudeColor: "#475569", animate: false } },
 ];
 
 interface ComparisonFont {
@@ -548,6 +586,10 @@ export default function Home() {
 
   // 預覽模式：純文字 / 按鈕
   const [previewMode, setPreviewMode] = useState<"text" | "button" | "card" | "image">("text");
+  const [controlGroupView, setControlGroupView] = useState("all");
+  useEffect(() => {
+    setControlGroupView("all");
+  }, [previewMode]);
 
   // ── 按鈕外框狀態（btn* / bg* 前綴，避開文字漸層 gradient*）──
   // 盒模型
@@ -750,9 +792,17 @@ export default function Home() {
   const [cardBgGradAngle, setCardBgGradAngle] = useState(135);
   const [cardShadowEnabled, setCardShadowEnabled] = useState(false);
   const [cardShadow, setCardShadow] = useState("0 8px 24px rgba(0,0,0,0.12)");
+  const [cardShadowMode, setCardShadowMode] = useState<"outer" | "inner" | "glow">("outer");
+  const [cardShadowX, setCardShadowX] = useState(0);
+  const [cardShadowY, setCardShadowY] = useState(12);
+  const [cardShadowBlur, setCardShadowBlur] = useState(28);
+  const [cardShadowSpread, setCardShadowSpread] = useState(0);
+  const [cardShadowColor, setCardShadowColor] = useState("#000000");
+  const [cardShadowOpacity, setCardShadowOpacity] = useState(0.18);
 
   // 設計圖片效果用的狀態
   const [imageSrc, setImageSrc] = useState<string>("");            // 使用者上傳的圖片（data URL）
+  const [isImageDragging, setIsImageDragging] = useState(false);
   const [imgWidth, setImgWidth] = useState(320);                   // 顯示寬度
   const [imgOpacity, setImgOpacity] = useState(100);
   const [imgSquare, setImgSquare] = useState(IMG_DEFAULTS.square);  // 是否正方形裁切（圓形頭像用）
@@ -787,6 +837,21 @@ export default function Home() {
   const [imgSkewY, setImgSkewY] = useState(0);
   const [imgScaleX, setImgScaleX] = useState(100);
   const [activeImagePreset, setActiveImagePreset] = useState<string | null>(null);
+  const [imgShapeEffectEnabled, setImgShapeEffectEnabled] = useState(false);
+  const [imgShapePreset, setImgShapePreset] = useState<ShapeEffectPresetName>("custom");
+  const [imgShapeColor1, setImgShapeColor1] = useState("#ffffff");
+  const [imgShapeColor2, setImgShapeColor2] = useState("#22d3ee");
+  const [imgShapeAngle, setImgShapeAngle] = useState(110);
+  const [imgShapeGlowEnabled, setImgShapeGlowEnabled] = useState(true);
+  const [imgShapeGlowColor, setImgShapeGlowColor] = useState("#22d3ee");
+  const [imgShapeGlowBlur, setImgShapeGlowBlur] = useState(24);
+  const [imgShapeOutlineEnabled, setImgShapeOutlineEnabled] = useState(false);
+  const [imgShapeOutlineWidth, setImgShapeOutlineWidth] = useState(2);
+  const [imgShapeOutlineColor, setImgShapeOutlineColor] = useState("#ffffff");
+  const [imgShapeExtrudeEnabled, setImgShapeExtrudeEnabled] = useState(false);
+  const [imgShapeExtrudeDepth, setImgShapeExtrudeDepth] = useState(8);
+  const [imgShapeExtrudeColor, setImgShapeExtrudeColor] = useState("#334155");
+  const [imgShapeAnimateFlow, setImgShapeAnimateFlow] = useState(false);
 
   // 字型載入完成後 bump 一次，用來強制預覽重掛 → 讓 background-clip:text 的漸層
   // 在粗體網路字型 swap 進來後重新裁切(否則漸層會變成一塊底色跑到字後面)
@@ -816,6 +881,7 @@ export default function Home() {
   // 本地字型管理
   const { localFonts, isLoading, error, uploadFont, deleteFont, ensureFontLoaded, bulkImportSystemFonts } = useLocalFonts();
   const [isImporting, setIsImporting] = useState(false);
+  const canBulkImportSystemFonts = import.meta.env.DEV;
   // 被使用者隱藏的內建／網路字型（key 例如 "builtin:Noto Sans"、"web:Dela Gothic One"），存 localStorage
   const [hiddenFonts, setHiddenFonts] = useState<string[]>(() => {
     try { return JSON.parse(localStorage.getItem("fontTool:hidden") || "[]"); } catch { return []; }
@@ -827,6 +893,21 @@ export default function Home() {
       try { localStorage.setItem("fontTool:hidden", JSON.stringify(next)); } catch (e) { /* ignore quota */ }
       return next;
     });
+  const restoreHiddenFont = (key: string) =>
+    setHiddenFonts((prev) => {
+      const next = prev.filter((item) => item !== key);
+      try { localStorage.setItem("fontTool:hidden", JSON.stringify(next)); } catch (e) { /* ignore quota */ }
+      return next;
+    });
+  const restoreAllHiddenFonts = () => {
+    setHiddenFonts([]);
+    try { localStorage.setItem("fontTool:hidden", "[]"); } catch (e) { /* ignore quota */ }
+  };
+  const hiddenFontLabels = hiddenFonts.map((key) => {
+    const [, rawName] = key.split(":");
+    const web = WEB_FONTS.find((font) => font.family === rawName);
+    return { key, label: web?.cn ? `${rawName} · ${web.cn}` : rawName || key };
+  });
   // 各分組的收合狀態（key 例如 "web:中文"、"local:英文"）
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const toggleGroup = (k: string) =>
@@ -837,6 +918,10 @@ export default function Home() {
     });
 
   const handleBulkImport = async () => {
+    if (!canBulkImportSystemFonts) {
+      toast.error("部署版無法讀取本機字型清單，請改用單檔上傳字型");
+      return;
+    }
     setIsImporting(true);
     const toastId = toast.loading("匯入本機字型中…");
     try {
@@ -1251,6 +1336,24 @@ export default function Home() {
     setActiveImagePreset(null);
     toast.success("已清除圖片效果，原本設定已還原");
   };
+  const applyShapeEffectPreset = (preset: ShapeEffectPreset) => {
+    setImgShapeEffectEnabled(true);
+    setImgShapePreset(preset.name);
+    setImgShapeColor1(preset.v.c1);
+    setImgShapeColor2(preset.v.c2);
+    setImgShapeAngle(preset.v.angle);
+    setImgShapeGlowEnabled(preset.v.glow);
+    setImgShapeGlowColor(preset.v.glowColor);
+    setImgShapeGlowBlur(preset.v.glowBlur);
+    setImgShapeOutlineEnabled(preset.v.outline);
+    setImgShapeOutlineWidth(preset.v.outlineWidth);
+    setImgShapeOutlineColor(preset.v.outlineColor);
+    setImgShapeExtrudeEnabled(preset.v.extrude);
+    setImgShapeExtrudeDepth(preset.v.extrudeDepth);
+    setImgShapeExtrudeColor(preset.v.extrudeColor);
+    setImgShapeAnimateFlow(preset.v.animate);
+    toast.success(`已套用「${preset.label}」圖案特效`);
+  };
   // 讀取使用者選的圖片成 data URL
   const onPickImage = (file: File | undefined) => {
     if (!file) return;
@@ -1259,11 +1362,16 @@ export default function Home() {
     reader.onload = () => setImageSrc(String(reader.result));
     reader.readAsDataURL(file);
   };
+  const handleImageDrop = (e: React.DragEvent<HTMLElement>) => {
+    e.preventDefault();
+    setIsImageDragging(false);
+    onPickImage(e.dataTransfer.files?.[0]);
+  };
 
   // 新增對比字型
   const addComparisonFont = (font: typeof FONT_LIST[0]) => {
-    if (comparisonFonts.length >= 3) {
-      toast.error("最多只能對比 3 個字型");
+    if (comparisonFonts.length >= 6) {
+      toast.error("最多只能對比 6 個字型");
       return;
     }
     
@@ -1291,6 +1399,15 @@ export default function Home() {
 
   // 由卡片外框控制項組出實際要疊加的覆蓋樣式
   // 盒模型四項一律寫入；邊框/背景/陰影依各自啟用開關決定是否覆蓋
+  const cardShadowControlStr = (): string | null => {
+    if (!cardShadowEnabled) return null;
+    const x = cardShadowMode === "glow" ? 0 : cardShadowX;
+    const y = cardShadowMode === "glow" ? 0 : cardShadowY;
+    const spread = cardShadowMode === "glow" ? Math.max(cardShadowSpread, 0) : cardShadowSpread;
+    const inset = cardShadowMode === "inner" ? "inset " : "";
+    return `${inset}${x}px ${y}px ${cardShadowBlur}px ${spread}px ${withAlpha(cardShadowColor, cardShadowOpacity)}`;
+  };
+
   const cardOverrideStyle = useMemo<React.CSSProperties>(() => {
     const o: React.CSSProperties = {
       padding: `${cardPadY}px ${cardPadX}px`,
@@ -1316,7 +1433,7 @@ export default function Home() {
     }
     // 發光邊框 + 陰影合併成 box-shadow（兩者皆有時以逗號併接）
     const glow = cardBorderGlowEnabled ? `0 0 ${cardBorderGlowBlur}px ${cardBorderGlowColor}` : null;
-    const shadow = cardShadowEnabled ? cardShadow : null;
+    const shadow = cardShadowControlStr() || (cardShadowEnabled ? cardShadow : null);
     const boxShadow = [glow, shadow].filter(Boolean).join(", ");
     if (boxShadow) {
       o.boxShadow = boxShadow;
@@ -1349,6 +1466,13 @@ export default function Home() {
     cardBgGradAngle,
     cardShadowEnabled,
     cardShadow,
+    cardShadowMode,
+    cardShadowX,
+    cardShadowY,
+    cardShadowBlur,
+    cardShadowSpread,
+    cardShadowColor,
+    cardShadowOpacity,
   ]);
 
   // 發光邊框 box-shadow 字串（未開啟時回傳 null）
@@ -1522,6 +1646,47 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
       if (imgSkewX !== 0) xf.push(`skewX(${imgSkewX}deg)`);
       if (imgSkewY !== 0) xf.push(`skewY(${imgSkewY}deg)`);
       if (imgScaleX !== 100) xf.push(`scaleX(${imgScaleX / 100})`);
+      if (imgShapeEffectEnabled) {
+        const shapeFilter = [
+          ...filterParts,
+          imgShapeOutlineEnabled && imgShapeOutlineWidth > 0 ? buildOutlineFilter(imgShapeOutlineWidth, imgShapeOutlineColor) : "",
+          imgShapeGlowEnabled && imgShapeGlowBlur > 0 ? `drop-shadow(0 0 ${imgShapeGlowBlur}px ${imgShapeGlowColor}) drop-shadow(0 0 ${Math.round(imgShapeGlowBlur * 1.7)}px ${imgShapeGlowColor})` : "",
+        ].filter(Boolean).join(" ");
+        const shapeBg = imgShapeColor1 === "transparent" && imgShapeColor2 === "transparent"
+          ? "transparent"
+          : `linear-gradient(${imgShapeAngle}deg, ${imgShapeColor1}, ${imgShapeColor2})`;
+        const wrapperLines = [
+          `  position: relative;`,
+          `  display: inline-block;`,
+          `  width: ${imgWidth}px;`,
+          `  max-width: 100%;`,
+          imgPadding > 0 ? `  padding: ${imgPadding}px;\n  background: ${imgFrameColor};` : "",
+          imgBorderW > 0 ? `  border: ${imgBorderW}px ${imgBorderStyle} ${imgBorderColor};` : "",
+          `  border-radius: ${imgRadius}px;`,
+          imgShadowEnabled && imgShadowType === "box" ? `  box-shadow: ${imgShadowX}px ${imgShadowY}px ${imgShadowBlur}px ${imgShadowSpread}px ${shadowRgba};` : "",
+        ].filter(Boolean);
+        const maskLines = [
+          `  position: absolute;`,
+          `  inset: 0;`,
+          `  background: ${shapeBg};`,
+          imgShapeAnimateFlow ? `  background-size: 220% 220%;\n  animation: shape-flow 3.6s linear infinite;` : "",
+          `  -webkit-mask-image: url("your-transparent-image.png");`,
+          `  mask-image: url("your-transparent-image.png");`,
+          `  -webkit-mask-repeat: no-repeat;`,
+          `  mask-repeat: no-repeat;`,
+          `  -webkit-mask-size: ${imgSquare ? "cover" : "contain"};`,
+          `  mask-size: ${imgSquare ? "cover" : "contain"};`,
+          `  -webkit-mask-position: center;`,
+          `  mask-position: center;`,
+          shapeFilter ? `  filter: ${shapeFilter};` : "",
+          imgOpacity !== 100 ? `  opacity: ${(imgOpacity / 100).toFixed(2)};` : "",
+          xf.length ? `  transform: ${xf.join(" ")};` : "",
+        ].filter(Boolean);
+        const extrude = imgShapeExtrudeEnabled
+          ? `\n.shape-image::after {\n  content: \"\";\n${maskLines.join("\n").replace(`  background: ${shapeBg};`, `  background: ${imgShapeExtrudeColor};`).replace(shapeFilter ? `  filter: ${shapeFilter};` : "", "").replace(xf.length ? `  transform: ${xf.join(" ")};` : "", `  transform: translate(${imgShapeExtrudeDepth}px, ${imgShapeExtrudeDepth}px);`)}\n  z-index: 0;\n}`
+          : "";
+        return `.shape-image {\n${wrapperLines.join("\n")}\n}\n.shape-image img {\n  width: 100%;\n  height: ${imgSquare ? `${imgWidth}px` : "auto"};\n  display: block;\n  opacity: 0;\n}\n.shape-image::before {\n  content: \"\";\n${maskLines.join("\n")}\n  z-index: 1;\n}${extrude}`;
+      }
       const lines = [
         `  width: ${imgWidth}px;`,
         imgSquare ? `  height: ${imgWidth}px;\n  object-fit: cover;` : `  height: auto;`,
@@ -1708,14 +1873,38 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     fontAxisWeight,
     fontAxisWidth,
     fontAxisOpticalSize,
+    cardShadowMode,
+    cardShadowX,
+    cardShadowY,
+    cardShadowBlur,
+    cardShadowSpread,
+    cardShadowColor,
+    cardShadowOpacity,
+    imgShapeEffectEnabled,
+    imgShapeColor1,
+    imgShapeColor2,
+    imgShapeAngle,
+    imgShapeGlowEnabled,
+    imgShapeGlowColor,
+    imgShapeGlowBlur,
+    imgShapeOutlineEnabled,
+    imgShapeOutlineWidth,
+    imgShapeOutlineColor,
+    imgShapeExtrudeEnabled,
+    imgShapeExtrudeDepth,
+    imgShapeExtrudeColor,
+    imgShapeAnimateFlow,
     blendMode,
   ]);
 
   const handleCopyCSS = () => {
-    navigator.clipboard.writeText(cssCode);
-    setCopied(true);
-    toast.success("已複製到剪貼板");
-    setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard.writeText(outputCode)
+      .then(() => {
+        setCopied(true);
+        toast.success("已複製到剪貼板");
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => toast.error("剪貼簿權限被擋住，請手動選取複製"));
   };
 
   const handleUploadFont = async (file: File) => {
@@ -1857,6 +2046,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
   const [fontSearch, setFontSearch] = useState("");
   const [interactOpen, setInteractOpen] = useState(false);
   const [cssOpen, setCssOpen] = useState(false);
+  const [cssOutputMode, setCssOutputMode] = useState<"css" | "html" | "react">("css");
   // 貼上 CSS 解析回控制項
   const [pasteMode, setPasteMode] = useState(false);
   const [pasteText, setPasteText] = useState("");
@@ -1959,14 +2149,23 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     btnFocusBgColor: setBtnFocusBgColor, btnFocusBorderColor: setBtnFocusBorderColor, btnFocusBorderWidth: setBtnFocusBorderWidth, btnFocusOutlineEnabled: setBtnFocusOutlineEnabled, btnFocusOutlineColor: setBtnFocusOutlineColor, btnFocusOutlineWidth: setBtnFocusOutlineWidth, btnFocusShadow: setBtnFocusShadow, btnFocusShadowEnabled: setBtnFocusShadowEnabled,
     btnDisabledOpacity: setBtnDisabledOpacity, btnDisabledCursor: setBtnDisabledCursor, btnDisabledEnabled: setBtnDisabledEnabled, btnOpacity: setBtnOpacity,
     btnBoxShadow: setBtnBoxShadow, btnBackdropBlur: setBtnBackdropBlur, btnAccent: setBtnAccent, activeButtonPreset: setActiveButtonPreset,
+    btnShadowEnabled: setBtnShadowEnabled, btnShadowInset: setBtnShadowInset, btnShadowX: setBtnShadowX, btnShadowY: setBtnShadowY, btnShadowBlur: setBtnShadowBlur, btnShadowSpread: setBtnShadowSpread, btnShadowColor: setBtnShadowColor, btnShadowOpacity: setBtnShadowOpacity,
+    btnActiveOffsetX: setBtnActiveOffsetX, btnActiveOffsetY: setBtnActiveOffsetY,
     textShadowEnabled: setTextShadowEnabled, textShadowX: setTextShadowX, textShadowY: setTextShadowY, textShadowBlur: setTextShadowBlur, textShadowColor: setTextShadowColor, textShadowOpacity: setTextShadowOpacity,
+    textShadowLayers: setTextShadowLayers,
     textStrokeEnabled: setTextStrokeEnabled, textStrokeWidth: setTextStrokeWidth, textStrokeColor: setTextStrokeColor,
     gradientEnabled: setGradientEnabled, gradientType: setGradientType, gradientAngle: setGradientAngle, gradientColor1: setGradientColor1, gradientColor2: setGradientColor2,
     textFillTransparent: setTextFillTransparent, textHighlightColor: setTextHighlightColor, effectShadow: setEffectShadow, effectAnimate: setEffectAnimate, designAccent: setDesignAccent, activeDesignPreset: setActiveDesignPreset,
+    textRotate: setTextRotate, textSkewX: setTextSkewX, textSkewY: setTextSkewY, textScaleX: setTextScaleX, textPerspective: setTextPerspective, textRotateX: setTextRotateX, textRotateY: setTextRotateY,
+    writingMode: setWritingMode, textDecoLine: setTextDecoLine, textDecoStyle: setTextDecoStyle, textDecoColor: setTextDecoColor, textDecoThickness: setTextDecoThickness, textUnderlineOffset: setTextUnderlineOffset,
+    textTransformVal: setTextTransformVal, textAlign: setTextAlign, textIndent: setTextIndent, dropCapEnabled: setDropCapEnabled,
+    filterBlur: setFilterBlur, filterBrightness: setFilterBrightness, filterContrast: setFilterContrast, filterHueRotate: setFilterHueRotate, filterSaturate: setFilterSaturate, filterDropShadowEnabled: setFilterDropShadowEnabled, filterDropShadowX: setFilterDropShadowX, filterDropShadowY: setFilterDropShadowY, filterDropShadowBlur: setFilterDropShadowBlur, filterDropShadowColor: setFilterDropShadowColor,
+    ligatures: setLigatures, swash: setSwash, oldstyleNums: setOldstyleNums, tabularNums: setTabularNums, fontAxisWeight: setFontAxisWeight, fontAxisWidth: setFontAxisWidth, fontAxisOpticalSize: setFontAxisOpticalSize, fontVariationEnabled: setFontVariationEnabled,
+    blendMode: setBlendMode,
     combinedPresets: setCombinedPresets, combinedShadows: setCombinedShadows, activePreset: setActivePreset,
-    cardStyle: setCardStyle, cardTextColor: setCardTextColor, cardAccent: setCardAccent, activeCardPreset: setActiveCardPreset, cardOverride: setCardOverride, cardPadX: setCardPadX, cardPadY: setCardPadY, cardRadius: setCardRadius, cardWidth: setCardWidth, cardHeight: setCardHeight, cardBorderEnabled: setCardBorderEnabled, cardBorderMode: setCardBorderMode, cardBorderWidth: setCardBorderWidth, cardBorderTopWidth: setCardBorderTopWidth, cardBorderRightWidth: setCardBorderRightWidth, cardBorderBottomWidth: setCardBorderBottomWidth, cardBorderLeftWidth: setCardBorderLeftWidth, cardBorderColor: setCardBorderColor, cardBorderStyle: setCardBorderStyle, cardBorderGlowEnabled: setCardBorderGlowEnabled, cardBorderGlowColor: setCardBorderGlowColor, cardBorderGlowBlur: setCardBorderGlowBlur, cardBgEnabled: setCardBgEnabled, cardBgColor: setCardBgColor, cardBgUseGradient: setCardBgUseGradient, cardBgGradColor1: setCardBgGradColor1, cardBgGradColor2: setCardBgGradColor2, cardBgGradAngle: setCardBgGradAngle, cardShadowEnabled: setCardShadowEnabled, cardShadow: setCardShadow,
-    cardRotate: setCardRotate, cardSkewX: setCardSkewX, cardSkewY: setCardSkewY, cardScaleX: setCardScaleX, cardPerspective: setCardPerspective, cardRotateX: setCardRotateX, cardRotateY: setCardRotateY,
-    imgWidth: setImgWidth, imgOpacity: setImgOpacity, imgSquare: setImgSquare, imgRadius: setImgRadius, imgPadding: setImgPadding, imgFrameColor: setImgFrameColor, imgBorderW: setImgBorderW, imgBorderColor: setImgBorderColor, imgBorderStyle: setImgBorderStyle, imgShadowEnabled: setImgShadowEnabled, imgShadowType: setImgShadowType, imgShadowX: setImgShadowX, imgShadowY: setImgShadowY, imgShadowBlur: setImgShadowBlur, imgShadowSpread: setImgShadowSpread, imgShadowColor: setImgShadowColor, imgShadowOpacity: setImgShadowOpacity, imgOutlineEnabled: setImgOutlineEnabled, imgOutlineWidth: setImgOutlineWidth, imgOutlineColor: setImgOutlineColor, imgBrightness: setImgBrightness, imgContrast: setImgContrast, imgSaturate: setImgSaturate, imgHue: setImgHue, imgGrayscale: setImgGrayscale, imgSepia: setImgSepia, imgBlur: setImgBlur, imgInvert: setImgInvert, imgRotate: setImgRotate, imgSkewX: setImgSkewX, imgSkewY: setImgSkewY, imgScaleX: setImgScaleX, activeImagePreset: setActiveImagePreset,
+    cardStyle: setCardStyle, cardTextColor: setCardTextColor, cardAccent: setCardAccent, activeCardPreset: setActiveCardPreset, cardOverride: setCardOverride, cardPadX: setCardPadX, cardPadY: setCardPadY, cardRadius: setCardRadius, cardWidth: setCardWidth, cardHeight: setCardHeight, cardBorderEnabled: setCardBorderEnabled, cardBorderMode: setCardBorderMode, cardBorderWidth: setCardBorderWidth, cardBorderTopWidth: setCardBorderTopWidth, cardBorderRightWidth: setCardBorderRightWidth, cardBorderBottomWidth: setCardBorderBottomWidth, cardBorderLeftWidth: setCardBorderLeftWidth, cardBorderColor: setCardBorderColor, cardBorderStyle: setCardBorderStyle, cardBorderGlowEnabled: setCardBorderGlowEnabled, cardBorderGlowColor: setCardBorderGlowColor, cardBorderGlowBlur: setCardBorderGlowBlur, cardBgEnabled: setCardBgEnabled, cardBgColor: setCardBgColor, cardBgUseGradient: setCardBgUseGradient, cardBgGradColor1: setCardBgGradColor1, cardBgGradColor2: setCardBgGradColor2, cardBgGradAngle: setCardBgGradAngle, cardShadowEnabled: setCardShadowEnabled, cardShadow: setCardShadow, cardShadowMode: setCardShadowMode, cardShadowX: setCardShadowX, cardShadowY: setCardShadowY, cardShadowBlur: setCardShadowBlur, cardShadowSpread: setCardShadowSpread, cardShadowColor: setCardShadowColor, cardShadowOpacity: setCardShadowOpacity,
+    cardRotate: setCardRotate, cardSkewX: setCardSkewX, cardSkewY: setCardSkewY, cardScaleX: setCardScaleX, cardPerspective: setCardPerspective, cardRotateX: setCardRotateX, cardRotateY: setCardRotateY, cardTiltEnabled: setCardTiltEnabled, cardTiltIntensity: setCardTiltIntensity,
+    imgWidth: setImgWidth, imgOpacity: setImgOpacity, imgSquare: setImgSquare, imgRadius: setImgRadius, imgPadding: setImgPadding, imgFrameColor: setImgFrameColor, imgBorderW: setImgBorderW, imgBorderColor: setImgBorderColor, imgBorderStyle: setImgBorderStyle, imgShadowEnabled: setImgShadowEnabled, imgShadowType: setImgShadowType, imgShadowX: setImgShadowX, imgShadowY: setImgShadowY, imgShadowBlur: setImgShadowBlur, imgShadowSpread: setImgShadowSpread, imgShadowColor: setImgShadowColor, imgShadowOpacity: setImgShadowOpacity, imgOutlineEnabled: setImgOutlineEnabled, imgOutlineWidth: setImgOutlineWidth, imgOutlineColor: setImgOutlineColor, imgBrightness: setImgBrightness, imgContrast: setImgContrast, imgSaturate: setImgSaturate, imgHue: setImgHue, imgGrayscale: setImgGrayscale, imgSepia: setImgSepia, imgBlur: setImgBlur, imgInvert: setImgInvert, imgRotate: setImgRotate, imgSkewX: setImgSkewX, imgSkewY: setImgSkewY, imgScaleX: setImgScaleX, activeImagePreset: setActiveImagePreset, imgShapeEffectEnabled: setImgShapeEffectEnabled, imgShapePreset: setImgShapePreset, imgShapeColor1: setImgShapeColor1, imgShapeColor2: setImgShapeColor2, imgShapeAngle: setImgShapeAngle, imgShapeGlowEnabled: setImgShapeGlowEnabled, imgShapeGlowColor: setImgShapeGlowColor, imgShapeGlowBlur: setImgShapeGlowBlur, imgShapeOutlineEnabled: setImgShapeOutlineEnabled, imgShapeOutlineWidth: setImgShapeOutlineWidth, imgShapeOutlineColor: setImgShapeOutlineColor, imgShapeExtrudeEnabled: setImgShapeExtrudeEnabled, imgShapeExtrudeDepth: setImgShapeExtrudeDepth, imgShapeExtrudeColor: setImgShapeExtrudeColor, imgShapeAnimateFlow: setImgShapeAnimateFlow,
   };
   const collectState = () => ({
     previewText, selectedFont, fontSize, lineHeight, letterSpacing, wordSpacing, fontWeight, textOpacity, textColor, previewBgColor, gallerySample, previewMode,
@@ -1978,14 +2177,23 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     btnFocusBgColor, btnFocusBorderColor, btnFocusBorderWidth, btnFocusOutlineEnabled, btnFocusOutlineColor, btnFocusOutlineWidth, btnFocusShadow, btnFocusShadowEnabled,
     btnDisabledOpacity, btnDisabledCursor, btnDisabledEnabled, btnOpacity,
     btnBoxShadow, btnBackdropBlur, btnAccent, activeButtonPreset,
+    btnShadowEnabled, btnShadowInset, btnShadowX, btnShadowY, btnShadowBlur, btnShadowSpread, btnShadowColor, btnShadowOpacity,
+    btnActiveOffsetX, btnActiveOffsetY,
     textShadowEnabled, textShadowX, textShadowY, textShadowBlur, textShadowColor, textShadowOpacity,
+    textShadowLayers,
     textStrokeEnabled, textStrokeWidth, textStrokeColor,
     gradientEnabled, gradientType, gradientAngle, gradientColor1, gradientColor2,
     textFillTransparent, textHighlightColor, effectShadow, effectAnimate, designAccent, activeDesignPreset,
+    textRotate, textSkewX, textSkewY, textScaleX, textPerspective, textRotateX, textRotateY,
+    writingMode, textDecoLine, textDecoStyle, textDecoColor, textDecoThickness, textUnderlineOffset,
+    textTransformVal, textAlign, textIndent, dropCapEnabled,
+    filterBlur, filterBrightness, filterContrast, filterHueRotate, filterSaturate, filterDropShadowEnabled, filterDropShadowX, filterDropShadowY, filterDropShadowBlur, filterDropShadowColor,
+    ligatures, swash, oldstyleNums, tabularNums, fontAxisWeight, fontAxisWidth, fontAxisOpticalSize, fontVariationEnabled,
+    blendMode,
     combinedPresets, combinedShadows, activePreset,
-    cardStyle, cardTextColor, cardAccent, activeCardPreset, cardOverride, cardPadX, cardPadY, cardRadius, cardWidth, cardHeight, cardBorderEnabled, cardBorderMode, cardBorderWidth, cardBorderTopWidth, cardBorderRightWidth, cardBorderBottomWidth, cardBorderLeftWidth, cardBorderColor, cardBorderStyle, cardBorderGlowEnabled, cardBorderGlowColor, cardBorderGlowBlur, cardBgEnabled, cardBgColor, cardBgUseGradient, cardBgGradColor1, cardBgGradColor2, cardBgGradAngle, cardShadowEnabled, cardShadow,
-    cardRotate, cardSkewX, cardSkewY, cardScaleX, cardPerspective, cardRotateX, cardRotateY,
-    imgWidth, imgOpacity, imgSquare, imgRadius, imgPadding, imgFrameColor, imgBorderW, imgBorderColor, imgBorderStyle, imgShadowEnabled, imgShadowType, imgShadowX, imgShadowY, imgShadowBlur, imgShadowSpread, imgShadowColor, imgShadowOpacity, imgOutlineEnabled, imgOutlineWidth, imgOutlineColor, imgBrightness, imgContrast, imgSaturate, imgHue, imgGrayscale, imgSepia, imgBlur, imgInvert, imgRotate, imgSkewX, imgSkewY, imgScaleX, activeImagePreset,
+    cardStyle, cardTextColor, cardAccent, activeCardPreset, cardOverride, cardPadX, cardPadY, cardRadius, cardWidth, cardHeight, cardBorderEnabled, cardBorderMode, cardBorderWidth, cardBorderTopWidth, cardBorderRightWidth, cardBorderBottomWidth, cardBorderLeftWidth, cardBorderColor, cardBorderStyle, cardBorderGlowEnabled, cardBorderGlowColor, cardBorderGlowBlur, cardBgEnabled, cardBgColor, cardBgUseGradient, cardBgGradColor1, cardBgGradColor2, cardBgGradAngle, cardShadowEnabled, cardShadow, cardShadowMode, cardShadowX, cardShadowY, cardShadowBlur, cardShadowSpread, cardShadowColor, cardShadowOpacity,
+    cardRotate, cardSkewX, cardSkewY, cardScaleX, cardPerspective, cardRotateX, cardRotateY, cardTiltEnabled, cardTiltIntensity,
+    imgWidth, imgOpacity, imgSquare, imgRadius, imgPadding, imgFrameColor, imgBorderW, imgBorderColor, imgBorderStyle, imgShadowEnabled, imgShadowType, imgShadowX, imgShadowY, imgShadowBlur, imgShadowSpread, imgShadowColor, imgShadowOpacity, imgOutlineEnabled, imgOutlineWidth, imgOutlineColor, imgBrightness, imgContrast, imgSaturate, imgHue, imgGrayscale, imgSepia, imgBlur, imgInvert, imgRotate, imgSkewX, imgSkewY, imgScaleX, activeImagePreset, imgShapeEffectEnabled, imgShapePreset, imgShapeColor1, imgShapeColor2, imgShapeAngle, imgShapeGlowEnabled, imgShapeGlowColor, imgShapeGlowBlur, imgShapeOutlineEnabled, imgShapeOutlineWidth, imgShapeOutlineColor, imgShapeExtrudeEnabled, imgShapeExtrudeDepth, imgShapeExtrudeColor, imgShapeAnimateFlow,
   });
   const applyState = (s: any) => { if (!s || typeof s !== "object") return; Object.keys(styleSetters).forEach((k) => { if (k in s) styleSetters[k](s[k]); }); };
 
@@ -1995,11 +2203,11 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
   // 清除分頁時要還原的狀態鍵，依分頁分組。共用排版(typo)那組四個分頁都會還原；
   // 不動：選取的字型、預覽文字、自訂範例字、目前所在分頁。
   const RESET_KEYS = {
-    common: ["fontSize", "lineHeight", "letterSpacing", "wordSpacing", "fontWeight", "textOpacity", "textColor", "previewBgColor"],
-    text: ["textShadowEnabled", "textShadowX", "textShadowY", "textShadowBlur", "textShadowColor", "textShadowOpacity", "textStrokeEnabled", "textStrokeWidth", "textStrokeColor", "gradientEnabled", "gradientType", "gradientAngle", "gradientColor1", "gradientColor2", "textFillTransparent", "textHighlightColor", "effectShadow", "effectAnimate", "designAccent", "activeDesignPreset", "combinedPresets", "combinedShadows", "activePreset"],
-    button: ["btnPaddingX", "btnPaddingY", "btnBorderRadius", "btnWidth", "btnHeight", "btnBorderMode", "btnBorderWidth", "btnBorderTopWidth", "btnBorderRightWidth", "btnBorderBottomWidth", "btnBorderLeftWidth", "btnBorderColor", "btnBorderStyle", "btnBorderGlowEnabled", "btnBorderGlowColor", "btnBorderGlowBlur", "btnBorderGlowSpread", "btnBgColor", "btnBgEnabled", "bgUseGradient", "bgGradColor1", "bgGradColor2", "bgGradAngle", "btnHoverBgColor", "btnHoverScale", "btnHoverShadow", "btnHoverShadowEnabled", "btnTransitionDuration", "btnTransitionTiming", "btnFocusBgColor", "btnFocusBorderColor", "btnFocusBorderWidth", "btnFocusOutlineEnabled", "btnFocusOutlineColor", "btnFocusOutlineWidth", "btnFocusShadow", "btnFocusShadowEnabled", "btnDisabledOpacity", "btnDisabledCursor", "btnDisabledEnabled", "btnOpacity", "btnBoxShadow", "btnBackdropBlur", "btnAccent", "activeButtonPreset"],
-    card: ["cardStyle", "cardTextColor", "cardAccent", "activeCardPreset", "cardOverride", "cardPadX", "cardPadY", "cardRadius", "cardWidth", "cardHeight", "cardBorderEnabled", "cardBorderMode", "cardBorderWidth", "cardBorderTopWidth", "cardBorderRightWidth", "cardBorderBottomWidth", "cardBorderLeftWidth", "cardBorderColor", "cardBorderStyle", "cardBorderGlowEnabled", "cardBorderGlowColor", "cardBorderGlowBlur", "cardBgEnabled", "cardBgColor", "cardBgUseGradient", "cardBgGradColor1", "cardBgGradColor2", "cardBgGradAngle", "cardShadowEnabled", "cardShadow", "cardRotate", "cardSkewX", "cardSkewY", "cardScaleX", "cardPerspective", "cardRotateX", "cardRotateY"],
-    image: ["imgWidth", "imgOpacity", "imgSquare", "imgRadius", "imgPadding", "imgFrameColor", "imgBorderW", "imgBorderColor", "imgBorderStyle", "imgShadowEnabled", "imgShadowType", "imgShadowX", "imgShadowY", "imgShadowBlur", "imgShadowSpread", "imgShadowColor", "imgShadowOpacity", "imgOutlineEnabled", "imgOutlineWidth", "imgOutlineColor", "imgBrightness", "imgContrast", "imgSaturate", "imgHue", "imgGrayscale", "imgSepia", "imgBlur", "imgInvert", "imgRotate", "imgSkewX", "imgSkewY", "imgScaleX", "activeImagePreset"],
+    common: ["fontSize", "lineHeight", "letterSpacing", "wordSpacing", "fontWeight", "textOpacity", "textColor", "previewBgColor", "writingMode", "textDecoLine", "textDecoStyle", "textDecoColor", "textDecoThickness", "textUnderlineOffset", "textTransformVal", "textAlign", "textIndent", "dropCapEnabled", "filterBlur", "filterBrightness", "filterContrast", "filterHueRotate", "filterSaturate", "filterDropShadowEnabled", "filterDropShadowX", "filterDropShadowY", "filterDropShadowBlur", "filterDropShadowColor", "ligatures", "swash", "oldstyleNums", "tabularNums", "fontAxisWeight", "fontAxisWidth", "fontAxisOpticalSize", "fontVariationEnabled", "blendMode"],
+    text: ["textShadowEnabled", "textShadowX", "textShadowY", "textShadowBlur", "textShadowColor", "textShadowOpacity", "textShadowLayers", "textStrokeEnabled", "textStrokeWidth", "textStrokeColor", "gradientEnabled", "gradientType", "gradientAngle", "gradientColor1", "gradientColor2", "textFillTransparent", "textHighlightColor", "effectShadow", "effectAnimate", "designAccent", "activeDesignPreset", "combinedPresets", "combinedShadows", "activePreset", "textRotate", "textSkewX", "textSkewY", "textScaleX", "textPerspective", "textRotateX", "textRotateY"],
+    button: ["btnPaddingX", "btnPaddingY", "btnBorderRadius", "btnWidth", "btnHeight", "btnBorderMode", "btnBorderWidth", "btnBorderTopWidth", "btnBorderRightWidth", "btnBorderBottomWidth", "btnBorderLeftWidth", "btnBorderColor", "btnBorderStyle", "btnBorderGlowEnabled", "btnBorderGlowColor", "btnBorderGlowBlur", "btnBorderGlowSpread", "btnBgColor", "btnBgEnabled", "bgUseGradient", "bgGradColor1", "bgGradColor2", "bgGradAngle", "btnHoverBgColor", "btnHoverScale", "btnHoverShadow", "btnHoverShadowEnabled", "btnTransitionDuration", "btnTransitionTiming", "btnFocusBgColor", "btnFocusBorderColor", "btnFocusBorderWidth", "btnFocusOutlineEnabled", "btnFocusOutlineColor", "btnFocusOutlineWidth", "btnFocusShadow", "btnFocusShadowEnabled", "btnDisabledOpacity", "btnDisabledCursor", "btnDisabledEnabled", "btnOpacity", "btnBoxShadow", "btnBackdropBlur", "btnAccent", "activeButtonPreset", "btnShadowEnabled", "btnShadowInset", "btnShadowX", "btnShadowY", "btnShadowBlur", "btnShadowSpread", "btnShadowColor", "btnShadowOpacity", "btnActiveOffsetX", "btnActiveOffsetY"],
+    card: ["cardStyle", "cardTextColor", "cardAccent", "activeCardPreset", "cardOverride", "cardPadX", "cardPadY", "cardRadius", "cardWidth", "cardHeight", "cardBorderEnabled", "cardBorderMode", "cardBorderWidth", "cardBorderTopWidth", "cardBorderRightWidth", "cardBorderBottomWidth", "cardBorderLeftWidth", "cardBorderColor", "cardBorderStyle", "cardBorderGlowEnabled", "cardBorderGlowColor", "cardBorderGlowBlur", "cardBgEnabled", "cardBgColor", "cardBgUseGradient", "cardBgGradColor1", "cardBgGradColor2", "cardBgGradAngle", "cardShadowEnabled", "cardShadow", "cardShadowMode", "cardShadowX", "cardShadowY", "cardShadowBlur", "cardShadowSpread", "cardShadowColor", "cardShadowOpacity", "cardRotate", "cardSkewX", "cardSkewY", "cardScaleX", "cardPerspective", "cardRotateX", "cardRotateY", "cardTiltEnabled", "cardTiltIntensity"],
+    image: ["imgWidth", "imgOpacity", "imgSquare", "imgRadius", "imgPadding", "imgFrameColor", "imgBorderW", "imgBorderColor", "imgBorderStyle", "imgShadowEnabled", "imgShadowType", "imgShadowX", "imgShadowY", "imgShadowBlur", "imgShadowSpread", "imgShadowColor", "imgShadowOpacity", "imgOutlineEnabled", "imgOutlineWidth", "imgOutlineColor", "imgBrightness", "imgContrast", "imgSaturate", "imgHue", "imgGrayscale", "imgSepia", "imgBlur", "imgInvert", "imgRotate", "imgSkewX", "imgSkewY", "imgScaleX", "activeImagePreset", "imgShapeEffectEnabled", "imgShapePreset", "imgShapeColor1", "imgShapeColor2", "imgShapeAngle", "imgShapeGlowEnabled", "imgShapeGlowColor", "imgShapeGlowBlur", "imgShapeOutlineEnabled", "imgShapeOutlineWidth", "imgShapeOutlineColor", "imgShapeExtrudeEnabled", "imgShapeExtrudeDepth", "imgShapeExtrudeColor", "imgShapeAnimateFlow"],
   } as const;
   // 只清除目前所在分頁(加上共用排版)的設定，其他分頁不動
   const resetToDefault = () => {
@@ -2022,11 +2230,15 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     try { localStorage.setItem("fontTool:last", JSON.stringify(collectState())); } catch (e) { /* ignore (quota) */ }
   });
 
-  const [savedStyles, setSavedStyles] = useState<{ name: string; state: any }[]>(() => {
+  const [savedStyles, setSavedStyles] = useState<SavedStyleEntry[]>(() => {
     try { return JSON.parse(localStorage.getItem("fontTool:saved") || "[]"); } catch { return []; }
   });
   const [styleName, setStyleName] = useState("");
-  const persistSaved = (list: { name: string; state: any }[]) => {
+  const [savedStyleSearch, setSavedStyleSearch] = useState("");
+  const [savedStyleMode, setSavedStyleMode] = useState<SavedStyleMode | "all">("all");
+  const [hiddenFontsOpen, setHiddenFontsOpen] = useState(false);
+  const importStylesInputRef = useRef<HTMLInputElement | null>(null);
+  const persistSaved = (list: SavedStyleEntry[]) => {
     setSavedStyles(list);
     try { localStorage.setItem("fontTool:saved", JSON.stringify(list)); } catch (e) { /* ignore */ }
   };
@@ -2037,8 +2249,45 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     setStyleName("");
     toast.success(`已儲存「${name}」`);
   };
-  const loadStyle = (entry: { name: string; state: any }) => { applyState(entry.state); toast.success(`已載入「${entry.name}」`); };
+  const loadStyle = (entry: SavedStyleEntry) => { applyState(entry.state); toast.success(`已載入「${entry.name}」`); };
   const deleteStyle = (name: string) => { persistSaved(savedStyles.filter((x) => x.name !== name)); toast.success(`已刪除「${name}」`); };
+  const exportSavedStyles = () => {
+    if (savedStyles.length === 0) {
+      toast.error("目前沒有已儲存樣式可匯出");
+      return;
+    }
+
+    const text = createSavedStylesBackup(savedStyles);
+    const blob = new Blob([text], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const date = new Date().toISOString().slice(0, 10);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `font-tool-saved-styles-${date}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    toast.success(`已匯出 ${savedStyles.length} 個樣式`);
+  };
+  const importSavedStyles = async (file: File | undefined) => {
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const incoming = parseSavedStylesBackup(text, []);
+      const summary = summarizeSavedStyleImport(savedStyles, incoming);
+      const next = parseSavedStylesBackup(text, savedStyles);
+      persistSaved(next);
+      toast.success(`已匯入：新增 ${summary.added} 個，覆蓋 ${summary.overwritten} 個，現在共有 ${summary.total} 個`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "匯入失敗，請確認 JSON 檔案格式");
+    }
+  };
+  const filteredSavedStyles = useMemo(
+    () => filterSavedStyles(savedStyles, { query: savedStyleSearch, mode: savedStyleMode }),
+    [savedStyles, savedStyleSearch, savedStyleMode],
+  );
 
   // ============ Frosted Studio：宣告式控制項小元件（用函式回傳 JSX，避免重掛失焦） ============
   const clamp = (v: number, min: number, max: number) =>
@@ -2131,14 +2380,29 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
       placeholder="CSS 值，例如 0 4px 12px rgba(0,0,0,.2)"
     />
   );
+  const controlGroupMeta = [
+    { id: "content", label: "內容", hint: "文字、圖片來源、字型本體與預覽底色" },
+    { id: "size", label: "尺寸排版", hint: "大小、間距、盒模型與變形" },
+    { id: "appearance", label: "外觀", hint: "背景、邊框、圓角與底色" },
+    { id: "effects", label: "效果", hint: "漸層、陰影、光暈、濾鏡與圖案特效" },
+    { id: "interaction", label: "互動", hint: "懸停、焦點、點擊與動態狀態" },
+    { id: "preview", label: "預覽", hint: "預覽舞台相關設定" },
+  ] as const;
+  const getControlGroupId = (key: string) => {
+    if (["typo", "img-src", "fx-opentype", "fx-variation", "bg"].includes(key)) return "content";
+    if (["box-model", "cbox-model", "ibox-model", "fx-layout", "fx-writing", "fx-deco", "fx-transform", "cbox-transform", "ibox-transform"].includes(key)) return "size";
+    if (["box-border", "cbox-border", "ibox-border", "box-bg", "cbox-bg"].includes(key)) return "appearance";
+    if (["text-accent", "btn-accent", "card-accent", "fx-grad", "fx-shadow", "fx-stroke", "multi-shadow", "fx-filter", "fx-blend", "box-shadow", "cbox-shadow", "ibox-filter", "ibox-shape-effect", "ibox-outline", "ibox-shadow"].includes(key)) return "effects";
+    if (["button-states", "cbox-tilt"].includes(key)) return "interaction";
+    return "content";
+  };
   const ctlCard = (
     key: string, eyebrow: string, title: string,
     headRight: React.ReactNode, body: React.ReactNode,
   ) => (
-    <div className="ctl-card" key={key}>
+    <div className="ctl-card" key={key} data-control-group={getControlGroupId(key)}>
       <div className="cc-head">
         <div className="cc-titles">
-          {eyebrow && <span className="cc-eyebrow">{eyebrow}</span>}
           <span className="cc-title">{title}</span>
         </div>
         {headRight}
@@ -2574,11 +2838,23 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
         )}
       </>
     )));
-    cards.push(ctlCard("cbox-shadow", "外框", "陰影", null, (
+    cards.push(ctlCard("cbox-shadow", "卡片", "陰影 / 內陰影 / 光暈", togBtn(cardShadowEnabled, () => setCardShadowEnabled(!cardShadowEnabled), true), cardShadowEnabled ? (
       <>
-        {togRow("陰影覆蓋", cardShadowEnabled, () => setCardShadowEnabled(!cardShadowEnabled))}
-        {cardShadowEnabled && strRow(cardShadow, setCardShadow)}
+        {segRow("類型", cardShadowMode, [["outer", "外陰影"], ["inner", "內陰影"], ["glow", "光暈"]], (v) => setCardShadowMode(v as any))}
+        {cardShadowMode !== "glow" && sRow("X 偏移", cardShadowX, -40, 40, 1, (v) => setCardShadowX(v), `${cardShadowX}px`)}
+        {cardShadowMode !== "glow" && sRow("Y 偏移", cardShadowY, -40, 40, 1, (v) => setCardShadowY(v), `${cardShadowY}px`)}
+        {sRow("模糊", cardShadowBlur, 0, 80, 1, (v) => setCardShadowBlur(v), `${cardShadowBlur}px`)}
+        {sRow("擴散", cardShadowSpread, -30, 40, 1, (v) => setCardShadowSpread(v), `${cardShadowSpread}px`)}
+        {cRow("顏色", cardShadowColor, setCardShadowColor)}
+        {sRow("透明度", Math.round(cardShadowOpacity * 100), 0, 100, 5, (v) => setCardShadowOpacity(v / 100), `${Math.round(cardShadowOpacity * 100)}%`)}
+        <div className="row-line"><span className="lbl sm" style={{ fontSize: 10, opacity: .6 }}>光暈會自動把 X/Y 設為 0；內陰影使用 inset。</span></div>
+        <details style={{ fontSize: 11, color: "var(--muted)" }}>
+          <summary style={{ cursor: "pointer" }}>進階：手動 box-shadow</summary>
+          {strRow(cardShadow, setCardShadow)}
+        </details>
       </>
+    ) : (
+      <span className="off-note">開啟後可調外陰影、內陰影或光暈。</span>
     )));
     // 外框靜態變形（固定擺好角度，與滑鼠互動無關）
     cards.push(ctlCard("cbox-transform", "外框", "變形", null, (
@@ -2601,7 +2877,12 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     // 圖片來源：上傳 / 更換 / 移除
     cards.push(ctlCard("img-src", "", "圖片來源", <span className="mtag">Image</span>, (
       <>
-        <label className="img-pick">
+        <label
+          className={`img-pick${isImageDragging ? " drag-over" : ""}`}
+          onDragOver={(e) => { e.preventDefault(); setIsImageDragging(true); }}
+          onDragLeave={() => setIsImageDragging(false)}
+          onDrop={handleImageDrop}
+        >
           {imageSrc ? "更換圖片" : "選擇圖片…"}
           <input type="file" accept="image/*" hidden onChange={(e) => { onPickImage(e.target.files?.[0]); e.target.value = ""; }} />
         </label>
@@ -2629,6 +2910,45 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
         {sRow("模糊", imgBlur, 0, 20, 0.2, (v) => setImgBlur(v), `${imgBlur}px`)}
         {sRow("反相", imgInvert, 0, 100, 1, (v) => setImgInvert(v), `${imgInvert}%`)}
       </>
+    )));
+    cards.push(ctlCard("ibox-shape-effect", "", "圖案特效", togBtn(imgShapeEffectEnabled, () => setImgShapeEffectEnabled(!imgShapeEffectEnabled), true), imgShapeEffectEnabled ? (
+      <>
+        <div className="preset-grid mini">
+          {SHAPE_EFFECT_PRESETS.map((p) => (
+            <button key={p.name} className={`preset tiny${imgShapePreset === p.name ? " active" : ""}`} onClick={() => applyShapeEffectPreset(p)}>
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <div className="row-line"><span className="lbl sm" style={{ fontSize: 10, opacity: .65 }}>透明 PNG 會用不透明區域當遮罩，效果貼合圖形。</span></div>
+        {sRow("漸層角度", imgShapeAngle, 0, 360, 1, (v) => { setImgShapeAngle(v); setImgShapePreset("custom"); }, `${imgShapeAngle}°`)}
+        {cRow("漸層色 1", imgShapeColor1 === "transparent" ? "#ffffff" : imgShapeColor1, (v) => { setImgShapeColor1(v); setImgShapePreset("custom"); })}
+        {cRow("漸層色 2", imgShapeColor2 === "transparent" ? "#ffffff" : imgShapeColor2, (v) => { setImgShapeColor2(v); setImgShapePreset("custom"); })}
+        {togRow("貼合光暈", imgShapeGlowEnabled, () => { setImgShapeGlowEnabled(!imgShapeGlowEnabled); setImgShapePreset("custom"); })}
+        {imgShapeGlowEnabled && (
+          <>
+            {cRow("光暈顏色", imgShapeGlowColor, (v) => { setImgShapeGlowColor(v); setImgShapePreset("custom"); })}
+            {sRow("光暈模糊", imgShapeGlowBlur, 0, 80, 1, (v) => { setImgShapeGlowBlur(v); setImgShapePreset("custom"); }, `${imgShapeGlowBlur}px`)}
+          </>
+        )}
+        {togRow("中空 / 描邊", imgShapeOutlineEnabled, () => { setImgShapeOutlineEnabled(!imgShapeOutlineEnabled); setImgShapePreset("custom"); })}
+        {imgShapeOutlineEnabled && (
+          <>
+            {sRow("描邊寬度", imgShapeOutlineWidth, 0, 12, 1, (v) => { setImgShapeOutlineWidth(v); setImgShapePreset("custom"); }, `${imgShapeOutlineWidth}px`)}
+            {cRow("描邊顏色", imgShapeOutlineColor, (v) => { setImgShapeOutlineColor(v); setImgShapePreset("custom"); })}
+          </>
+        )}
+        {togRow("立體偏移", imgShapeExtrudeEnabled, () => { setImgShapeExtrudeEnabled(!imgShapeExtrudeEnabled); setImgShapePreset("custom"); })}
+        {imgShapeExtrudeEnabled && (
+          <>
+            {sRow("立體深度", imgShapeExtrudeDepth, 0, 16, 1, (v) => { setImgShapeExtrudeDepth(v); setImgShapePreset("custom"); }, `${imgShapeExtrudeDepth}px`)}
+            {cRow("立體側面", imgShapeExtrudeColor, (v) => { setImgShapeExtrudeColor(v); setImgShapePreset("custom"); })}
+          </>
+        )}
+        {togRow("流光動畫", imgShapeAnimateFlow, () => { setImgShapeAnimateFlow(!imgShapeAnimateFlow); setImgShapePreset("custom"); })}
+      </>
+    ) : (
+      <span className="off-note">開啟後可把透明圖片變成金屬、霓虹、流光、描邊或立體圖案。</span>
     )));
     cards.push(ctlCard("ibox-border", "", "邊框", null, (
       <>
@@ -2683,7 +3003,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     { label: "不能點擊時", bg: btnBgCss(), extra: { opacity: btnDisabledOpacity } as React.CSSProperties, border: getBorderStyle(0.5), shadow: glowShadow(0.5) ?? "none" },
   ];
   const interactCard = previewMode === "button" ? (
-    <div style={{ padding: "0 16px 18px" }}>
+    <div className="control-group-card-wrap" data-control-group="interaction">
       <div className="ctl-card">
         <div className="cc-head" style={{ cursor: "pointer" }} onClick={() => setInteractOpen((o) => !o)}>
           <div className="cc-titles"><span className="cc-title">互動狀態</span></div>
@@ -2774,6 +3094,51 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
   ) : null;
 
   // ============ 中央預覽內容（依模式） ============
+  const controlCards = interactCard ? [...cards, interactCard] : cards;
+  const getNodeGroupId = (node: React.ReactNode) => {
+    if (!isValidElement(node)) return "preview";
+    return String((node.props as any)["data-control-group"] || "preview");
+  };
+  const controlGroups = controlGroupMeta
+    .map((group) => ({
+      ...group,
+      items: controlCards.filter((node) => getNodeGroupId(node) === group.id),
+    }))
+    .filter((group) => group.items.length > 0);
+  const visibleControlGroups = controlGroupView === "all"
+    ? controlGroups
+    : controlGroups.filter((group) => group.id === controlGroupView);
+  const groupedControls = (
+    <div className="control-organizer" data-view={controlGroupView}>
+      <div className="control-group-tabs" aria-label="控制面板分類">
+        <button className={controlGroupView === "all" ? "on" : ""} onClick={() => setControlGroupView("all")}>
+          全部
+          <span>{controlCards.length}</span>
+        </button>
+        {controlGroups.map((group) => (
+          <button key={group.id} className={controlGroupView === group.id ? "on" : ""} onClick={() => setControlGroupView(group.id)}>
+            {group.label}
+            <span>{group.items.length}</span>
+          </button>
+        ))}
+      </div>
+      <div className="control-groups">
+        {visibleControlGroups.map((group) => (
+          <section className="control-section" key={group.id}>
+            <div className="control-section-head">
+              <div>
+                <h3>{group.label}</h3>
+                <p>{group.hint}</p>
+              </div>
+              <span>{group.items.length}</span>
+            </div>
+            <div className="ctl-cols control-section-grid">{group.items}</div>
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+
   const cardXform = buildCardTransform();
   // 圖片預覽：把所有圖片調整組成 style
   const imgFilterStr = (() => {
@@ -2819,9 +3184,122 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     transform: imgXformStr || undefined,
     mixBlendMode: blendMode !== "normal" ? (blendMode as any) : undefined,
   };
+  const imgShapeFill = imgShapeColor1 === "transparent" && imgShapeColor2 === "transparent"
+    ? "transparent"
+    : `linear-gradient(${imgShapeAngle}deg, ${imgShapeColor1}, ${imgShapeColor2})`;
+  const imgShapeMaskStyle: React.CSSProperties = {
+    position: "absolute",
+    inset: 0,
+    background: imgShapeFill,
+    backgroundSize: imgShapeAnimateFlow ? "220% 220%" : undefined,
+    animation: imgShapeAnimateFlow ? "shape-flow 3.6s linear infinite" : undefined,
+    WebkitMaskImage: imageSrc ? `url("${imageSrc}")` : undefined,
+    maskImage: imageSrc ? `url("${imageSrc}")` : undefined,
+    WebkitMaskRepeat: "no-repeat",
+    maskRepeat: "no-repeat",
+    WebkitMaskSize: imgSquare ? "cover" : "contain",
+    maskSize: imgSquare ? "cover" : "contain",
+    WebkitMaskPosition: "center",
+    maskPosition: "center",
+    filter: [
+      imgFilterStr,
+      imgShapeOutlineEnabled && imgShapeOutlineWidth > 0 ? buildOutlineFilter(imgShapeOutlineWidth, imgShapeOutlineColor) : "",
+      imgShapeGlowEnabled && imgShapeGlowBlur > 0 ? `drop-shadow(0 0 ${imgShapeGlowBlur}px ${imgShapeGlowColor}) drop-shadow(0 0 ${Math.round(imgShapeGlowBlur * 1.7)}px ${imgShapeGlowColor})` : "",
+      imgShadowEnabled && imgShadowType === "drop" ? imgDropShadow : "",
+    ].filter(Boolean).join(" ") || undefined,
+    opacity: imgOpacity / 100,
+    transform: imgXformStr || undefined,
+    mixBlendMode: blendMode !== "normal" ? (blendMode as any) : undefined,
+  };
+  const imgShapeWrapperStyle: React.CSSProperties = {
+    position: "relative",
+    display: "inline-block",
+    width: imgWidth,
+    maxWidth: "100%",
+    padding: imgPadding > 0 ? imgPadding : undefined,
+    background: imgPadding > 0 ? imgFrameColor : undefined,
+    border: imgBorderW > 0 ? `${imgBorderW}px ${imgBorderStyle} ${imgBorderColor}` : undefined,
+    borderRadius: imgRadius,
+    boxShadow: imgShadowEnabled && imgShadowType === "box" ? imgBoxShadow : undefined,
+    overflow: "visible",
+  };
+  const renderImagePreview = () => {
+    if (!imageSrc || !imgShapeEffectEnabled) return <img src={imageSrc} alt="預覽圖片" style={imgPreviewStyle} />;
+    const depth = Math.max(0, Math.min(imgShapeExtrudeDepth, 16));
+    return (
+      <span className="shape-preview" style={imgShapeWrapperStyle}>
+        <img
+          src={imageSrc}
+          alt="預覽圖片尺寸參考"
+          aria-hidden
+          style={{ ...imgPreviewStyle, opacity: 0, filter: undefined, boxShadow: undefined, transform: undefined, pointerEvents: "none" }}
+        />
+        {imgShapeExtrudeEnabled && Array.from({ length: depth }, (_, i) => (
+          <span
+            key={`shape-extrude-${i}`}
+            aria-hidden
+            style={{
+              ...imgShapeMaskStyle,
+              background: imgShapeExtrudeColor,
+              filter: undefined,
+              opacity: (imgOpacity / 100) * (0.28 + (i / Math.max(depth, 1)) * 0.32),
+              transform: `${imgXformStr ? `${imgXformStr} ` : ""}translate(${i + 1}px, ${i + 1}px)`,
+              zIndex: 0,
+            }}
+          />
+        ))}
+        <span aria-hidden style={{ ...imgShapeMaskStyle, zIndex: 1 }} />
+      </span>
+    );
+  };
+  const cleanStyle = (style: React.CSSProperties) =>
+    Object.fromEntries(Object.entries(style).filter(([, value]) => value !== undefined && value !== null && value !== ""));
+  const jsStyleLiteral = (style: React.CSSProperties) =>
+    JSON.stringify(cleanStyle(style), null, 2).replace(/"([^"]+)":/g, "$1:");
+  const escapeHtml = (value: string) =>
+    value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const outputCode = useMemo(() => {
+    if (cssOutputMode === "css") return cssCode;
+
+    const safeText = escapeHtml(previewText);
+    const markup = previewMode === "button"
+      ? `<button class="button"><span>${safeText}</span></button>`
+      : previewMode === "card"
+        ? `<div class="card">${safeText}</div>`
+        : previewMode === "image"
+          ? imgShapeEffectEnabled
+            ? `<span class="shape-image"><img src="your-transparent-image.png" alt="預覽圖片" /></span>`
+            : `<img class="image" src="your-image.png" alt="預覽圖片" />`
+          : `<h1 class="heading">${safeText}</h1>`;
+
+    if (cssOutputMode === "html") {
+      const selectorCss = previewMode === "text" ? `.heading {\n${cssCode}\n}` : cssCode;
+      return `<style>\n${selectorCss}\n</style>\n\n${markup}`;
+    }
+
+    if (previewMode === "button") {
+      return `const buttonStyle = ${jsStyleLiteral(getButtonBoxStyle())};\nconst textStyle = ${jsStyleLiteral({ ...previewStyle, display: "inline-block" })};\n\n<button style={buttonStyle}>\n  <span style={textStyle}>${previewText}</span>\n</button>`;
+    }
+    if (previewMode === "card") {
+      return `const cardStyle = ${jsStyleLiteral({ ...cardStyle, ...cardOverrideStyle })};\n\n<div style={cardStyle}>\n  ${previewText}\n</div>`;
+    }
+    if (previewMode === "image") {
+      if (imgShapeEffectEnabled) {
+        return `const shapeWrapperStyle = ${jsStyleLiteral(imgShapeWrapperStyle)};
+const shapeMaskStyle = ${jsStyleLiteral(imgShapeMaskStyle)};
+
+<span style={shapeWrapperStyle}>
+  <img src="your-transparent-image.png" alt="預覽圖片尺寸參考" style={{ width: "100%", opacity: 0 }} />
+  <span aria-hidden style={shapeMaskStyle} />
+</span>`;
+      }
+      return `const imageStyle = ${jsStyleLiteral(imgPreviewStyle)};\n\n<img src=\"your-image.png\" alt=\"預覽圖片\" style={imageStyle} />`;
+    }
+    return `const headingStyle = ${jsStyleLiteral(previewStyle)};\n\n<h1 style={headingStyle}>${previewText}</h1>`;
+  }, [cssOutputMode, cssCode, previewMode, previewText, previewStyle, cardStyle, cardOverrideStyle, imgPreviewStyle, imgShapeEffectEnabled, imgShapeWrapperStyle, imgShapeMaskStyle]);
   const previewContent =
     previewMode === "text" ? (
-      <div key={`pv-${fontStamp}`} style={previewStyle} className="preview-text">{previewText}</div>
+      <div key={`pv-${fontStamp}`} style={{ ...previewStyle, whiteSpace: "pre-wrap" }} className="preview-text">{previewText}</div>
     ) : previewMode === "card" ? (
       <div className="relative flex items-center justify-center">
         {(activeCardPreset === "frosted" || activeCardPreset === "liquidGlass") && (
@@ -2856,9 +3334,14 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
       </div>
     ) : previewMode === "image" ? (
       imageSrc ? (
-        <img src={imageSrc} alt="預覽圖片" style={imgPreviewStyle} />
+        renderImagePreview()
       ) : (
-        <label className="img-dropzone">
+        <label
+          className={`img-dropzone${isImageDragging ? " drag-over" : ""}`}
+          onDragOver={(e) => { e.preventDefault(); setIsImageDragging(true); }}
+          onDragLeave={() => setIsImageDragging(false)}
+          onDrop={handleImageDrop}
+        >
           <span className="img-dropzone-icon">＋</span>
           <span>點此上傳圖片</span>
           <span className="img-dropzone-hint">或把圖片拖進來</span>
@@ -2928,6 +3411,90 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
     />
   );
 
+  const renderSavedStylePreview = (entry: SavedStyleEntry) => {
+    const s = entry.state as Record<string, any>;
+    const mode = getSavedStyleMode(entry);
+    const sample = String(s.previewText || "Aa 永");
+    const fontFamily = s.selectedFont?.value || "'Dela Gothic One'";
+    const textStyle: React.CSSProperties = {
+      fontFamily,
+      fontSize: 20,
+      fontWeight: s.fontWeight || 600,
+      lineHeight: 1.15,
+      letterSpacing: s.letterSpacing ? `${s.letterSpacing}px` : undefined,
+      color: s.textColor || "#111827",
+      textShadow: s.effectShadow || undefined,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      maxWidth: "100%",
+    };
+    if (s.gradientEnabled) {
+      textStyle.background = s.gradientType === "radial"
+        ? `radial-gradient(circle, ${s.gradientColor1}, ${s.gradientColor2})`
+        : `linear-gradient(${s.gradientAngle || 90}deg, ${s.gradientColor1}, ${s.gradientColor2})`;
+      (textStyle as any).WebkitBackgroundClip = "text";
+      (textStyle as any).WebkitTextFillColor = "transparent";
+      textStyle.backgroundClip = "text" as any;
+    }
+
+    if (mode === "button") {
+      const bg = s.btnBgEnabled === false
+        ? "transparent"
+        : s.bgUseGradient
+          ? `linear-gradient(${s.bgGradAngle || 90}deg, ${s.bgGradColor1 || "#3498db"}, ${s.bgGradColor2 || "#2980b9"})`
+          : s.btnBgColor || "#3498db";
+      return (
+        <div className="saved-pv-stage">
+          <span className="saved-pv-button" style={{
+            background: bg,
+            borderRadius: s.btnBorderRadius ?? 8,
+            border: `${s.btnBorderWidth ?? 0}px ${s.btnBorderStyle || "solid"} ${s.btnBorderColor || "#000"}`,
+            boxShadow: s.btnBoxShadow || undefined,
+            color: s.textColor || "#fff",
+          }}>{sample}</span>
+        </div>
+      );
+    }
+
+    if (mode === "card") {
+      return (
+        <div className="saved-pv-stage">
+          <div className="saved-pv-card" style={{
+            ...(s.cardStyle || {}),
+            ...(s.cardOverride || {}),
+            color: s.cardTextColor || "#111827",
+          }}>{sample}</div>
+        </div>
+      );
+    }
+
+    if (mode === "image") {
+      return (
+        <div className="saved-pv-stage">
+          <div className="saved-pv-image" style={{
+            borderRadius: s.imgRadius ?? 12,
+            padding: s.imgPadding ?? 0,
+            background: s.imgPadding ? s.imgFrameColor || "#fff" : "linear-gradient(135deg,#dbeafe,#fce7f3)",
+            border: s.imgBorderW ? `${s.imgBorderW}px ${s.imgBorderStyle || "solid"} ${s.imgBorderColor || "#ddd"}` : undefined,
+            boxShadow: s.imgShadowEnabled ? `0 8px 18px rgba(0,0,0,${s.imgShadowOpacity ?? 0.25})` : undefined,
+            filter: [
+              s.imgBrightness !== 100 ? `brightness(${s.imgBrightness || 100}%)` : "",
+              s.imgContrast !== 100 ? `contrast(${s.imgContrast || 100}%)` : "",
+              s.imgSaturate !== 100 ? `saturate(${s.imgSaturate || 100}%)` : "",
+            ].filter(Boolean).join(" ") || undefined,
+          }} />
+        </div>
+      );
+    }
+
+    return (
+      <div className="saved-pv-stage">
+        <span style={textStyle}>{sample}</span>
+      </div>
+    );
+  };
+
   return comparisonMode ? (
     /* ============ 對比模式 ============ */
     <div className="wrap">
@@ -2940,7 +3507,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
               返回編輯
             </button>
           </div>
-          <p className="text-sm text-purple-800 mb-4">最多可選擇 3 個字型進行並排對比 ({comparisonFonts.length}/3)</p>
+          <p className="text-sm text-purple-800 mb-4">最多可選擇 6 個字型進行並排對比 ({comparisonFonts.length}/6)</p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
             {Array.from(fontCategories.entries()).map(([category, fonts]) => (
               <div key={category}>
@@ -2952,10 +3519,10 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                       <button
                         key={font.name}
                         onClick={() => addComparisonFont(font)}
-                        disabled={isSelected || (comparisonFonts.length >= 3 && !isSelected)}
+                        disabled={isSelected || (comparisonFonts.length >= 6 && !isSelected)}
                         className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
                           isSelected ? "bg-purple-600 text-white font-medium"
-                          : comparisonFonts.length >= 3 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : comparisonFonts.length >= 6 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                           : "bg-white text-purple-900 border border-purple-200 hover:border-purple-400"
                         }`}
                       >
@@ -3009,6 +3576,21 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                   </Card>
                 );
               })}
+            </div>
+            <div className="code" style={{ whiteSpace: "normal" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1.3fr repeat(5, minmax(80px, 1fr))", gap: 8, fontSize: 12 }}>
+                <b>字型</b><b>分類</b><b>字重</b><b>字級</b><b>行高</b><b>字距</b>
+                {comparisonFonts.map((cf) => (
+                  <div key={`metric-${cf.id}`} style={{ display: "contents" }}>
+                    <span>{cf.font.name}</span>
+                    <span>{cf.font.category}</span>
+                    <span>{fontWeight}</span>
+                    <span>{fontSize}px</span>
+                    <span>{lineHeight}</span>
+                    <span>{letterSpacing}px</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -3122,12 +3704,19 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                 {previewPos && <button className="dh-reset" onMouseDown={(e) => e.stopPropagation()} onClick={() => setPreviewPos(null)}>歸位</button>}
               </div>
               {previewMode === "image" ? (
-                <label className="img-pick">
+                <label
+                  className={`img-pick${isImageDragging ? " drag-over" : ""}`}
+                  onDragOver={(e) => { e.preventDefault(); setIsImageDragging(true); }}
+                  onDragLeave={() => setIsImageDragging(false)}
+                  onDrop={handleImageDrop}
+                >
                   {imageSrc ? "更換圖片" : "選擇圖片…"}
                   <input type="file" accept="image/*" hidden onChange={(e) => { onPickImage(e.target.files?.[0]); e.target.value = ""; }} />
                 </label>
               ) : previewMode === "card" ? (
                 <textarea className="text-input" value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="輸入卡片標題（按 Enter 換行）" spellCheck={false} rows={2} style={{ resize: "vertical", minHeight: 48, lineHeight: 1.4, fontFamily: "inherit" }} />
+              ) : previewMode === "text" ? (
+                <textarea className="text-input" value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="輸入要預覽的文字（按 Enter 換行）" spellCheck={false} rows={1} style={{ resize: "vertical", minHeight: 44, lineHeight: 1.4, fontFamily: "inherit" }} />
               ) : (
                 <input className="text-input" value={previewText} onChange={(e) => setPreviewText(e.target.value)} placeholder="輸入要預覽的文字" spellCheck={false} />
               )}
@@ -3154,8 +3743,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                 <span className="tag">{modeTag}</span>
               </span>
             </div>
-            <div className="ctl-cols">{cards}</div>
-            {interactCard}
+            {groupedControls}
           </section>
 
           <section className="panel">
@@ -3166,11 +3754,36 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                   <button className={!pasteMode ? "on" : ""} onClick={() => { setPasteMode(false); setPasteMsg(""); setCssOpen(true); }}>輸出</button>
                   <button className={pasteMode ? "on" : ""} onClick={() => { if (!pasteMode) setPasteText(cssCode); setPasteMode(true); setPasteMsg(""); setCssOpen(true); }}>貼上編輯</button>
                 </div>
+                {!pasteMode && (
+                  <div className="mini-seg" onClick={(e) => e.stopPropagation()}>
+                    <button className={cssOutputMode === "css" ? "on" : ""} onClick={() => { setCssOutputMode("css"); setCssOpen(true); }}>CSS</button>
+                    <button className={cssOutputMode === "html" ? "on" : ""} onClick={() => { setCssOutputMode("html"); setCssOpen(true); }}>HTML</button>
+                    <button className={cssOutputMode === "react" ? "on" : ""} onClick={() => { setCssOutputMode("react"); setCssOpen(true); }}>React</button>
+                  </div>
+                )}
               </div>
               <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ display: "flex", alignItems: "center", gap: 8 }} onClick={(e) => e.stopPropagation()}>
                   <input className="text-input" style={{ height: 38, width: 110, fontSize: 13 }} value={styleName} onChange={(e) => setStyleName(e.target.value)} placeholder="樣式名稱" />
                   <button className="btn primary" style={{ height: 38, whiteSpace: "nowrap" }} onClick={saveCurrentStyle}>儲存樣式</button>
+                  <button className="btn" style={{ height: 38, whiteSpace: "nowrap" }} onClick={exportSavedStyles}>
+                    <Download className="h-4 w-4" />
+                    匯出 JSON
+                  </button>
+                  <button className="btn" style={{ height: 38, whiteSpace: "nowrap" }} onClick={() => importStylesInputRef.current?.click()}>
+                    <Upload className="h-4 w-4" />
+                    匯入 JSON
+                  </button>
+                  <input
+                    ref={importStylesInputRef}
+                    type="file"
+                    accept="application/json,.json"
+                    hidden
+                    onChange={(e) => {
+                      void importSavedStyles(e.target.files?.[0]);
+                      e.currentTarget.value = "";
+                    }}
+                  />
                 </span>
                 <span className="tag">Export</span>
                 <ChevronDown className="h-4 w-4" style={{ transition: "transform .15s", transform: cssOpen ? "none" : "rotate(-90deg)", color: "var(--muted)" }} />
@@ -3179,14 +3792,44 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
             {cssOpen && (
               <div className="panel-b">
                 {savedStyles.length > 0 && (
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10, marginBottom: 14 }}>
-                    {savedStyles.map((s) => (
-                      <div key={s.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 12px", borderRadius: 12, border: "1px solid var(--glass-line)", background: "var(--glass-2)" }}>
-                        <span style={{ flex: 1, minWidth: 0, fontWeight: 700, fontSize: 13, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.name}</span>
-                        <button className="btn" style={{ height: 30, padding: "0 12px", fontSize: 12 }} onClick={() => loadStyle(s)}>載入</button>
-                        <button className="clear-link" onClick={() => deleteStyle(s.name)} title="刪除"><X className="h-3 w-3" /></button>
+                  <div className="saved-box">
+                    <div className="saved-tools">
+                      <div className="fsearch saved-search">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
+                        <input value={savedStyleSearch} onChange={(e) => setSavedStyleSearch(e.target.value)} placeholder="搜尋已儲存樣式" />
                       </div>
-                    ))}
+                      <div className="mini-seg">
+                        {([
+                          ["all", "全部"],
+                          ["text", "文字"],
+                          ["button", "按鈕"],
+                          ["card", "卡片"],
+                          ["image", "圖片"],
+                        ] as [SavedStyleMode | "all", string][]).map(([mode, label]) => (
+                          <button key={mode} className={savedStyleMode === mode ? "on" : ""} onClick={() => setSavedStyleMode(mode)}>{label}</button>
+                        ))}
+                      </div>
+                      <span className="g-cn" style={{ whiteSpace: "nowrap" }}>{filteredSavedStyles.length}/{savedStyles.length}</span>
+                    </div>
+                    {filteredSavedStyles.length > 0 ? (
+                      <div className="saved-grid">
+                        {filteredSavedStyles.map((s) => (
+                          <div key={s.name} className="saved-card">
+                            <div className="saved-card-top">
+                              <span className="mtag">{getSavedStyleModeLabel(s)}</span>
+                              <button className="clear-link" onClick={() => deleteStyle(s.name)} title="刪除"><X className="h-3 w-3" /></button>
+                            </div>
+                            {renderSavedStylePreview(s)}
+                            <div className="saved-card-bottom">
+                              <span className="saved-name">{s.name}</span>
+                              <button className="btn" style={{ height: 30, padding: "0 12px", fontSize: 12 }} onClick={() => loadStyle(s)}>載入</button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="off-note" style={{ marginBottom: 0 }}>沒有符合條件的已儲存樣式</p>
+                    )}
                   </div>
                 )}
                 {pasteMode ? (
@@ -3210,7 +3853,7 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
                 ) : (
                   <div className="code">
                     <button className="code-copy" onClick={handleCopyCSS}>{copied ? "已複製" : "複製"}</button>
-                    {cssCode}
+                    {outputCode}
                   </div>
                 )}
               </div>
@@ -3227,8 +3870,17 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
             <div style={{ flex: 1, minWidth: 160 }}>
               <FontUploader onUpload={handleUploadFont} isLoading={isLoading} error={error} />
             </div>
-            <button className="btn" onClick={handleBulkImport} disabled={isImporting} style={{ whiteSpace: "nowrap" }}>
-              {isImporting ? "匯入中…" : "一鍵匯入已安裝字型"}
+            <button
+              className="btn"
+              onClick={handleBulkImport}
+              disabled={isImporting || !canBulkImportSystemFonts}
+              title={canBulkImportSystemFonts ? "讀取 Windows 使用者字型資料夾" : "部署版無法讀取本機字型清單，請用單檔上傳"}
+              style={{ whiteSpace: "nowrap" }}
+            >
+              {isImporting ? "匯入中…" : canBulkImportSystemFonts ? "一鍵匯入已安裝字型" : "部署版請單檔上傳"}
+            </button>
+            <button className="btn" onClick={() => setHiddenFontsOpen((open) => !open)} style={{ whiteSpace: "nowrap" }}>
+              隱藏字型 {hiddenFonts.length}
             </button>
             <div className="fsearch" style={{ width: 200, flex: "0 0 auto" }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4-4" /></svg>
@@ -3237,6 +3889,26 @@ background: linear-gradient(transparent 55%, ${textHighlightColor} 55%);`;
             <input id="gallerySample" value={gallerySample} onChange={(e) => setGallerySample(e.target.value)} placeholder="自訂範例字" />
             <span className="g-cn" style={{ whiteSpace: "nowrap", color: "var(--faint)", fontSize: 11 }}>自訂範例字</span>
           </div>
+          {hiddenFontsOpen && (
+            <div className="hidden-fonts-box">
+              <div className="hidden-fonts-head">
+                <span className="cc-title">已隱藏字型</span>
+                {hiddenFonts.length > 0 && <button className="clear-link" onClick={restoreAllHiddenFonts}>全部恢復</button>}
+              </div>
+              {hiddenFontLabels.length > 0 ? (
+                <div className="hidden-fonts-list">
+                  {hiddenFontLabels.map((font) => (
+                    <button key={font.key} className="hidden-font-chip" onClick={() => restoreHiddenFont(font.key)}>
+                      {font.label}
+                      <span>恢復</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="off-note">目前沒有隱藏字型</p>
+              )}
+            </div>
+          )}
 
           {groupByScript(WEB_FONTS).map(([script, fonts]) => {
             const items = fonts.filter((f) => fmatch(f.family, f.cn) && !hiddenFonts.includes(`web:${f.family}`));
